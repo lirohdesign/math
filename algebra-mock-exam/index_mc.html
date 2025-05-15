@@ -219,7 +219,7 @@
                 page-break-inside: avoid !important; /* Older property for print breaking */
                 page-break-after: auto !important; /* Allow multiple questions per page */
                 height: auto !important; /* Ensure height is auto */
-                overflow: visible !important; /* Ensure content is hidden */
+                overflow: visible !important; /* Ensure content is not hidden */
             }
              .question:last-child {
                 margin-bottom: 0 !important; /* Remove margin after the last question */
@@ -538,14 +538,14 @@
                     {
                         id: 'q31', type: 'text-only', question: 'Create a table of values for the quadratic function $$y = -x^2 + 6x - 5$$. (This question is not graded in this mockup.)',
                          // Updated image URL for Table of Values
-                         image: { src: 'https://file.gen-2.storage.googleapis.com/b5dcd960-bdca-44d5-aa60-19426917127d', alt: 'Table of values for y = -x^2 + 6x - 5' },
+                         image: { src: './images/table_of_values.png', alt: 'Table of values for y = -x^2 + 6x - 5' },
                         explanation: 'To create a table of values, choose several x-values (including the vertex\'s x-value and points on either side) and substitute them into the equation $y = -x^2 + 6x - 5$ to find the corresponding y-values.\n\n| x | Substitution | y |\n|---|---|---|\n| 0 | $y = -(0)^2 + 6(0) - 5 = 0 + 0 - 5 = -5$ | -5 |\n| 1 | $y = -(1)^2 + 6(1) - 5 = -1 + 6 - 5 = 0$ | 0 |\n| 2 | $y = -(2)^2 + 6(2) - 5 = -4 + 12 - 5 = 3$ | 3 |\
 | 3 | $y = -(3)^2 + 6(3) - 5 = -9 + 18 - 5 = 4$ | 4 (Vertex) |\n| 4 | $y = -(4)^2 + 6(4) - 5 = -16 + 24 - 5 = 3$ | 3 |\n| 5 | $y = -(5)^2 + 6(5) - 5 = -25 + 30 - 5 = 0$ | 0 |\n| 6 | $y = -(6)^2 + 6(6) - 5 = -36 + 36 - 5 = -5$ | -5 |',
                     },
                      {
                         id: 'q32', type: 'text-only', question: 'Graph the quadratic function $$y = -x^2 + 6x - 5$$. (This question is not graded in this mockup.)',
                          // Updated image URL for Graphing Grid
-                         image: { src: 'https://file.gen-2.storage.googleapis.com/7222860c-f3eb-4ac5-94c6-165938607a32', alt: 'Graph of y = -x^2 + 6x - 5' },
+                         image: { src: './images/desmos-graph.png', alt: 'Graph of y = -x^2 + 6x - 5' },
                         explanation: 'Plot the points from your table of values on a coordinate plane. Since it\'s a quadratic function, the graph will be a parabola. Connect the points with a smooth curve, remembering that the parabola opens downwards and has its vertex at (3, 4).'
                     }
                 ]
@@ -571,12 +571,12 @@
              // Figure 2 Group (Questions 36-38) - Updated content
             {
                 type: 'figure-group',
-                figure: { src: 'Screenshot 2025-05-15 at 12.05.25 PM.jpg', alt: 'Table of Presidential Ages at Start of Term', title: 'Figure 2:' },
+                figure: { src: './images/Screenshot 2025-05-15 at 12.05.25 PM.jpg', alt: 'Table of Presidential Ages at Start of Term', title: 'Figure 2:' },
                 content: [
                     {
                         id: 'q36', type: 'multiple-choice', question: 'Find the mean age for the data set in Figure 2 (round to the tenths place).',
-                        options: { a: '60.0', b: '60.1', c: '60.2', d: '60.3' }, correctAnswer: 'c', // Calculated mean: (78+78+70+51+47+58+54+50+46+64+73+69+52+61+60) / 15 = 901 / 15 = 60.066...
-                        explanation: 'To find the mean, sum all the ages and divide by the number of presidents.\nSum of ages: $78+78+70+51+47+58+54+50+46+64+73+69+52+61+60 = 901$.\nNumber of presidents: 15.\nMean: $901 \\div 15 \\approx 60.066... \\approx 60.1$ (rounded to the tenths place).' // Corrected calculation and explanation
+                        options: { a: '60.0', b: '60.1', c: '60.2', d: '60.3' }, correctAnswer: 'b', // Corrected answer based on calculation
+                        explanation: 'To find the mean, sum all the ages and divide by the number of presidents.\nSum of ages: $78+78+70+51+47+58+54+50+46+64+73+69+52+61+60 = 901$.\nNumber of presidents: 15.\nMean: $901 \\div 15 \\approx 60.066... \\approx 60.1$ (rounded to the tenths place).'
                     },
                     {
                         id: 'q37', type: 'multiple-choice', question: 'Find the median age for the data set in Figure 2.',
@@ -594,7 +594,7 @@
              // Figure 3 Group (Questions 39-40) - Updated content
             {
                 type: 'figure-group',
-                figure: { src: 'Screenshot 2025-05-15 at 12.05.34 PM.png', alt: 'Histogram of Age of Householder, Family Households, 2023 Data', title: 'Figure 3:' },
+                figure: { src: './images/Screenshot 2025-05-15 at 12.05.34 PM.png', alt: 'Histogram of Age of Householder, Family Households, 2023 Data', title: 'Figure 3:' },
                 content: [
                      {
                         id: 'q39', type: 'multiple-choice', question: 'Based on Figure 3, which age range has the most family households?',
