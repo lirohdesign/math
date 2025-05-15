@@ -1,0 +1,23 @@
+/* Custom CSS for specific elements not easily handled by Tailwind or for fine-tuning */
+
+/* Using Inter font loaded in HTML head */
+body {
+    font-family: 'Inter', sans-serif;
+}
+
+/* Basic styling for sound blocks within the sequence display */
+.sound-block {
+    padding: 4px 8px;
+    background-color: #d1d5db; /* Tailwind gray-300 */
+    border-radius: 4px; /* Tailwind rounded */
+    font-size: 0.875rem; /* Tailwind text-sm */
+    color: #4b5563; /* Tailwind gray-600 */
+    white-space: nowrap; /* Prevent breaking within the block */
+}
+
+/* Style for the history display to maintain formatting */
+.history-display {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; /* Tailwind font-mono */
+    font-size: 0.875rem; /* Tailwind text-sm */
+    white-space: pre-wrap; /* Preserve whitespace and wrap text */
+}
