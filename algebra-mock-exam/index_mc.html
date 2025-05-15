@@ -91,7 +91,7 @@
             border-radius: 4px;
             cursor: pointer;
             font-size: 0.9em;
-            display: none; /* Initially hidden */
+            display: none; /* Initially hidden */ /* Keep hidden by default */
         }
         .show-answer-btn:hover {
             background-color: #3b82f6; /* Darker blue */
@@ -661,10 +661,10 @@
             // After rendering, typeset the MathJax content in the container
             MathJax.typesetPromise([questionsContainer]);
 
-             // Show "Show Answer" buttons after rendering
-            document.querySelectorAll('.show-answer-btn').forEach(button => {
-                button.style.display = 'inline-block';
-            });
+             // Show "Show Answer" buttons after rendering - REMOVED FROM HERE
+            // document.querySelectorAll('.show-answer-btn').forEach(button => {
+            //     button.style.display = 'inline-block';
+            // });
         }
 
         // Helper function to create a single question element
@@ -812,9 +812,13 @@
                 // Text-only questions are not graded in this mockup
             });
 
-
             scoreDisplay.textContent = `Your Score: ${score} out of ${totalGradedQuestions}`;
             scoreDisplay.style.display = 'block';
+
+            // Show all "Show Answer/Explanation" buttons after submission
+            document.querySelectorAll('.show-answer-btn').forEach(button => {
+                button.style.display = 'inline-block';
+            });
         });
 
     </script>
