@@ -192,7 +192,7 @@
                 page-break-inside: avoid !important; /* Older property for print breaking */
                 border-bottom: none; /* Ensure no border at the bottom in print */
                 /* Removed page-break-after: always !important; */ /* Reverted to allow multiple per page */
-                margin-bottom: 5mm !important; /* Added margin bottom for print */
+                margin-bottom: 8mm !important; /* Increased margin bottom for print */
                 height: auto !important; /* Ensure height is auto */
                 overflow: visible !important; /* Ensure content is not hidden */
             }
@@ -248,7 +248,7 @@
                 grid-template-columns: 1fr 1fr; /* Two columns */
                 gap: 4mm; /* Reduced gap for printing */
                 /* Removed margin-bottom: 5mm !important; */ /* Reverted to allow multiple per page */
-                margin-bottom: 5mm !important; /* Added margin bottom for print */
+                margin-bottom: 8mm !important; /* Increased margin bottom for print */
                 grid-column: span 2; /* Make this group span both columns of the main grid */
                 break-inside: avoid !important; /* Avoid breaking the group across pages */
                 page-break-inside: avoid !important; /* Older property for print breaking */
@@ -310,7 +310,7 @@
             .questions-only-group {
                 grid-column: span 2; /* Span both columns */
                 /* Removed margin-bottom: 5mm !important; */ /* Reverted to allow multiple per page */
-                margin-bottom: 5mm !important; /* Added margin bottom for print */
+                margin-bottom: 8mm !important; /* Increased margin bottom for print */
                 padding: 0 !important; /* Removed padding around the group in print */
                 border: none !important; /* Removed border for the group in print */
                 border-radius: 0; /* Remove rounded corners in print */
