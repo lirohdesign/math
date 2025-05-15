@@ -86,7 +86,7 @@
         /* Style for images within questions */
         .question img {
             max-width: 100%; /* Ensure images are responsive */
-            height: auto;
+            height: auto; /* Maintain aspect ratio */
             display: block; /* Make image a block element */
             margin: 10px auto; /* Reduced vertical margin for images */
             border: 1px solid #ccc; /* Optional: Add a light border */
@@ -201,11 +201,15 @@
             }
             /* Adjust image sizes for print if necessary */
             .question img[alt="Table of Values Template"] {
-                height: 15em; /* Maintain relative height */
+                 /* Removed fixed height for print */
             }
             .question img[alt="Graphing Grid"] {
-                height: 30em; /* Maintain relative height */
+                 /* Removed fixed height for print */
             }
+             .figure-box img {
+                 max-height: 100%; /* Ensure images in figure boxes don't exceed container height in print */
+             }
+
 
             /* Print styles for workspace heights */
              .workspace {
@@ -458,7 +462,7 @@
                     <div class="question-header">
                         <h3>Figure 1:</h3>
                     </div>
-                    <img src="./images/desmos-graph-fig-1.png" alt="Graph of y = -x^2 + 6x - 5" style="height: 30em;">
+                    <img src="./images/desmos-graph-fig-1.png" alt="Graph of y = -x^2 + 6x - 5">
                 </div>
                 <div class="questions-group">
                     <div class="question">
@@ -527,7 +531,7 @@
                         <h3>[31]</h3>
                         <p>Create a table of values for the quadratic function $$y = -x^2 + 6x - 5$$. (This question is not graded in this mockup.)</p>
                     </div>
-                    <img src="./images/table_of_values.png" alt="Table of Values Template" style="height: 15em;">
+                    <img src="./images/table_of_values.png" alt="Table of Values Template">
                     <div class="workspace large-space"></div>
                 </div>
 
@@ -536,7 +540,7 @@
                         <h3>[32]</h3>
                         <p>Graph the quadratic function $$y = -x^2 + 6x - 5$$. (This question is not graded in this mockup.)</p>
                     </div>
-                    <img src="./images/desmos-graph.png" alt="Graphing Grid" style="height: 30em;">
+                    <img src="./images/desmos-graph.png" alt="Graphing Grid">
                     <div class="workspace large-space"></div>
                 </div>
             </div>
@@ -601,7 +605,7 @@
                     <div class="question-header">
                         <h3>Figure 2:</h3>
                     </div>
-                    <img src="./images/fig-2.png" alt="Data Set Table" style="height: 30em;">
+                    <img src="./images/fig-2.png" alt="Data Set Table">
                 </div>
                 <div class="questions-group">
                     <div class="question">
