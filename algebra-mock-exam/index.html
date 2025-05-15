@@ -185,6 +185,7 @@
                 background-color: #fff; /* White background for questions in print */
                 padding: 5px; /* Reduced padding inside the box in print */
                 break-inside: avoid; /* Avoid breaking questions across pages */
+                page-break-inside: avoid; /* Older property for print breaking */
                 border-bottom: none; /* Ensure no border at the bottom in print */
             }
              .question:last-child {
@@ -200,14 +201,15 @@
                 display: none !important; /* Hide score in print */
             }
             /* Adjust image sizes for print if necessary */
-            .question img[alt="Table of Values Template"] {
-                 /* Removed fixed height for print */
-            }
+            .question img[alt="Table of Values Template"],
             .question img[alt="Graphing Grid"] {
-                 /* Removed fixed height for print */
+                 height: auto; /* Ensure height is auto for proportional scaling */
+                 max-width: 100%; /* Ensure images don't overflow */
             }
              .figure-box img {
-                 max-height: 100%; /* Ensure images in figure boxes don't exceed container height in print */
+                 height: auto; /* Ensure height is auto for proportional scaling */
+                 max-width: 100%; /* Ensure images don't overflow */
+                 /* Removed max-height: 100%; */
              }
 
 
@@ -233,7 +235,8 @@
                 gap: 8mm; /* Adjust gap for printing */
                 margin-bottom: 8mm; /* Space below the group */
                 grid-column: span 2; /* Make this group span both columns of the main grid */
-                break-inside: avoid; /* Avoid breaking the group across pages */
+                break-inside: avoid !important; /* Avoid breaking the group across pages */
+                page-break-inside: avoid !important; /* Older property for print breaking */
             }
 
             .figure-box {
@@ -257,6 +260,8 @@
                  flex-grow: 1; /* Allow question box to grow */
                  border: 1px solid #000; /* Black border for questions inside the group in print */
                  background-color: #fff; /* White background for questions inside the group in print */
+                 break-inside: avoid; /* Avoid breaking questions across pages */
+                 page-break-inside: avoid; /* Older property for print breaking */
             }
 
              .figure-and-questions-group .questions-group .question .workspace {
@@ -272,7 +277,8 @@
                 border: 1px solid #000; /* Black border for the group in print */
                 border-radius: 0; /* Remove rounded corners in print */
                 background-color: #fff; /* White background for the group in print */
-                break-inside: avoid; /* Avoid breaking the group across pages */
+                break-inside: avoid !important; /* Avoid breaking the group across pages */
+                page-break-inside: avoid !important; /* Older property for print breaking */
                 display: grid; /* Use grid for internal layout */
                 grid-template-columns: 1fr 1fr; /* Two columns within this group in print */
                 gap: 8mm; /* Space between questions within the group in print */
@@ -281,6 +287,8 @@
             .questions-only-group .question {
                 border: 1px solid #000; /* Black border for questions inside the group in print */
                 background-color: #fff; /* White background for questions inside the group in print */
+                break-inside: avoid; /* Avoid breaking questions across pages */
+                page-break-inside: avoid; /* Older property for print breaking */
             }
         }
     </style>
