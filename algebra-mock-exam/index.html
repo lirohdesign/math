@@ -169,7 +169,7 @@
         @media print {
             body {
                 background-color: #fff; /* White background for printing */
-                padding: 10mm; /* Adjust padding for print margins */
+                padding: 5mm; /* Reduced padding for print margins */
             }
             .container {
                 box-shadow: none; /* Remove shadow in print */
@@ -177,13 +177,13 @@
                 padding: 0;
             }
             .questions-container {
-                gap: 8mm; /* Adjusted gap for printing (using mm for print precision) */
+                gap: 4mm; /* Reduced gap for printing */
             }
             .question {
                 border: 1px solid #000; /* Black border for questions in print */
                 border-radius: 0; /* Remove rounded corners in print */
                 background-color: #fff; /* White background for questions in print */
-                padding: 5px; /* Reduced padding inside the box in print */
+                padding: 3mm; /* Reduced padding inside the box in print */
                 break-inside: avoid; /* Avoid breaking questions across pages */
                 page-break-inside: avoid; /* Older property for print breaking */
                 border-bottom: none; /* Ensure no border at the bottom in print */
@@ -216,7 +216,7 @@
             /* Print styles for workspace heights */
              .workspace {
                 min-height: 0; /* No default min-height in print */
-                margin-top: 5px; /* Reduced space above workspace in print */
+                margin-top: 3mm; /* Reduced space above workspace in print */
                 border-bottom: 1px dashed #000; /* Add dashed line back for workspace divs in print */
              }
             .workspace.medium-space {
@@ -232,8 +232,8 @@
             .figure-and-questions-group {
                 display: grid; /* Keep grid layout for printing */
                 grid-template-columns: 1fr 1fr; /* Two columns */
-                gap: 8mm; /* Adjust gap for printing */
-                margin-bottom: 8mm; /* Space below the group */
+                gap: 4mm; /* Reduced gap for printing */
+                margin-bottom: 5mm; /* Reduced space below the group */
                 grid-column: span 2; /* Make this group span both columns of the main grid */
                 break-inside: avoid !important; /* Avoid breaking the group across pages */
                 page-break-inside: avoid !important; /* Older property for print breaking */
@@ -243,13 +243,13 @@
                 border: 1px solid #000; /* Black border for printing */
                 border-radius: 0; /* Remove rounded corners in print */
                 background-color: #fff; /* White background for printing */
-                padding: 5px; /* Match question padding in print */
+                padding: 3mm; /* Reduced padding in print */
             }
 
              .questions-group {
                  display: flex;
                  flex-direction: column; /* Stack questions vertically */
-                 gap: 8mm; /* Space between questions within the group in print */
+                 gap: 4mm; /* Reduced space between questions within the group in print */
                  /* Removed justify-content: space-between; */
             }
 
@@ -272,8 +272,8 @@
             /* Print styles for questions-only group */
             .questions-only-group {
                 grid-column: span 2; /* Span both columns */
-                margin-bottom: 8mm; /* Space below the group */
-                padding: 8mm; /* Add some padding around the group in print */
+                margin-bottom: 5mm; /* Reduced space below the group */
+                padding: 5mm; /* Reduced padding around the group in print */
                 border: 1px solid #000; /* Black border for the group in print */
                 border-radius: 0; /* Remove rounded corners in print */
                 background-color: #fff; /* White background for the group in print */
@@ -281,7 +281,7 @@
                 page-break-inside: avoid !important; /* Older property for print breaking */
                 display: grid; /* Use grid for internal layout */
                 grid-template-columns: 1fr 1fr; /* Two columns within this group in print */
-                gap: 8mm; /* Space between questions within the group in print */
+                gap: 4mm; /* Reduced space between questions within the group in print */
             }
 
             .questions-only-group .question {
