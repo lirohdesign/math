@@ -181,13 +181,13 @@
             }
              /* Removed .download-button-container display: none; */
             .questions-container {
-                gap: 4mm; /* Reduced gap for printing */
+                gap: 0; /* Removed gap for printing */
             }
             .question {
-                border: 1px solid #000; /* Black border for questions in print */
+                border: none !important; /* Removed border for questions in print */
                 border-radius: 0; /* Remove rounded corners in print */
                 background-color: #fff; /* White background for questions in print */
-                padding: 3mm; /* Reduced padding inside the box in print */
+                padding: 0 !important; /* Removed padding inside the box in print */
                 break-inside: avoid !important; /* Avoid breaking questions across pages */
                 page-break-inside: avoid !important; /* Older property for print breaking */
                 border-bottom: none; /* Ensure no border at the bottom in print */
@@ -228,30 +228,32 @@
              .workspace {
                 min-height: 0 !important; /* No default min-height in print */
                 margin-top: 3mm !important; /* Reduced space above workspace in print */
-                border-bottom: 1px dashed #000 !important; /* Add dashed line back for workspace divs in print */
+                border-bottom: none !important; /* Removed dashed line back for workspace divs in print */
                 height: auto !important; /* Ensure workspace height is auto */
              }
             .workspace.medium-space {
                 min-height: 5em !important; /* Medium space in print */
-                 border-bottom: 1px dashed #000 !important; /* Dashed line in print */
+                 border-bottom: none !important; /* Removed dashed line back for workspace divs in print */
             }
             .workspace.large-space {
                 min-height: 8em !important; /* Large space in print */
-                 border-bottom: 1px dashed #000 !important; /* Dashed line in print */
+                 border-bottom: none !important; /* Removed dashed line back for workspace divs in print */
             }
 
             /* Print styles for figure and related questions group */
             .figure-and-questions-group {
                 display: grid; /* Keep grid layout for printing */
                 grid-template-columns: 1fr 1fr; /* Two columns */
-                gap: 4mm; /* Reduced gap for printing */
-                margin-bottom: 5mm; /* Reduced space below the group */
+                gap: 0; /* Removed gap for printing */
+                margin-bottom: 0 !important; /* Removed margin below the group */
                 grid-column: span 2; /* Make this group span both columns of the main grid */
                 break-inside: avoid !important; /* Avoid breaking the group across pages */
                 page-break-inside: avoid !important; /* Older property for print breaking */
                 page-break-after: always !important; /* Force a page break after the group */
                 height: auto !important; /* Ensure height is auto */
                 overflow: visible !important; /* Ensure content is not hidden */
+                border: none !important; /* Removed border for the group in print */
+                padding: 0 !important; /* Removed padding around the group in print */
             }
              /* Don't force a page break after the last group */
              .questions-container .figure-and-questions-group:last-child {
@@ -260,10 +262,10 @@
 
 
             .figure-box {
-                border: 1px solid #000; /* Black border for printing */
+                border: none !important; /* Removed border for printing */
                 border-radius: 0; /* Remove rounded corners in print */
                 background-color: #fff; /* White background for printing */
-                padding: 3mm; /* Reduced padding in print */
+                padding: 0 !important; /* Removed padding in print */
                 height: auto !important; /* Ensure height is auto */
                 overflow: visible !important; /* Ensure content is not hidden */
             }
@@ -271,7 +273,7 @@
              .questions-group {
                  display: flex;
                  flex-direction: column; /* Stack questions vertically */
-                 gap: 4mm; /* Reduced space between questions within the group in print */
+                 gap: 0; /* Removed space between questions within the group in print */
                  /* Removed justify-content: space-between; */
                  height: auto !important; /* Ensure height is auto */
                  overflow: visible !important; /* Ensure content is not hidden */
@@ -282,7 +284,7 @@
                  display: flex;
                  flex-direction: column; /* Arrange content and workspace vertically */
                  flex-grow: 1; /* Allow question box to grow */
-                 border: 1px solid #000; /* Black border for questions inside the group in print */
+                 border: none !important; /* Removed border for questions inside the group in print */
                  background-color: #fff; /* White background for questions inside the group in print */
                  break-inside: avoid !important; /* Avoid breaking questions across pages */
                  page-break-inside: avoid !important; /* Older property for print breaking */
@@ -290,6 +292,7 @@
                  page-break-after: auto !important; /* Don't force page break after questions within a group */
                  height: auto !important; /* Ensure height is auto */
                  overflow: visible !important; /* Ensure content is not hidden */
+                 padding: 0 !important; /* Removed padding for questions within the group */
             }
 
              .figure-and-questions-group .questions-group .question .workspace {
@@ -302,16 +305,16 @@
             /* Print styles for questions-only group */
             .questions-only-group {
                 grid-column: span 2; /* Span both columns */
-                margin-bottom: 5mm; /* Reduced space below the group */
-                padding: 5mm; /* Reduced padding around the group in print */
-                border: 1px solid #000; /* Black border for the group in print */
+                margin-bottom: 0 !important; /* Removed margin below the group */
+                padding: 0 !important; /* Removed padding around the group in print */
+                border: none !important; /* Removed border for the group in print */
                 border-radius: 0; /* Remove rounded corners in print */
                 background-color: #fff; /* White background for the group in print */
                 break-inside: avoid !important; /* Avoid breaking the group across pages */
                 page-break-inside: avoid !important; /* Older property for print breaking */
                 display: grid; /* Use grid for internal layout */
                 grid-template-columns: 1fr 1fr; /* Two columns within this group in print */
-                gap: 4mm; /* Reduced space between questions within the group in print */
+                gap: 0; /* Removed space between questions within the group in print */
                 page-break-after: always !important; /* Force a page break after the group */
                 height: auto !important; /* Ensure height is auto */
                 overflow: visible !important; /* Ensure content is not hidden */
@@ -322,7 +325,7 @@
              }
 
             .questions-only-group .question {
-                border: 1px solid #000; /* Black border for questions inside the group in print */
+                border: none !important; /* Removed border for questions inside the group in print */
                 background-color: #fff; /* White background for questions inside the group in print */
                 break-inside: avoid !important; /* Avoid breaking questions across pages */
                 page-break-inside: avoid !important; /* Older property for print breaking */
@@ -330,6 +333,7 @@
                  page-break-after: auto !important; /* Don't force page break after questions within a group */
                  height: auto !important; /* Ensure height is auto */
                  overflow: visible !important; /* Ensure content is not hidden */
+                 padding: 0 !important; /* Removed padding for questions within the group */
             }
         }
     </style>
