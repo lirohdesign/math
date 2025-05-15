@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algebra 1 Mock Exam Two</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Configure MathJax before loading it
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true,
+                processEnvironments: true
+            },
+            options: {
+                // Process elements with class 'mathjax-process'
+                processHtmlClass: 'mathjax-process',
+                // Ignore elements with class 'tex2jax_ignore' (optional, but good practice)
+                ignoreHtmlClass: 'tex2jax_ignore'
+            },
+            loader: {
+                load: ['input/tex', 'output/chtml']
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        /* Custom styles for better readability and layout */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #1f2937;
+            margin-bottom: 20px;
+        }
+
+        /* Container for two-column layout - applied by default */
+        .questions-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Two equal columns */
+            gap: 10px; /* Space between columns and rows */
+        }
+
+        .question {
+            margin-bottom: 0; /* Handled by gap in grid or group */
+            padding: 15px;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            background-color: #f9fafb;
+        }
+        .question h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #1f2937;
+        }
+        .options label {
+            display: block;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+        /* Style for incorrect answers */
+        .options label.incorrect {
+            background-color: #fecaca; /* Light red background */
+            border-left: 4px solid #dc2626; /* Red border */
+            padding: 4px; /* Add some padding */
+            border-radius: 4px;
+        }
+         /* Style for incorrect dropdowns */
+        .question select.incorrect {
+             border: 1px solid #dc2626; /* Red border for the dropdown itself */
+        }
+
+        /* Initially hidden elements */
+        .initially-hidden {
+            display: none;
+        }
+
+        .explanation {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #e0f2f7; /* Light blue background */
+            border-left: 4px solid #0891b2; /* Cyan border */
+            border-radius: 4px;
+            color: #0e7490; /* Darker cyan text */
+            display: none; /* Initially hidden */
+            white-space: pre-wrap; /* Preserve line breaks in explanations */
+        }
+        .show-answer-btn {
+            margin-top: 10px;
+            padding: 6px 12px;
+            background-color: #60a5fa; /* Blue */
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            display: none; /* Initially hidden */ /* Keep hidden by default */
+        }
+        .show-answer-btn:hover {
+            background-color: #3b82f6; /* Darker blue */
+        }
+        .submit-btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #10b981; /* Green */
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1.1em;
+            cursor: pointer;
+            margin-top: 20px;
+            display: none; /* Initially hidden */
+        }
+        .submit-btn:hover {
+            background-color: #059669; /* Darker green */
+        }
+         /* Style for the Unlock Explanations button */
+        #submitExam.unlock-btn {
+             background-color: #f97316; /* Orange */
+        }
+         #submitExam.unlock-btn:hover {
+             background-color: #ea580c; /* Darker orange */
+        }
+
+        /* Style for the initial Unlock Quiz button */
+        #unlockQuiz {
+             display: block; /* Initially visible */
+             width: 100%;
+             padding: 10px;
+             background-color: #3b82f6; /* Blue */
+             color: white;
+             border: none;
+             border-radius: 6px;
+             font-size: 1.1em;
+             cursor: pointer;
+             margin-top: 20px;
+        }
+        #unlockQuiz:hover {
+             background-color: #2563eb; /* Darker blue */
+        }
+
+
+        .score {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #d1fae5; /* Light green */
+            border: 1px solid #34d399; /* Green border */
+            border-radius: 6px;
+            font-size: 1.2em;
+            font-weight: bold;
+            text-align: center;
+            color: #065f46; /* Dark green text */
+            display: none; /* Initially hidden */
+        }
+         /* Style for dropdowns */
+        .question select {
+            margin-top: 10px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: auto; /* Adjust width as needed */
+            display: inline-block;
+        }
+
+        /* Container for figure and related questions */
+        .figure-and-questions-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Two columns */
+            gap: 10px; /* Space between figure and questions */
+            margin-bottom: 10px; /* Space below the group */
+            grid-column: span 2; /* Make this group span both columns of the main grid */
+        }
+
+        .figure-box {
+             padding: 15px; /* Match question padding */
+             border: 1px solid #e5e7eb; /* Match question border */
+             border-radius: 6px; /* Match question border-radius */
+             background-color: #f9fafb; /* Match question background */
+        }
+         .figure-box img {
+             max-width: 100%; /* Ensure images are responsive */
+             height: auto; /* Maintain aspect ratio */
+             display: block; /* Make image a block element */
+             margin: 0 auto; /* Center the image */
+             border: 1px solid #ccc; /* Optional: Add a light border */
+             border-radius: 4px; /* Optional: Rounded corners */
+         }
+
+
+        .questions-group {
+             display: flex;
+             flex-direction: column; /* Stack questions vertically */
+             gap: 10px; /* Space between questions within the group */
+        }
+
+        /* Style for questions within a figure-and-questions-group */
+        .figure-and-questions-group .questions-group .question {
+             margin-bottom: 0; /* Handled by gap in questions-group */
+             padding: 15px; /* Keep padding */
+             border: 1px solid #e5e7eb; /* Keep border */
+             border-radius: 6px; /* Keep border-radius */
+             background-color: #f9fafb; /* Keep background */
+        }
+
+
+        /* Container for grouped questions */
+        .questions-only-group {
+            grid-column: span 2; /* Span both columns */
+            margin-bottom: 10px; /* Space below the group */
+            padding: 10px; /* Add some padding around the group */
+            border: 1px solid #d1d5db; /* Light grey border for the group */
+            border-radius: 8px;
+            background-color: #e5e7eb; /* Light background for the group */
+            display: grid; /* Use grid for internal layout */
+            grid-template-columns: 1fr 1fr; /* Two columns within this group */
+            gap: 10px; /* Space between questions within the group */
+        }
+
+        .questions-only-group .question {
+             margin-bottom: 0; /* Handled by gap in grid */
+             padding: 15px; /* Keep padding */
+             border: 1px solid #e5e7eb; /* Keep border */
+             border-radius: 6px; /* Keep border-radius */
+             background-color: #f9fafb; /* Keep background */
+        }
+
+        /* Print-specific styles */
+        @media print {
+            body {
+                background-color: #fff; /* White background for printing */
+                padding: 5mm; /* Reduced padding for print margins */
+            }
+            .container {
+                box-shadow: none; /* Remove shadow in print */
+                margin: 0;
+                padding: 0;
+            }
+            .questions-container {
+                 /* Revert to single column for print */
+                 display: block;
+                 gap: 0;
+            }
+             /* Reset question styles for print */
+            .question {
+                border: 1px solid #000 !important; /* Black border for questions in print */
+                border-radius: 0 !important; /* Remove rounded corners in print */
+                background-color: #fff !important; /* White background for questions in print */
+                padding: 5mm !important; /* Padding inside the box in print */
+                margin-bottom: 10mm !important; /* Add some space between questions */
+                break-inside: avoid !important; /* Avoid breaking questions across pages */
+                page-break-inside: avoid !important; /* Older property for print breaking */
+                page-break-after: auto !important; /* Allow multiple questions per page */
+                height: auto !important; /* Ensure height is auto */
+                overflow: visible !important; /* Ensure content is hidden */
+                border-bottom: none !important; /* Remove bottom border in print */
+            }
+             .question:last-child {
+                margin-bottom: 0 !important; /* Remove margin after the last question */
+             }
+
+
+            .options, .explanation, .show-answer-btn, .submit-btn, .score, .navigation-links, #unlockQuiz { /* Hide interactive elements and unlock button in print */
+                display: none !important; /* Hide buttons, score, and navigation in print */
+            }
+
+             /* Add space for answers in print */
+            .question .answer-space {
+                 display: block !important; /* Show answer space in print */
+                 min-height: 20mm; /* Add space for writing answers */
+                 border-bottom: 1px dashed #ccc; /* Dashed line for answer space */
+                 margin-top: 10mm;
+            }
+
+
+             /* Adjust image sizes for print if necessary */
+            .question img {
+                 height: auto !important; /* Ensure height is auto for proportional scaling */
+                 max-width: 100% !important; /* Ensure images don't overflow */
+                 margin: 5mm auto !important; /* Adjust margin for print */
+            }
+             /* Style for dropdowns in print - display as text */
+             .question select {
+                 display: none !important; /* Hide dropdown */
+             }
+             .question .selected-option-print::before {
+                 content: "Selected Answer: " attr(data-selected-option) !important; /* Display selected answer */
+                 display: block !important;
+                 margin-top: 5mm !important;
+                 font-weight: bold !important;
+             }
+
+             /* Print styles for figure and related questions group */
+            .figure-and-questions-group {
+                display: block; /* Stack elements in print */
+                gap: 0;
+                margin-bottom: 10mm !important; /* Add some space below the group */
+                grid-column: span 2; /* Make this group span both columns of the main grid */
+                break-inside: avoid !important; /* Avoid breaking the group across pages */
+                page-break-inside: avoid !important; /* Older property for print breaking */
+                page-break-after: auto !important; /* Allow multiple groups per page */
+                height: auto !important; /* Ensure height is auto */
+                overflow: visible !important; /* Ensure content is not hidden */
+                border: 1px solid #000 !important; /* Black border for the group in print */
+                padding: 5mm !important; /* Padding around the group in print */
+                 border-bottom: none !important; /* No bottom border for the group in print */
+            }
+             /* Don't force a page break after the last group */
+             .questions-container .figure-and-questions-group:last-child {
+                 margin-bottom: 0 !important; /* Remove margin after the last group */
+             }
+
+            .figure-box {
+                border: none !important; /* Removed border for printing */
+                border-radius: 0; /* Remove rounded corners in print */
+                background-color: #fff; /* White background for printing */
+                padding: 0 !important; /* Removed padding in print */
+                height: auto !important; /* Ensure height is auto */
+                overflow: visible !important; /* Ensure content is not hidden */
+            }
+             .figure-box img {
+                 height: auto !important; /* Ensure height is auto for proportional scaling */
+                 max-width: 100% !important; /* Ensure images don't overflow */
+                 margin: 0 auto !important; /* Adjust margin for print */
+            }
+
+             .questions-group {
+                 display: block; /* Stack questions vertically */
+                 gap: 0;
+                 height: auto !important; /* Ensure height is auto */
+                 overflow: visible !important; /* Ensure content is not hidden */
+            }
+
+            /* Print styles for questions within a figure-and-questions-group to make workspace fill space */
+            .figure-and-questions-group .questions-group .question {
+                 border: 1px solid #000 !important; /* Black border for questions inside the group in print */
+                 background-color: #fff !important; /* White background for questions inside the group in print */
+                 break-inside: avoid !important; /* Avoid breaking questions across pages */
+                 page-break-inside: avoid !important; /* Older property for print breaking */
+                 margin-bottom: 10mm !important; /* Add some space between questions */
+                 page-break-after: auto !important; /* Don't force page break after questions within a group */
+                 height: auto !important; /* Ensure height is auto */
+                 overflow: visible !important; /* Ensure content is not hidden */
+                 padding: 5mm !important; /* Padding for questions within the group */
+                 border-bottom: none !important; /* Remove bottom border in print */
+            }
+             /* Remove bottom border for the last question in a group */
+            .figure-and-questions-group .questions-group .question:last-child {
+                margin-bottom: 0 !important;
+            }
+
+
+             .figure-and-questions-group .questions-group .question .workspace {
+                 flex-grow: 1; /* Make the workspace fill the remaining vertical space */
+                 height: auto !important; /* Ensure height is auto */
+                 overflow: visible !important; /* Ensure content is not hidden */
+             }
+
+
+            /* Print styles for questions-only group */
+            .questions-only-group {
+                grid-column: span 2; /* Span both columns */
+                margin-bottom: 10mm !important; /* Add some space below the group */
+                padding: 5mm !important; /* Padding around the group in print */
+                border: 1px solid #000 !important; /* Black border for the group in print */
+                border-radius: 0; /* Remove rounded corners in print */
+                background-color: #fff !important; /* White background for the group in print */
+                break-inside: avoid !important; /* Avoid breaking the group across pages */
+                page-break-inside: avoid !important; /* Older property for print breaking */
+                display: block; /* Stack questions in print */
+                gap: 0;
+                page-break-after: auto !important; /* Allow multiple groups per page */
+                height: auto !important; /* Ensure height is auto */
+                overflow: visible !important; /* Ensure content is not hidden */
+                 border-bottom: none !important; /* No bottom border for the group in print */
+            }
+             /* Don't force a page break after the last group */
+             .questions-container .questions-only-group:last-child {
+                 margin-bottom: 0 !important; /* Remove margin after the last group */
+             }
+
+            .questions-only-group .question {
+                border: 1px solid #000 !important; /* Black border for questions inside the group in print */
+                background-color: #fff !important; /* White background for questions inside the group in print */
+                break-inside: avoid !important; /* Avoid breaking questions across pages */
+                page-break-inside: avoid !important; /* Older property for print breaking */
+                 margin-bottom: 10mm !important; /* Add some space between questions */
+                 page-break-after: auto !important; /* Don't force page break after questions within a group */
+                 height: auto !important; /* Ensure height is auto */
+                 overflow: visible !important; /* Ensure content is not hidden */
+                 padding: 5mm !important; /* Padding for questions within the group */
+                 border-bottom: none !important; /* Remove bottom border in print */
+            }
+             /* Remove bottom border for the last question in a group */
+            .questions-only-group .question:last-child {
+                margin-bottom: 0 !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-2xl font-bold mb-6 text-center text-gray-800">Semester 2 Algebra 1 Mock Exam Two</h1>
+
+        <form id="examForm">
+            <div class="questions-container" id="questionsContainer">
+                </div>
+        </form>
+
+        <button type="button" id="unlockQuiz">Unlock Multiple Choice</button>
+        <button type="button" class="submit-btn" id="submitExam">Submit Exam</button>
+        <div class="score" id="examScore"></div>
+    </div>
+
+    <script>
+        // Define all questions and groups with their content for Mock Exam Two
+        const examData = [
+             // Individual Questions (1-19)
+            {
+                id: 'q1', type: 'multiple-choice', question: 'Solve the system of equations:\n$$x+3y=17$$\n$$2x-y=6$$',
+                options: { a: '(5, 4)', b: '(4, 5)', c: '(-5, -4)', d: '(-4, -5)' }, correctAnswer: 'a',
+                explanation: 'Using substitution:\nSolve equation (1) for x: $x = 17 - 3y$.\nSubstitute into equation (2): $2(17 - 3y) - y = 6$.\nSimplify: $34 - 6y - y = 6 \\Rightarrow 34 - 7y = 6$.\nSubtract 34: $-7y = -28$.\nDivide by -7: $y = 4$.\nSubstitute y=4 into $x = 17 - 3y$: $x = 17 - 3(4) = 17 - 12 = 5$.\nSolution: (5, 4).'
+            },
+            {
+                id: 'q2', type: 'multiple-choice', question: 'Solve the system of equations:\n$$y=2x+3$$\n$$y=4x-1$$',
+                options: { a: '(2, 7)', b: '(7, 2)', c: '(-2, -7)', d: '(-7, -2)' }, correctAnswer: 'a',
+                explanation: 'Set equations equal: $2x + 3 = 4x - 1$.\nSubtract 2x: $3 = 2x - 1$.\nAdd 1: $4 = 2x$.\nDivide by 2: $x = 2$.\nSubstitute x=2 into $y = 2x + 3$: $y = 2(2) + 3 = 4 + 3 = 7$.\nSolution: (2, 7).'
+            },
+             {
+                id: 'q3', type: 'multiple-choice', displayType: 'dropdown', question: 'Determine if the polynomial is a monomial, binomial or trinomial:\n$$7a^{2}b$$',
+                 options: { a: 'Monomial', b: 'Binomial', c: 'Trinomial' }, correctAnswer: 'a',
+                explanation: 'A monomial has one term. This expression has one term.'
+            },
+            {
+                id: 'q4', type: 'multiple-choice', displayType: 'dropdown', question: 'Determine if the polynomial is a monomial, binomial or trinomial:\n$$x^{2} - 4x + 4$$',
+                 options: { a: 'Monomial', b: 'Binomial', c: 'Trinomial' }, correctAnswer: 'c',
+                explanation: 'A trinomial has three terms. This expression has three terms.'
+            },
+            {
+                id: 'q5', type: 'multiple-choice', displayType: 'dropdown', question: 'Determine if the polynomial is a monomial, binomial or trinomial:\n$$12p^{7}$$',
+                 options: { a: 'Monomial', b: 'Binomial', c: 'Trinomial' }, correctAnswer: 'a',
+                explanation: 'A monomial has one term. This expression has one term.'
+            },
+             {
+                id: 'q6', type: 'multiple-choice', displayType: 'dropdown', question: 'Determine the degree of the polynomial:\n$$5x^{4} - 2x^{2} + 1$$',
+                 options: { a: '2', b: '4', c: '1', d: '5' }, correctAnswer: 'b',
+                explanation: 'The highest power of x is 4.'
+            },
+            {
+                id: 'q7', type: 'multiple-choice', displayType: 'dropdown', question: 'Determine the degree of the polynomial:\n$$10m^{3}n^{5}$$',
+                 options: { a: '3', b: '5', c: '8', d: '10' }, correctAnswer: 'c',
+                explanation: 'The degree of a term with multiple variables is the sum of the exponents of the variables: $3 + 5 = 8$. The polynomial has only one term, so its degree is 8.'
+            },
+            {
+                id: 'q8', type: 'multiple-choice', displayType: 'dropdown', question: 'Determine the degree of the polynomial:\n$$14$$',
+                 options: { a: '1', b: '14', c: '0', d: 'Undefine' }, correctAnswer: 'c',
+                explanation: 'The degree of a constant is 0.'
+            },
+            {
+                id: 'q9', type: 'multiple-choice', question: 'Simplify the sum:\n$$(4x^2 + 7x - 1) + (x^2 - 3x + 5)$$',
+                options: { A: '$5x^2 + 4x + 4$', B: '$5x^2 + 10x + 4$', C: '$3x^2 + 4x + 4$', D: '$5x^2 + 4x + 6$' }, correctAnswer: 'A',
+                explanation: 'Combine like terms: $(4x^2+x^2) + (7x-3x) + (-1+5) = 5x^2 + 4x + 4$.'
+            },
+            {
+                id: 'q10', type: 'multiple-choice', question: 'Simplify the difference:\n$$(9p^3 - 2p + 6) - (5p^3 + p^2 - 3)$$',
+                options: { A: '$4p^3 - p^2 - 2p + 9$', B: '$4p^3 + p^2 - 2p + 9$', C: '$4p^3 - p^2 - 2p + 3$', D: '$4p^3 + p^2 - 2p + 3$' }, correctAnswer: 'A',
+                explanation: 'Distribute the negative: $9p^3 - 2p + 6 - 5p^3 - p^2 + 3$.\nCombine like terms: $(9p^3 - 5p^3) - p^2 - 2p + (6 + 3) = 4p^3 - p^2 - 2p + 9$.'
+            },
+            {
+                id: 'q11', type: 'multiple-choice', question: 'Find the product:\n$$5y(3y^2 + y - 4)$$',
+                options: { A: '$15y^3 + 5y^2 - 20y$', B: '$15y^3 + 5y^2 + 20y$', C: '$15y^3 - 5y^2 - 20y$', D: '$15y^3 - 5y^2 + 20y$' }, correctAnswer: 'A',
+                explanation: 'Distribute 5y: $5y(3y^2) + 5y(y) + 5y(-4) = 15y^3 + 5y^2 - 20y$.'
+            },
+            {
+                id: 'q12', type: 'multiple-choice', question: 'Find the product:\n$$(x-5)^2$$',
+                options: { A: '$x^2 - 25$', B: '$x^2 - 10x + 25$', C: '$x^2 + 10x + 25$', D: '$x^2 + 25$' }, correctAnswer: 'B',
+                explanation: 'Expand: $(x-5)(x-5)$.\nFOIL: $x(x) + x(-5) + (-5)(x) + (-5)(-5) = x^2 - 5x - 5x + 25 = x^2 - 10x + 25$.'
+            },
+            {
+                id: 'q13', type: 'multiple-choice', question: 'Find the product:\n$$(a+2)(a+7)$$',
+                options: { A: '$a^2 + 9a + 14$', B: '$a^2 + 14a + 14$', C: '$a^2 + 9a + 9$', D: '$a^2 + 14$' }, correctAnswer: 'A',
+                explanation: 'FOIL: $a(a) + a(7) + 2(a) + 2(7) = a^2 + 7a + 2a + 14 = a^2 + 9a + 14$.'
+            },
+            {
+                id: 'q14', type: 'multiple-choice', question: 'Find the product:\n$$(3k+2)(k^2 - k - 5)$$',
+                options: { A: '$3k^3 - k^2 - 17k - 10$', B: '$3k^3 + k^2 - 17k - 10$', C: '$3k^3 - k^2 - 13k - 10$', D: '$3k^3 + k^2 - 13k - 10$' }, correctAnswer: 'A',
+                explanation: 'Distribute:\n$3k(k^2 - k - 5) + 2(k^2 - k - 5)$\n$3k^3 - 3k^2 - 15k + 2k^2 - 2k - 10$\nCombine like terms: $3k^3 + (-3k^2 + 2k^2) + (-15k - 2k) - 10 = 3k^3 - k^2 - 17k - 10$.'
+            },
+            {
+                id: 'q15', type: 'multiple-choice', question: 'State the Greatest Common Factor of:\n$$24x^4, 36x^2$$',
+                options: { a: '$6x^2$', b: '$12x^2$', c: '$12x^4$', d: '$36x^4$' }, correctAnswer: 'b',
+                explanation: 'GCF of 24 and 36 is 12.\nGCF of $x^4$ and $x^2$ is $x^2$.\nGCF is $12x^2$.',
+            },
+            {
+                id: 'q16', type: 'multiple-choice', question: 'State the Greatest Common Factor of:\n$$10a^2b^3, 15a^3b^2, 20a^4b$$',
+                options: { a: '$5a^2b$', b: '$5a^4b^3$', c: '$10a^2b$', d: '$60a^4b^3$' }, correctAnswer: 'a',
+                explanation: 'GCF of 10, 15, and 20 is 5.\nLowest power of a is $a^2$.\nLowest power of b is $b^1$ (or b).\nGCF is $5a^2b$.',
+            },
+            {
+                id: 'q17', type: 'multiple-choice', question: 'Factor completely:\n$$y^2 - 8y + 15$$',
+                options: { a: '$(y-5)(y-3)$', b: '$(y+5)(y+3)$', c: '$(y-5)(y+3)$', d: '$(y+5)(y-3)$' }, correctAnswer: 'a',
+                explanation: 'Look for two numbers that multiply to 15 and add to -8. These are -5 and -3.'
+            },
+            {
+                id: 'q18', type: 'multiple-choice', question: 'Factor completely:\n$$2w^2 - 7w - 4$$',
+                options: { a: '$(2w+1)(w-4)$', b: '$(2w-1)(w+4)$', c: '$(2w+4)(w-1)$', d: '$(2w-4)(w+1)$' }, correctAnswer: 'a',
+                explanation: 'Use the AC method or trial and error.\nMultiply a*c (2*-4 = -8).\nFind two numbers that multiply to -8 and add to -7 (1 and -8).\nRewrite: $2w^2 + w - 8w - 4$.\nGroup: $w(2w + 1) - 4(2w + 1)$\nFactor: $(w - 4)(2w + 1)$.'
+            },
+            {
+                id: 'q19', type: 'multiple-choice', question: 'Solve the quadratic equation:\n$$(m+6)(m-1)=0$$',
+                options: { a: '$m=-6, m=1$', b: '$m=6, m=-1$', c: '$m=-6, m=-1$', d: '$m=6, m=1$' }, correctAnswer: 'a',
+                explanation: 'Zero Product Property:\n$m+6 = 0 \\Rightarrow m = -6$.\n$m-1 = 0 \\Rightarrow m = 1$.'
+            },
+
+            // Figure 1 Group (Questions 20-23) - New Graph
+            {
+                type: 'figure-group',
+                figure: { src: './images/mock2-graph-fig1.png', alt: 'Graph of a parabola opening upwards', title: 'Figure 1:' }, // Placeholder image
+                content: [
+                    {
+                        id: 'q20', type: 'multiple-choice', question: 'State the vertex of the function shown in Figure 1.',
+                        options: { a: '(1, -4)', b: '(-1, 4)', c: '(4, -1)', d: '(-4, 1)' }, correctAnswer: 'a', // Based on placeholder graph
+                        explanation: 'Identify the lowest point on the parabola and its coordinates.'
+                    },
+                    {
+                        id: 'q21', type: 'multiple-choice', question: 'Does the graph in Figure 1 have a maximum or minimum?',
+                        options: { a: 'Maximum', b: 'Minimum' }, correctAnswer: 'b', // Based on placeholder graph opening upwards
+                        explanation: 'A parabola opening upwards has a minimum point (the vertex).'
+                    },
+                    {
+                        id: 'q22', type: 'multiple-choice', question: 'State the roots of the function shown in Figure 1.',
+                        options: { a: '(-1, 0), (3, 0)', b: '(1, 0), (-3, 0)', c: '(0, -1), (0, 3)', d: '(0, 1), (0, -3)' }, correctAnswer: 'a', // Based on placeholder graph x-intercepts
+                        explanation: 'Identify the points where the graph crosses the x-axis.'
+                    },
+                    {
+                        id: 'q23', type: 'multiple-choice', question: 'State the y-intercept of the function shown in Figure 1.',
+                        options: { a: '(0, -3)', b: '(-3, 0)', c: '(0, 3)', d: '(3, 0)' }, correctAnswer: 'a', // Based on placeholder graph y-intercept
+                        explanation: 'Identify the point where the graph crosses the y-axis.'
+                    }
+                ]
+            },
+
+            // Individual Questions (24-26)
+            {
+                id: 'q24', type: 'multiple-choice', question: 'Calculate the discriminant and determine the number of solutions:\n$$x^2 + 4x + 4 = 0$$',
+                options: { A: '0; one real solution', B: '16; two real solutions', C: '-16; no solutions', D: '8; two real solutions' }, correctAnswer: 'A',
+                explanation: 'a=1, b=4, c=4.\nDiscriminant = $4^2 - 4(1)(4) = 16 - 16 = 0$. One real solution.'
+            },
+            {
+                id: 'q25', type: 'multiple-choice', question: 'Calculate the discriminant and determine the number of solutions:\n$$3y^2 - 2y + 5 = 0$$',
+                options: { A: '64; two real solutions', B: '-56; no solutions', C: '56; two real solutions', D: '0; one real solution' }, correctAnswer: 'B',
+                explanation: 'a=3, b=-2, c=5.\nDiscriminant = $(-2)^2 - 4(3)(5) = 4 - 60 = -56$. No real solutions.'
+            },
+            {
+                id: 'q26', type: 'multiple-choice', question: 'Calculate the discriminant and determine the number of solutions:\n$$2w^2 + 7w + 3 = 0$$',
+                options: { A: '25; two real solutions', B: '-25; no solutions', C: '0; one real solution', D: '49; two real solutions' }, correctAnswer: 'A',
+                explanation: 'a=2, b=7, c=3.\nDiscriminant = $7^2 - 4(2)(3) = 49 - 24 = 25$. Two real solutions.'
+            },
+
+            // Questions Only Group (Questions 27-32)
+            {
+                type: 'questions-only-group',
+                content: [
+                    {
+                        id: 'q27', type: 'multiple-choice', question: 'For the quadratic function $$y = x^2 - 2x - 3$$, state the y-intercept.',
+                        options: { a: '(0, 3)', b: '(0, -3)', c: '(3, 0)', d: '(-3, 0)' }, correctAnswer: 'b',
+                        explanation: 'Set x=0: $y = 0^2 - 2(0) - 3 = -3$. Y-intercept is (0, -3).'
+                    },
+                    {
+                        id: 'q28', type: 'multiple-choice', question: 'For the quadratic function $$y = x^2 - 2x - 3$$, does it open UP or DOWN?',
+                        options: { a: 'UP', b: 'DOWN' }, correctAnswer: 'a',
+                        explanation: 'The coefficient of $x^2$ is positive (1), so it opens UP.'
+                    },
+                    {
+                        id: 'q29', type: 'multiple-choice', question: 'For the quadratic function $$y = x^2 - 2x - 3$$, state the Vertex.',
+                        options: { a: '(1, -4)', b: '(-1, 4)', c: '(4, -1)', d: '(-4, 1)' }, correctAnswer: 'a',
+                        explanation: 'x-coordinate of vertex: $x = \\frac{-(-2)}{2(1)} = \\frac{2}{2} = 1$.\nSubstitute x=1: $y = 1^2 - 2(1) - 3 = 1 - 2 - 3 = -4$.\nVertex is (1, -4).'
+                    },
+                    {
+                        id: 'q30', type: 'multiple-choice', question: 'For the quadratic function $$y = x^2 - 2x - 3$$, state the Axis of Symmetry.',
+                        options: { a: '$x=-1$', b: '$y=1$', c: '$x=1$', d: '$y=-1$' }, correctAnswer: 'c',
+                        explanation: 'The axis of symmetry is the vertical line through the vertex, $x = 1$.'
+                    },
+                    {
+                        id: 'q31', type: 'text-only', question: 'Create a table of values for the quadratic function $$y = x^2 - 2x - 3$$. (This question is not graded in this mockup.)',
+                         image: { src: './images/mock2-table-values.png', alt: 'Table of values template' }, // Placeholder image
+                        explanation: 'Choose x-values around the vertex (x=1) and calculate corresponding y-values.\n| x | y |\n|---|---|\n| -2 | $(-2)^2 - 2(-2) - 3 = 4 + 4 - 3 = 5$ |\n| -1 | $(-1)^2 - 2(-1) - 3 = 1 + 2 - 3 = 0$ |\n| 0 | $0^2 - 2(0) - 3 = -3$ |\n| 1 | $1^2 - 2(1) - 3 = 1 - 2 - 3 = -4$ (Vertex) |\n| 2 | $2^2 - 2(2) - 3 = 4 - 4 - 3 = -3$ |\n| 3 | $3^2 - 2(3) - 3 = 9 - 6 - 3 = 0$ |\n| 4 | $4^2 - 2(4) - 3 = 16 - 8 - 3 = 5$ |'
+                    },
+                     {
+                        id: 'q32', type: 'text-only', question: 'Graph the quadratic function $$y = x^2 - 2x - 3$$. (This question is not graded in this mockup.)',
+                         image: { src: './images/mock2-graph-grid.png', alt: 'Graphing grid template' }, // Placeholder image
+                        explanation: 'Plot the points from the table of values and connect them with a smooth curve. The vertex is at (1, -4) and the parabola opens upwards.'
+                    }
+                ]
+            },
+
+            // Individual Questions (33-35)
+            {
+                id: 'q33', type: 'multiple-choice', question: 'Solve the equation using the quadratic formula:\n$$2x^2 - x - 3 = 0$$',
+                options: { a: '$x = \\frac{3}{2}, x = -1$', b: '$x = -\\frac{3}{2}, x = 1$', c: '$x = 3, x = -1$', d: '$x = -3, x = 1$' }, correctAnswer: 'a',
+                explanation: 'a=2, b=-1, c=-3.\nDiscriminant = $(-1)^2 - 4(2)(-3) = 1 + 24 = 25$.\n$x = \\frac{-(-1)\\pm\\sqrt{25}}{2(2)} = \\frac{1\\pm5}{4}$.\n$x_1 = \\frac{1+5}{4} = \\frac{6}{4} = \\frac{3}{2}$.\n$x_2 = \\frac{1-5}{4} = \\frac{-4}{4} = -1$.'
+            },
+            {
+                id: 'q34', type: 'multiple-choice', question: 'Simplify the radical expression:\n$$\\sqrt{48}$$',
+                options: { a: '$4\\sqrt{3}$', b: '$3\\sqrt{4}$', c: '$16\\sqrt{3}$', d: '$12\\sqrt{4}$' }, correctAnswer: 'a',
+                explanation: 'Largest perfect square factor of 48 is 16.\n$\\sqrt{48} = \\sqrt{16 \\times 3} = \\sqrt{16} \\times \\sqrt{3} = 4\\sqrt{3}$.'
+            },
+            {
+                id: 'q35', type: 'multiple-choice', question: 'Simplify the radical expression:\n$$5\\sqrt{18}$$',
+                options: { a: '$10\\sqrt{2}$', b: '$15\\sqrt{2}$', c: '$5\\sqrt{3}$', d: '$45\\sqrt{2}$' }, correctAnswer: 'b',
+                explanation: 'Largest perfect square factor of 18 is 9.\n$5\\sqrt{18} = 5\\sqrt{9 \\times 2} = 5 \\times \\sqrt{9} \\times \\sqrt{2} = 5 \\times 3 \\times \\sqrt{2} = 15\\sqrt{2}$.'
+            },
+
+             // Figure 2 Group (Questions 36-38) - New Data Set
+            {
+                type: 'figure-group',
+                figure: { src: './images/mock2-data-fig2.png', alt: 'Table of Student Test Scores', title: 'Figure 2:' }, // Placeholder image
+                content: [
+                    {
+                        id: 'q36', type: 'multiple-choice', question: 'Find the mean for the data set in Figure 2 (round to the tenths place).',
+                        options: { a: '75.5', b: '76.0', c: '76.5', d: '77.0' }, correctAnswer: 'd', // Data: 80, 75, 90, 65, 70, 85, 75, 95, 60, 80. Sum = 775. Count = 10. Mean = 775/10 = 77.5
+                        explanation: 'Sum of scores: $80+75+90+65+70+85+75+95+60+80 = 775$.\nNumber of scores: 10.\nMean: $775 \\div 10 = 77.5$.' // Corrected calculation and explanation
+                    },
+                    {
+                        id: 'q37', type: 'multiple-choice', question: 'Find the median for the data set in Figure 2.',
+                        options: { a: '75', b: '77.5', c: '80', d: '75, 80' }, correctAnswer: 'b', // Ordered: 60, 65, 70, 75, 75, 80, 80, 85, 90, 95. Median is (75+80)/2 = 77.5
+                        explanation: 'Ordered data: 60, 65, 70, 75, **75, 80**, 80, 85, 90, 95.\nMedian is the average of the 5th and 6th values: $(75 + 80) / 2 = 155 / 2 = 77.5$.'
+                    },
+                    {
+                        id: 'q38', type: 'multiple-choice', question: 'Find the mode for the data set in Figure 2.',
+                        options: { a: '75', b: '80', c: '75, 80', d: 'No mode' }, correctAnswer: 'c', // 75 and 80 appear twice
+                        explanation: 'The scores 75 and 80 each appear 2 times, which is the highest frequency.'
+                    }
+                ]
+            },
+
+             // Figure 3 Group (Questions 39-40) - New Histogram
+            {
+                type: 'figure-group',
+                figure: { src: './images/mock2-histogram-fig3.png', alt: 'Histogram of Heights of Students', title: 'Figure 3:' }, // Placeholder image
+                content: [
+                     {
+                        id: 'q39', type: 'multiple-choice', question: 'Based on Figure 3, which height range has the fewest students?',
+                        options: { a: '140-149 cm', b: '150-159 cm', c: '160-169 cm', d: '170-179 cm', e: '180-189 cm' }, correctAnswer: 'a', // Based on placeholder histogram bar heights
+                        explanation: 'Look at the height of each bar. The shortest bar represents the height range with the fewest students.'
+                    },
+                    {
+                        id: 'q40', type: 'multiple-choice', question: 'Based on Figure 3, approximately how many students are between 160-169 cm tall?',
+                        options: { a: '6', b: '8', c: '10', d: '12' }, correctAnswer: 'c', // Based on placeholder histogram bar height
+                        explanation: 'Locate the bar for the 160-169 cm range and estimate its height on the frequency axis.'
+                    }
+                ]
+            }
+        ];
+
+        const questionsContainer = document.getElementById('questionsContainer');
+        const unlockQuizButton = document.getElementById('unlockQuiz'); // New unlock button
+        const submitButton = document.getElementById('submitExam');
+        const scoreDisplay = document.getElementById('examScore');
+        const unlockQuizPassword = '1+1=2'; // Password for initial unlock
+        const unlockExplanationsPassword = '2+2=4'; // Password for explanations
+
+        // Function to render questions based on structured data
+        function renderQuestions(data) {
+            questionsContainer.innerHTML = ''; // Clear existing content
+            let questionNumber = 1; // Initialize question number
+
+            data.forEach(block => {
+                if (block.type === 'figure-group') {
+                    const groupElement = document.createElement('div');
+                    groupElement.classList.add('figure-and-questions-group');
+
+                    const figureBox = document.createElement('div');
+                    figureBox.classList.add('figure-box');
+                    figureBox.innerHTML = `<h3>${block.figure.title}</h3><img src="${block.figure.src}" alt="${block.figure.alt}">`;
+                    groupElement.appendChild(figureBox);
+
+                    const questionsGroup = document.createElement('div');
+                    questionsGroup.classList.add('questions-group');
+
+                    block.content.forEach(q => {
+                        const questionElement = createQuestionElement(q, questionNumber++);
+                        questionsGroup.appendChild(questionElement);
+                    });
+
+                    groupElement.appendChild(questionsGroup);
+                    questionsContainer.appendChild(groupElement);
+
+                } else if (block.type === 'questions-only-group') {
+                    const groupElement = document.createElement('div');
+                    groupElement.classList.add('questions-only-group');
+
+                     block.content.forEach(q => {
+                        const questionElement = createQuestionElement(q, questionNumber++);
+                        groupElement.appendChild(questionElement);
+                    });
+
+                    questionsContainer.appendChild(groupElement);
+
+                } else {
+                    // Individual question
+                    const questionElement = createQuestionElement(block, questionNumber++);
+                    questionsContainer.appendChild(questionElement);
+                }
+            });
+
+            // After rendering, typeset the MathJax content in the container
+            MathJax.typesetPromise([questionsContainer]);
+
+             // Add answer spaces for print view after initial render
+            document.querySelectorAll('.question').forEach(question => {
+                // Only add if it doesn't already have options (i.e., initially hidden)
+                if (!question.querySelector('.options')) {
+                    const answerSpace = document.createElement('div');
+                    answerSpace.classList.add('answer-space');
+                    question.appendChild(answerSpace);
+                }
+            });
+        }
+
+        // Helper function to create a single question element
+        function createQuestionElement(q, number) {
+            const questionElement = document.createElement('div');
+            questionElement.classList.add('question');
+            // Add mathjax-process class to the question text container
+            questionElement.innerHTML = `<h3>[${number}]</h3><p class="mathjax-process">${q.question}</p>`;
+
+            if (q.type === 'multiple-choice') {
+                const optionsDiv = document.createElement('div');
+                optionsDiv.classList.add('options', 'mt-4', 'mathjax-process', 'initially-hidden'); // Add initially-hidden class
+
+                if (q.displayType === 'dropdown') {
+                    // Render as a dropdown
+                    const selectElement = document.createElement('select');
+                    selectElement.name = q.id;
+                    selectElement.classList.add('p-2', 'border', 'rounded');
+
+                    // Add a default "Select an answer" option
+                    const defaultOption = document.createElement('option');
+                    defaultOption.value = '';
+                    defaultOption.textContent = 'Select an answer';
+                    selectElement.appendChild(defaultOption);
+
+                    for (const [key, value] of Object.entries(q.options)) {
+                        const option = document.createElement('option');
+                        option.value = key; // Use the key as the value
+                        option.textContent = value; // MathJax will process this later
+                        selectElement.appendChild(option);
+                    }
+                    optionsDiv.appendChild(selectElement);
+
+                     // Add a div to display selected option in print
+                    const selectedOptionPrint = document.createElement('div');
+                    selectedOptionPrint.classList.add('selected-option-print');
+                    // Data attribute will be set when an option is selected
+                    optionsDiv.appendChild(selectedOptionPrint);
+
+                    // Add event listener to update data attribute on change
+                    selectElement.addEventListener('change', () => {
+                        const selectedText = selectElement.options[selectElement.selectedIndex].text;
+                        selectedOptionPrint.setAttribute('data-selected-option', selectedText);
+                    });
+
+
+                } else {
+                    // Render as radio buttons (default multiple-choice)
+                    for (const [key, value] of Object.entries(q.options)) {
+                        const label = document.createElement('label');
+                        label.innerHTML = `
+                            <input type="radio" name="${q.id}" value="${key}" class="mr-2">
+                            <span class="mathjax-process">${value}</span>`; // Add mathjax-process to the text
+                        optionsDiv.appendChild(label);
+                    }
+                }
+                 questionElement.appendChild(optionsDiv);
+
+                 // Add explanation area (initially hidden)
+                const explanationElement = document.createElement('div');
+                explanationElement.classList.add('explanation', 'mathjax-process', 'initially-hidden'); // Add initially-hidden class
+                explanationElement.innerHTML = `<strong>Explanation:</strong> ${q.explanation}`;
+                questionElement.appendChild(explanationElement);
+
+                // Add show answer button
+                const showAnswerButton = document.createElement('button');
+                showAnswerButton.classList.add('show-answer-btn', 'initially-hidden'); // Add initially-hidden class
+                showAnswerButton.textContent = 'Show Answer';
+                showAnswerButton.type = 'button'; // Prevent form submission
+                showAnswerButton.addEventListener('click', () => {
+                    explanationElement.style.display = 'block';
+                     // Trigger MathJax typesetting for the explanation
+                     MathJax.typesetPromise([explanationElement]);
+                });
+                questionElement.appendChild(showAnswerButton);
+
+
+            } else if (q.type === 'text-only') {
+                 // For text-only questions (like graph/table tasks)
+                 // Add image if available
+                if (q.image) {
+                    const imgElement = document.createElement('img');
+                    imgElement.src = q.image.src;
+                    imgElement.alt = q.image.alt;
+                    imgElement.classList.add('mt-4', 'mb-4'); // Add some margin
+                    questionElement.appendChild(imgElement);
+                }
+
+                 // Always add explanation and button, but initially hidden
+                const explanationElement = document.createElement('div');
+                explanationElement.classList.add('explanation', 'mathjax-process', 'initially-hidden'); // Add initially-hidden class
+                explanationElement.innerHTML = `<strong>Explanation:</strong> ${q.explanation}`;
+                questionElement.appendChild(explanationElement);
+
+                const showAnswerButton = document.createElement('button');
+                showAnswerButton.classList.add('show-answer-btn', 'initially-hidden'); // Add initially-hidden class
+                showAnswerButton.textContent = 'Show Explanation'; // Changed button text
+                showAnswerButton.type = 'button'; // Prevent form submission
+                 showAnswerButton.addEventListener('click', () => {
+                    explanationElement.style.display = 'block';
+                     // Trigger MathJax typesetting for the explanation
+                     MathJax.typesetPromise([explanationElement]);
+                });
+                questionElement.appendChild(showAnswerButton);
+            }
+
+            return questionElement;
+        }
+
+
+        // Render all questions on page load (initially in printable format)
+        window.onload = () => {
+            renderQuestions(examData);
+        };
+
+        // Unlock Quiz button functionality
+        unlockQuizButton.addEventListener('click', () => {
+            const enteredPassword = prompt('Enter password to unlock multiple choice options:');
+            if (enteredPassword === unlockQuizPassword) {
+                // Show all multiple choice options and the submit button
+                document.querySelectorAll('.options').forEach(el => {
+                    el.classList.remove('initially-hidden');
+                });
+                submitButton.style.display = 'block'; // Show submit button
+
+                // Hide the unlock quiz button
+                unlockQuizButton.style.display = 'none';
+
+                 // Remove answer spaces from text-only questions
+                 document.querySelectorAll('.answer-space').forEach(space => {
+                     space.style.display = 'none';
+                 });
+
+                 // Re-typeset MathJax for newly visible elements
+                 MathJax.typesetPromise([questionsContainer]);
+
+            } else {
+                alert('Incorrect password.');
+            }
+        });
+
+        // Submit button functionality
+        submitButton.addEventListener('click', () => {
+            // Check if the button is currently in the 'Submit Exam' state
+            if (submitButton.textContent === 'Submit Exam') {
+                let score = 0;
+                let totalGradedQuestions = 0;
+
+                // Remove any previous incorrect answer highlighting
+                document.querySelectorAll('.incorrect').forEach(el => {
+                    el.classList.remove('incorrect');
+                });
+                 document.querySelectorAll('select.incorrect').forEach(el => {
+                    el.classList.remove('incorrect');
+                });
+
+
+                // Iterate through the structured data to find graded questions and check answers
+                examData.forEach(block => {
+                    if (block.type === 'multiple-choice') {
+                        totalGradedQuestions++;
+                        const selectedInput = document.forms["examForm"].elements[block.id];
+                        let selectedValue = '';
+
+                        // Get the selected value based on input type (radio or select)
+                        if (selectedInput.type === 'select-one') {
+                             selectedValue = selectedInput.value;
+                             if (selectedValue !== block.correctAnswer && selectedValue !== '') {
+                                selectedInput.classList.add('incorrect'); // Highlight incorrect dropdown
+                             }
+                        } else { // Radio buttons
+                            // Find the checked radio button
+                            const checkedRadio = Array.from(selectedInput).find(radio => radio.checked);
+                            if (checkedRadio) {
+                                selectedValue = checkedRadio.value;
+                                if (selectedValue !== block.correctAnswer) {
+                                    // Find the parent label and add the incorrect class
+                                    checkedRadio.closest('label').classList.add('incorrect');
+                                }
+                            }
+                        }
+
+
+                        if (selectedValue === block.correctAnswer) {
+                            score++;
+                        }
+                    } else if (block.type === 'figure-group' || block.type === 'questions-only-group') {
+                        block.content.forEach(q => {
+                            if (q.type === 'multiple-choice') {
+                                totalGradedQuestions++;
+                                const selectedInput = document.forms["examForm"].elements[q.id];
+                                let selectedValue = '';
+
+                                // Get the selected value based on input type (radio or select)
+                                if (selectedInput.type === 'select-one') {
+                                     selectedValue = selectedInput.value;
+                                     if (selectedValue !== q.correctAnswer && selectedValue !== '') {
+                                         selectedInput.classList.add('incorrect'); // Highlight incorrect dropdown
+                                     }
+                                } else { // Radio buttons
+                                    const checkedRadio = Array.from(selectedInput).find(radio => radio.checked);
+                                     if (checkedRadio) {
+                                        selectedValue = checkedRadio.value;
+                                        if (selectedValue !== q.correctAnswer) {
+                                            checkedRadio.closest('label').classList.add('incorrect');
+                                        }
+                                    }
+                                }
+
+                                if (selectedValue === q.correctAnswer) {
+                                    score++;
+                                }
+                            }
+                        });
+                    }
+                });
+
+                scoreDisplay.textContent = `Your Score: ${score} out of ${totalGradedQuestions}`;
+                scoreDisplay.style.display = 'block';
+
+                // Change button text and style
+                submitButton.textContent = 'Unlock Explanations';
+                submitButton.classList.add('unlock-btn');
+
+            } else if (submitButton.textContent === 'Unlock Explanations') {
+                // Handle the 'Unlock Explanations' state
+                const enteredPassword = prompt('Enter password to unlock explanations:');
+                if (enteredPassword === unlockExplanationsPassword) { // Use the correct password variable
+                    // Show all "Show Answer/Explanation" buttons and explanations
+                    document.querySelectorAll('.show-answer-btn').forEach(button => {
+                        button.style.display = 'inline-block';
+                    });
+                     document.querySelectorAll('.explanation').forEach(exp => {
+                         exp.style.display = 'block';
+                         MathJax.typesetPromise([exp]);
+                     });
+
+                } else {
+                    alert('Incorrect password.');
+                }
+            }
+        });
+
+    </script>
+</body>
+</html>
