@@ -55,7 +55,7 @@
         }
         .question {
             margin-bottom: 0; /* Remove default margin */
-            padding: 5px; /* Reduced padding inside the box */
+            padding: 5mm; /* Reduced padding inside the box */
             border: 1px solid #e5e7eb; /* Keep the light grey border */
             border-radius: 6px;
             background-color: #f9fafb;
@@ -122,7 +122,7 @@
         }
 
         .figure-box {
-             padding: 5px; /* Match question padding */
+             padding: 5mm; /* Match question padding */
              border: 1px solid #e5e7eb; /* Match question border */
              border-radius: 6px; /* Match question border-radius */
              background-color: #f9fafb; /* Match question background */
@@ -181,13 +181,15 @@
             }
              /* Removed .download-button-container display: none; */
             .questions-container {
-                gap: 4mm; /* Reduced gap for printing */
+                display: block !important; /* Change to block layout for printing */
+                gap: 0 !important; /* Remove gap in block layout */
             }
             .question {
                 border: none !important; /* Removed border for questions in print */
                 border-radius: 0; /* Remove rounded corners in print */
                 background-color: #fff; /* White background for questions in print */
                 padding: 0 !important; /* Removed padding inside the box in print */
+                padding-top: 5mm !important; /* Added padding top for print */
                 break-inside: avoid !important; /* Avoid breaking questions across pages */
                 page-break-inside: avoid !important; /* Older property for print breaking */
                 border-bottom: none; /* Ensure no border at the bottom in print */
@@ -244,12 +246,12 @@
 
             /* Print styles for figure and related questions group */
             .figure-and-questions-group {
-                display: grid; /* Keep grid layout for printing */
-                grid-template-columns: 1fr 1fr; /* Two columns */
-                gap: 4mm; /* Reduced gap for printing */
+                display: block !important; /* Change to block layout for printing */
+                grid-template-columns: none !important; /* Remove grid columns */
+                gap: 0 !important; /* Removed gap for printing */
                 /* Removed margin-bottom: 5mm !important; */ /* Reverted to allow multiple per page */
-                margin-bottom: 15mm !important; /* Increased margin bottom for print */
-                grid-column: span 2; /* Make this group span both columns of the main grid */
+                margin-bottom: 30mm !important; /* Increased margin bottom for print */
+                grid-column: span 2; /* Keep for screen, but block overrides for print */
                 break-inside: avoid !important; /* Avoid breaking the group across pages */
                 page-break-inside: avoid !important; /* Older property for print breaking */
                 /* Removed page-break-after: always !important; */ /* Reverted to allow multiple per page */
@@ -257,6 +259,7 @@
                 overflow: visible !important; /* Ensure content is not hidden */
                 border: none !important; /* Removed border for the group in print */
                 padding: 0 !important; /* Removed padding around the group in print */
+                padding-top: 5mm !important; /* Added padding top for print */
             }
              /* Don't force a page break after the last group */
              .questions-container .figure-and-questions-group:last-child {
@@ -272,10 +275,11 @@
                 padding: 0 !important; /* Removed padding in print */
                 height: auto !important; /* Ensure height is auto */
                 overflow: visible !important; /* Ensure content is not hidden */
+                margin-bottom: 10mm !important; /* Add space below the figure in print */
             }
 
              .questions-group {
-                 display: flex;
+                 display: block !important; /* Change to block layout for printing */
                  flex-direction: column; /* Stack questions vertically */
                  gap: 4mm; /* Reduced space between questions within the group in print */
                  /* Removed justify-content: space-between; */
@@ -285,22 +289,25 @@
 
             /* Print styles for questions within a figure-and-questions-group to make workspace fill space */
             .figure-and-questions-group .questions-group .question {
-                 display: flex;
+                 display: block !important; /* Change to block layout for printing */
                  flex-direction: column; /* Arrange content and workspace vertically */
-                 flex-grow: 1; /* Allow question box to grow */
+                 flex-grow: 0 !important; /* Remove flex grow in block layout */
                  border: none !important; /* Removed border for questions inside the group in print */
                  background-color: #fff; /* White background for questions inside the group in print */
                  break-inside: avoid !important; /* Avoid breaking questions across pages */
                  page-break-inside: avoid !important; /* Older property for print breaking */
-                 margin-bottom: 0 !important; /* Remove margin bottom for questions within the group */
+                 margin-bottom: 5mm !important; /* Add space between questions within the group in print */
                  page-break-after: auto !important; /* Don't force page break after questions within a group */
                  height: auto !important; /* Ensure height is auto */
                  overflow: visible !important; /* Ensure content is not hidden */
                  padding: 0 !important; /* Removed padding for questions within the group */
             }
+             .figure-and-questions-group .questions-group .question:last-child {
+                 margin-bottom: 0 !important; /* Remove margin bottom for the last question in a group */
+             }
 
              .figure-and-questions-group .questions-group .question .workspace {
-                 flex-grow: 1; /* Make the workspace fill the remaining vertical space */
+                 flex-grow: 0 !important; /* Remove flex grow in block layout */
                  height: auto !important; /* Ensure height is auto */
                  overflow: visible !important; /* Ensure content is not hidden */
              }
@@ -308,18 +315,19 @@
 
             /* Print styles for questions-only group */
             .questions-only-group {
-                grid-column: span 2; /* Span both columns */
+                grid-column: span 2; /* Keep for screen, but block overrides for print */
                 /* Removed margin-bottom: 5mm !important; */ /* Reverted to allow multiple per page */
-                margin-bottom: 15mm !important; /* Increased margin bottom for print */
+                margin-bottom: 30mm !important; /* Increased margin bottom for print */
                 padding: 0 !important; /* Removed padding around the group in print */
+                padding-top: 5mm !important; /* Added padding top for print */
                 border: none !important; /* Removed border for the group in print */
                 border-radius: 0; /* Remove rounded corners in print */
                 background-color: #fff; /* White background for the group in print */
                 break-inside: avoid !important; /* Avoid breaking the group across pages */
                 page-break-inside: avoid !important; /* Older property for print breaking */
-                display: grid; /* Use grid for internal layout */
-                grid-template-columns: 1fr 1fr; /* Two columns within this group in print */
-                gap: 4mm; /* Reduced space between questions within the group in print */
+                display: block !important; /* Change to block layout for printing */
+                grid-template-columns: none !important; /* Remove grid columns */
+                gap: 0 !important; /* Removed space between questions within the group in print */
                 /* Removed page-break-after: always !important; */ /* Reverted to allow multiple per page */
                 height: auto !important; /* Ensure height is auto */
                 overflow: visible !important; /* Ensure content is not hidden */
@@ -335,12 +343,15 @@
                 background-color: #fff; /* White background for questions inside the group in print */
                 break-inside: avoid !important; /* Avoid breaking questions across pages */
                 page-break-inside: avoid !important; /* Older property for print breaking */
-                 margin-bottom: 0 !important; /* Remove margin bottom for questions within the group */
+                 margin-bottom: 5mm !important; /* Add space between questions within the group in print */
                  page-break-after: auto !important; /* Don't force page break after questions within a group */
                  height: auto !important; /* Ensure height is auto */
                  overflow: visible !important; /* Ensure content is not hidden */
                  padding: 0 !important; /* Removed padding for questions within the group */
             }
+             .questions-only-group .question:last-child {
+                 margin-bottom: 0 !important; /* Remove margin bottom for the last question in a group */
+             }
         }
     </style>
 </head>
@@ -545,203 +556,4 @@
                         </div>
                          </div>
 
-                    <div class="question">
-                         <div class="question-header">
-                            <h3>[23]</h3>
-                            <p>State the y-intercept of the function shown in Figure 1.</p>
-                        </div>
-                         </div>
-                </div>
-            </div>
-
-            <div class="questions-only-group">
-                <div class="question">
-                     <div class="question-header">
-                        <h3>[27]</h3>
-                        <p>For the quadratic function $$y = -x^2 + 6x - 5$$, state the y-intercept.</p>
-                    </div>
-                    </div>
-
-                <div class="question">
-                     <div class="question-header">
-                        <h3>[28]</h3>
-                        <p>For the quadratic function $$y = -x^2 + 6x - 5$$, does it open UP or DOWN?</p>
-                    </div>
-                    </div>
-
-                <div class="question">
-                     <div class="question-header">
-                        <h3>[30]</h3>
-                        <p>For the quadratic function $$y = -x^2 + 6x - 5$$, state the Axis of Symmetry.</p>
-                    </div>
-                    <div class="workspace medium-space"></div>
-                </div>
-
-                <div class="question">
-                     <div class="question-header">
-                        <h3>[29]</h3>
-                        <p>For the quadratic function $$y = -x^2 + 6x - 5$$, state the Vertex.</p>
-                    </div>
-                    <div class="workspace medium-space"></div>
-                </div>
-
-                <div class="question">
-                     <div class="question-header">
-                        <h3>[31]</h3>
-                        <p>Create a table of values for the quadratic function $$y = -x^2 + 6x - 5$$. (This question is not graded in this mockup.)</p>
-                    </div>
-                    <img src="./images/table_of_values.png" alt="Table of Values Template">
-                    <div class="workspace large-space"></div>
-                </div>
-
-                 <div class="question">
-                     <div class="question-header">
-                        <h3>[32]</h3>
-                        <p>Graph the quadratic function $$y = -x^2 + 6x - 5$$. (This question is not graded in this mockup.)</p>
-                    </div>
-                    <img src="./images/desmos-graph.png" alt="Graphing Grid">
-                    <div class="workspace large-space"></div>
-                </div>
-            </div>
-
-
-            <div class="question">
-                 <div class="question-header">
-                    <h3>[24]</h3>
-                    <p>Calculate the discriminant and determine the number of solutions:</p>
-                </div>
-                $$x^2 - 6x + 9 = 0$$
-                <div class="workspace medium-space"></div>
-            </div>
-
-            <div class="question">
-                 <div class="question-header">
-                    <h3>[25]</h3>
-                    <p>Calculate the discriminant and determine the number of solutions:</p>
-                </div>
-                $$2k^2 + 3k + 4 = 0$$
-                <div class="workspace medium-space"></div>
-            </div>
-
-            <div class="question">
-                 <div class="question-header">
-                    <h3>[26]</h3>
-                    <p>Calculate the discriminant and determine the number of solutions:</p>
-                </div>
-                $$3n^2 - 7n + 2 = 0$$
-                <div class="workspace medium-space"></div>
-            </div>
-
-            <div class="question">
-                 <div class="question-header">
-                    <h3>[33]</h3>
-                    <p>Solve the equation using the quadratic formula:</p>
-                </div>
-                $$3x^2 + 5x - 2 = 0$$
-                <div class="workspace medium-space"></div>
-            </div>
-
-            <div class="question">
-                 <div class="question-header">
-                    <h3>[34]</h3>
-                    <p>Simplify the radical expression:</p>
-                </div>
-                $$\sqrt{75}$$
-                <div class="workspace medium-space"></div>
-            </div>
-
-            <div class="question">
-                 <div class="question-header">
-                    <h3>[35]</h3>
-                    <p>Simplify the radical expression:</p>
-                </div>
-                $$4\sqrt{32}$$
-                <div class="workspace medium-space"></div>
-            </div>
-
-            <div class="figure-and-questions-group">
-                <div class="figure-box">
-                    <div class="question-header">
-                        <h3>Figure 2:</h3>
-                    </div>
-                    <img src="./images/fig-2.png" alt="Data Set Table">
-                </div>
-                <div class="questions-group">
-                    <div class="question">
-                         <div class="question-header">
-                            <h3>[36]</h3>
-                            <p>Find the mean for the data set in Figure 2 (round to the tenths place).</p>
-                        </div>
-                        <div class="workspace medium-space"></div>
-                    </div>
-
-                    <div class="question">
-                         <div class="question-header">
-                            <h3>[37]</h3>
-                            <p>Find the median for the data set in Figure 2.</p>
-                        </div>
-                        <div class="workspace medium-space"></div>
-                    </div>
-
-                    <div class="question">
-                         <div class="question-header">
-                            <h3>[38]</h3>
-                            <p>Find the mode for the data set in Figure 2.</p>
-                        </div>
-                        </div>
-                </div>
-            </div>
-
-            <div class="figure-and-questions-group">
-                <div class="figure-box">
-                    <div class="question-header">
-                        <h3>Figure 3:</h3>
-                    </div>
-                    <img src="./images/fig-3.png" alt="Histogram">
-                </div>
-                <div class="questions-group">
-                     <div class="question">
-                         <div class="question-header">
-                            <h3>[39]</h3>
-                            <p>Based on Figure 3, which age range has the highest number of family households?</p>
-                        </div>
-                        </div>
-
-                    <div class="question">
-                         <div class="question-header">
-                            <h3>[40]</h3>
-                            <p>Based on Figure 3, approximately how many family households are in the 25-29 years age range (in thousands)?</p>
-                        </div>
-                        </div>
-                </div>
-            </div>
-
-        </div>
-    </div>
-    <script>
-        // Get all elements with the class 'question'
-        const questions = document.querySelectorAll('.question');
-
-        // Initialize a counter for question numbers
-        let questionNumber = 1;
-
-        // Function to update question numbers
-        function updateQuestionNumbers() {
-             questionNumber = 1; // Reset counter
-             questions.forEach(question => {
-                 const questionHeader = question.querySelector('.question-header h3');
-                 if (questionHeader && /^\[\d+\]$/.test(questionHeader.textContent.trim())) {
-                      questionHeader.textContent = '[' + questionNumber + ']';
-                      questionNumber++;
-                 }
-             });
-        }
-
-        // Update numbers on page load
-        updateQuestionNumbers();
-
-        // Removed JavaScript for PDF download
-
-    </script>
-</body>
-</html>
+                    <div clas
