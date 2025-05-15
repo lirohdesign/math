@@ -72,6 +72,19 @@
             margin-bottom: 8px;
             cursor: pointer;
         }
+        /* Style for incorrect answers */
+        .options label.incorrect {
+            background-color: #fecaca; /* Light red background */
+            border-left: 4px solid #dc2626; /* Red border */
+            padding: 4px; /* Add some padding */
+            border-radius: 4px;
+        }
+         /* Style for incorrect dropdowns */
+        .question select.incorrect {
+             border: 1px solid #dc2626; /* Red border for the dropdown itself */
+        }
+
+
         .explanation {
             margin-top: 15px;
             padding: 10px;
@@ -91,7 +104,7 @@
             border-radius: 4px;
             cursor: pointer;
             font-size: 0.9em;
-            display: none; /* Initially hidden */ /* Keep hidden by default */
+            display: none; /* Initially hidden */
         }
         .show-answer-btn:hover {
             background-color: #3b82f6; /* Darker blue */
@@ -111,6 +124,14 @@
         .submit-btn:hover {
             background-color: #059669; /* Darker green */
         }
+         /* Style for the Unlock Explanations button */
+        #submitExam.unlock-btn {
+             background-color: #f97316; /* Orange */
+        }
+         #submitExam.unlock-btn:hover {
+             background-color: #ea580c; /* Darker orange */
+        }
+
         .score {
             margin-top: 20px;
             padding: 15px;
@@ -613,6 +634,7 @@
         const questionsContainer = document.getElementById('questionsContainer');
         const submitButton = document.getElementById('submitExam');
         const scoreDisplay = document.getElementById('examScore');
+        const unlockPassword = '2+2=4'; // Define the password
 
         // Function to render questions based on structured data
         function renderQuestions(data) {
@@ -785,40 +807,106 @@
             renderQuestions(examData);
         };
 
-        // Submit button functionality for all questions
+        // Submit button functionality
         submitButton.addEventListener('click', () => {
-            let score = 0;
-            let totalGradedQuestions = 0;
+            // Check if the button is currently in the 'Submit Exam' state
+            if (submitButton.textContent === 'Submit Exam') {
+                let score = 0;
+                let totalGradedQuestions = 0;
 
-            // Iterate through the structured data to find graded questions
-            examData.forEach(block => {
-                if (block.type === 'multiple-choice') {
-                     totalGradedQuestions++;
-                    const selectedOption = document.forms["examForm"].elements[block.id].value;
-                    if (selectedOption === block.correctAnswer) {
-                        score++;
-                    }
-                } else if (block.type === 'figure-group' || block.type === 'questions-only-group') {
-                    block.content.forEach(q => {
-                        if (q.type === 'multiple-choice') {
-                            totalGradedQuestions++;
-                            const selectedOption = document.forms["examForm"].elements[q.id].value;
-                            if (selectedOption === q.correctAnswer) {
-                                score++;
+                // Remove any previous incorrect answer highlighting
+                document.querySelectorAll('.incorrect').forEach(el => {
+                    el.classList.remove('incorrect');
+                });
+                 document.querySelectorAll('select.incorrect').forEach(el => {
+                    el.classList.remove('incorrect');
+                });
+
+
+                // Iterate through the structured data to find graded questions and check answers
+                examData.forEach(block => {
+                    if (block.type === 'multiple-choice') {
+                        totalGradedQuestions++;
+                        const selectedInput = document.forms["examForm"].elements[block.id];
+                        let selectedValue = '';
+
+                        // Get the selected value based on input type (radio or select)
+                        if (selectedInput.type === 'select-one') {
+                             selectedValue = selectedInput.value;
+                             if (selectedValue !== block.correctAnswer && selectedValue !== '') {
+                                selectedInput.classList.add('incorrect'); // Highlight incorrect dropdown
+                             }
+                        } else { // Radio buttons
+                            // Find the checked radio button
+                            const checkedRadio = Array.from(selectedInput).find(radio => radio.checked);
+                            if (checkedRadio) {
+                                selectedValue = checkedRadio.value;
+                                if (selectedValue !== block.correctAnswer) {
+                                    // Find the parent label and add the incorrect class
+                                    checkedRadio.closest('label').classList.add('incorrect');
+                                }
                             }
                         }
+
+
+                        if (selectedValue === block.correctAnswer) {
+                            score++;
+                        }
+                    } else if (block.type === 'figure-group' || block.type === 'questions-only-group') {
+                        block.content.forEach(q => {
+                            if (q.type === 'multiple-choice') {
+                                totalGradedQuestions++;
+                                const selectedInput = document.forms["examForm"].elements[q.id];
+                                let selectedValue = '';
+
+                                // Get the selected value based on input type (radio or select)
+                                if (selectedInput.type === 'select-one') {
+                                     selectedValue = selectedInput.value;
+                                     if (selectedValue !== q.correctAnswer && selectedValue !== '') {
+                                         selectedInput.classList.add('incorrect'); // Highlight incorrect dropdown
+                                     }
+                                } else { // Radio buttons
+                                    const checkedRadio = Array.from(selectedInput).find(radio => radio.checked);
+                                     if (checkedRadio) {
+                                        selectedValue = checkedRadio.value;
+                                        if (selectedValue !== q.correctAnswer) {
+                                            checkedRadio.closest('label').classList.add('incorrect');
+                                        }
+                                    }
+                                }
+
+                                if (selectedValue === q.correctAnswer) {
+                                    score++;
+                                }
+                            }
+                        });
+                    }
+                });
+
+                scoreDisplay.textContent = `Your Score: ${score} out of ${totalGradedQuestions}`;
+                scoreDisplay.style.display = 'block';
+
+                // Change button text and style
+                submitButton.textContent = 'Unlock Explanations';
+                submitButton.classList.add('unlock-btn');
+
+            } else if (submitButton.textContent === 'Unlock Explanations') {
+                // Handle the 'Unlock Explanations' state
+                const enteredPassword = prompt('Enter password to unlock explanations:');
+                if (enteredPassword === unlockPassword) {
+                    // Show all "Show Answer/Explanation" buttons
+                    document.querySelectorAll('.show-answer-btn').forEach(button => {
+                        button.style.display = 'inline-block';
                     });
+                    // Optional: Disable the unlock button after use
+                    // submitButton.disabled = true;
+                     // Optional: Hide the unlock button after use
+                     // submitButton.style.display = 'none';
+
+                } else {
+                    alert('Incorrect password.');
                 }
-                // Text-only questions are not graded in this mockup
-            });
-
-            scoreDisplay.textContent = `Your Score: ${score} out of ${totalGradedQuestions}`;
-            scoreDisplay.style.display = 'block';
-
-            // Show all "Show Answer/Explanation" buttons after submission
-            document.querySelectorAll('.show-answer-btn').forEach(button => {
-                button.style.display = 'inline-block';
-            });
+            }
         });
 
     </script>
