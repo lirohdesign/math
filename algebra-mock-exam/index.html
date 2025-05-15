@@ -187,6 +187,7 @@
                 break-inside: avoid; /* Avoid breaking questions across pages */
                 page-break-inside: avoid; /* Older property for print breaking */
                 border-bottom: none; /* Ensure no border at the bottom in print */
+                margin-bottom: 4mm; /* Added margin bottom for print */
             }
              .question:last-child {
                 border-bottom: none; /* Ensure the last question also has no border at the bottom in print */
@@ -209,7 +210,6 @@
              .figure-box img {
                  height: auto; /* Ensure height is auto for proportional scaling */
                  max-width: 100%; /* Ensure images don't overflow */
-                 /* Removed max-height: 100%; */
              }
 
 
@@ -262,6 +262,7 @@
                  background-color: #fff; /* White background for questions inside the group in print */
                  break-inside: avoid; /* Avoid breaking questions across pages */
                  page-break-inside: avoid; /* Older property for print breaking */
+                 margin-bottom: 0 !important; /* Remove margin bottom for questions within the group */
             }
 
              .figure-and-questions-group .questions-group .question .workspace {
@@ -289,6 +290,7 @@
                 background-color: #fff; /* White background for questions inside the group in print */
                 break-inside: avoid; /* Avoid breaking questions across pages */
                 page-break-inside: avoid; /* Older property for print breaking */
+                 margin-bottom: 0 !important; /* Remove margin bottom for questions within the group */
             }
         }
     </style>
