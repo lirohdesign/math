@@ -33,43 +33,139 @@
         }
         .container {
             max-width: 800px;
-            margin: 0 auto; /* Center the container */
+            margin: 20px auto;
             padding: 20px;
             background-color: #fff;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
+        h1 {
+            text-align: center;
+            color: #1f2937;
+            margin-bottom: 20px;
+        }
+        /* Container for two-column layout */
+        .questions-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Two equal columns */
+            gap: 10px; /* Reduced space between columns and rows */
+        }
         .question {
-            margin-bottom: 25px; /* Increased spacing between questions */
-            padding-bottom: 15px; /* Add padding at the bottom */
-            border-bottom: 1px solid #e5e7eb; /* Add a separator line */
+            margin-bottom: 0; /* Remove default margin */
+            padding: 5px; /* Reduced padding inside the box */
+            border: 1px solid #e5e7eb; /* Keep the light grey border */
+            border-radius: 6px;
+            background-color: #f9fafb;
+            border-bottom: none; /* Ensure no border at the bottom */
         }
          .question:last-child {
-            border-bottom: none; /* No border after the last question */
-            margin-bottom: 0;
-            padding-bottom: 0;
+            border-bottom: none; /* Ensure the last question also has no border at the bottom */
         }
-        .question h3 {
+        /* Style for the container holding the question number and initial text */
+        .question-header {
+            display: flex; /* Use flexbox to align items horizontally */
+            align-items: baseline; /* Align text baselines */
+            margin-bottom: 3px; /* Reduced space below the header */
+        }
+        .question-header h3 {
             margin-top: 0;
-            margin-bottom: 10px;
+            margin-bottom: 0; /* Remove margin from h3 */
+            margin-right: 8px; /* Add space between number and text */
             color: #1f2937;
-            font-size: 1.1em; /* Slightly larger question number */
+            font-size: 1.1em;
+            flex-shrink: 0; /* Prevent shrinking */
         }
-        .question p {
-            margin-bottom: 0; /* Remove default paragraph margin */
+        .question-header p {
+             margin-bottom: 0; /* Remove margin from the first paragraph */
+             flex-grow: 1; /* Allow text to take up available space */
         }
         /* Ensure MathJax rendered content fits within the container */
         .MathJax_Display {
-            margin: 1em 0 !important; /* Adjust spacing for display equations */
+            margin: 0.2em 0 !important; /* Reduced spacing for display equations */
         }
         /* Style for images within questions */
         .question img {
             max-width: 100%; /* Ensure images are responsive */
             height: auto;
             display: block; /* Make image a block element */
-            margin: 15px auto; /* Center the image and add vertical margin */
+            margin: 10px auto; /* Reduced vertical margin for images */
             border: 1px solid #ccc; /* Optional: Add a light border */
             border-radius: 4px; /* Optional: Rounded corners */
+        }
+
+        /* Added workspace below each question */
+        .workspace {
+            margin-top: 10px; /* Space above workspace */
+            /* Default workspace has no min-height unless a specific class is applied */
+            border-bottom: none; /* Ensure no dashed line by default */
+        }
+
+        /* Classes for adjusting workspace height */
+        .workspace.medium-space {
+            min-height: 10em; /* Medium space (adjust as needed) */
+        }
+
+        .workspace.large-space {
+            min-height: 13em; /* Large space (medium + 3em) */
+        }
+
+
+        /* Print-specific styles */
+        @media print {
+            body {
+                background-color: #fff; /* White background for printing */
+                padding: 10mm; /* Adjust padding for print margins */
+            }
+            .container {
+                box-shadow: none; /* Remove shadow in print */
+                margin: 0;
+                padding: 0;
+            }
+            .questions-container {
+                gap: 8mm; /* Adjusted gap for printing (using mm for print precision) */
+            }
+            .question {
+                border: 1px solid #000; /* Black border for questions in print */
+                border-radius: 0; /* Remove rounded corners in print */
+                background-color: #fff; /* White background for questions in print */
+                padding: 5px; /* Reduced padding inside the box in print */
+                break-inside: avoid; /* Avoid breaking questions across pages */
+                border-bottom: none; /* Ensure no border at the bottom in print */
+            }
+             .question:last-child {
+                border-bottom: none; /* Ensure the last question also has no border at the bottom in print */
+            }
+            .show-answer-btn, .submit-btn {
+                display: none; /* Hide buttons in print */
+            }
+            .explanation {
+                display: none !important; /* Hide explanations in print */
+            }
+            .score {
+                display: none !important; /* Hide score in print */
+            }
+            /* Adjust image sizes for print if necessary */
+            .question img[alt="Table of Values Template"] {
+                height: 15em; /* Maintain relative height */
+            }
+            .question img[alt="Graphing Grid"] {
+                height: 30em; /* Maintain relative height */
+            }
+
+            /* Print styles for workspace heights */
+             .workspace {
+                min-height: 0; /* No default min-height in print */
+                margin-top: 5px; /* Reduced space above workspace in print */
+                border-bottom: 1px dashed #000; /* Add dashed line back for workspace divs in print */
+             }
+            .workspace.medium-space {
+                min-height: 5em; /* Medium space in print */
+                 border-bottom: 1px dashed #000; /* Dashed line in print */
+            }
+            .workspace.large-space {
+                min-height: 8em; /* Large space in print */
+                 border-bottom: 1px dashed #000; /* Dashed line in print */
+            }
         }
     </style>
 </head>
@@ -77,235 +173,362 @@
     <div class="container">
         <h1 class="text-2xl font-bold mb-8 text-center text-gray-800">Semester 2 Algebra 1 Mock Exam Questions</h1>
 
-        <div class="question">
-            <h3>Question 1:</h3>
-            <p>Solve the system of equations:</p>
-            $$2x+y=11$$
-            $$x-2y=8$$
-        </div>
+        <div class="questions-container">
+            <div class="question">
+                <div class="question-header">
+                    <h3>[1]</h3>
+                    <p>Solve the system of equations:</p>
+                </div>
+                $$2x+y=11$$
+                $$x-2y=8$$
+                <div class="workspace medium-space"></div>
+            </div>
 
-        <div class="question">
-            <h3>Question 2:</h3>
-            <p>Solve the system of equations:</p>
-            $$y=3x-5$$
-            $$y=-x+7$$
-        </div>
+            <div class="question">
+                 <div class="question-header">
+                    <h3>[2]</h3>
+                    <p>Solve the system of equations:</p>
+                </div>
+                $$y=3x-5$$
+                $$y=-x+7$$
+                <div class="workspace medium-space"></div>
+            </div>
 
-        <div class="question">
-            <h3>Question 3:</h3>
-            <p>Determine if the polynomial is a monomial, binomial or trinomial:</p>
-            $$5k^{3} + 2k$$
-        </div>
+            <div class="question">
+                 <div class="question-header">
+                    <h3>[3]</h3>
+                    <p>Determine if the polynomial is a monomial, binomial or trinomial:</p>
+                </div>
+                $$5k^{3} + 2k$$
+                </div>
 
-        <div class="question">
-            <h3>Question 4:</h3>
-            <p>Determine if the polynomial is a monomial, binomial or trinomial:</p>
-            $$-7b^{4} + b^{2} - 1$$
-        </div>
+            <div class="question">
+                 <div class="question-header">
+                    <h3>[4]</h3>
+                    <p>Determine if the polynomial is a monomial, binomial or trinomial:</p>
+                </div>
+                $$-7b^{4} + b^{2} - 1$$
+                 </div>
 
-        <div class="question">
-            <h3>Question 5:</h3>
-            <p>Determine if the polynomial is a monomial, binomial or trinomial:</p>
-            $$12p^{7}$$
-        </div>
+            <div class="question">
+                 <div class="question-header">
+                    <h3>[5]</h3>
+                    <p>Determine if the polynomial is a monomial, binomial or trinomial:</p>
+                </div>
+                $$12p^{7}$$
+                 </div>
 
-        <div class="question">
-            <h3>Question 6:</h3>
-            <p>Determine the degree of the polynomial:</p>
-            $$a^{3} + a^{7} - 5$$
-        </div>
+             <div class="question">
+                 <div class="question-header">
+                    <h3>[6]</h3>
+                    <p>Determine the degree of the polynomial:</p>
+                </div>
+                $$a^{3} + a^{7} - 5$$
+                 </div>
 
-        <div class="question">
-            <h3>Question 7:</h3>
-            <p>Determine the degree of the polynomial:</p>
-            $$4y^{8} - 3y^{2} + 9y^{5}$$
-        </div>
+            <div class="question">
+                 <div class="question-header">
+                    <h3>[7]</h3>
+                    <p>Determine the degree of the polynomial:</p>
+                </div>
+                $$4y^{8} - 3y^{2} + 9y^{5}$$
+                 </div>
 
-        <div class="question">
-            <h3>Question 8:</h3>
-            <p>Determine the degree of the polynomial:</p>
-            $$-25z^{10}$$
-        </div>
+            <div class="question">
+                 <div class="question-header">
+                    <h3>[8]</h3>
+                    <p>Determine the degree of the polynomial:</p>
+                </div>
+                $$-25z^{10}$$
+                 </div>
 
-        <div class="question">
-            <h3>Question 9:</h3>
-            <p>Simplify the sum:</p>
-            $$(3m^2 - 5m + 2) + (m^2 + 4m - 9)$$
-        </div>
+            <div class="question">
+                 <div class="question-header">
+                    <h3>[9]</h3>
+                    <p>Simplify the sum:</p>
+                </div>
+                $$(3m^2 - 5m + 2) + (m^2 + 4m - 9)$$
+                <div class="workspace medium-space"></div>
+            </div>
 
-        <div class="question">
-            <h3>Question 10:</h3>
-            <p>Simplify the difference:</p>
-            $$(7c^4 + 2c^2 - c) - (3c^4 - c^3 + 5c^2)$$
-        </div>
+            <div class="question">
+                 <div class="question-header">
+                    <h3>[10]</h3>
+                    <p>Simplify the difference:</p>
+                </div>
+                $$(7c^4 + 2c^2 - c) - (3c^4 - c^3 + 5c^2)$$
+                <div class="workspace medium-space"></div>
+            </div>
 
-        <div class="question">
-            <h3>Question 11:</h3>
-            <p>Find the product:</p>
-            $$-3x(2x^2 - 5x + 1)$$
-        </div>
+            <div class="question">
+                 <div class="question-header">
+                    <h3>[11]</h3>
+                    <p>Find the product:</p>
+                </div>
+                $$-3x(2x^2 - 5x + 1)$$
+                <div class="workspace medium-space"></div>
+            </div>
 
-        <div class="question">
-            <h3>Question 12:</h3>
-            <p>Find the product:</p>
-            $$(4y+1)^2$$
-        </div>
+            <div class="question">
+                 <div class="question-header">
+                    <h3>[12]</h3>
+                    <p>Find the product:</p>
+                </div>
+                $$(4y+1)^2$$
+                <div class="workspace medium-space"></div>
+            </div>
 
-        <div class="question">
-            <h3>Question 13:</h3>
-            <p>Find the product:</p>
-            $$(b+5)(2b-3)$$
-        </div>
+            <div class="question">
+                 <div class="question-header">
+                    <h3>[13]</h3>
+                    <p>Find the product:</p>
+                </div>
+                $$(b+5)(2b-3)$$
+                <div class="workspace medium-space"></div>
+            </div>
 
-        <div class="question">
-            <h3>Question 14:</h3>
-            <p>Find the product:</p>
-            $$(2w-1)(w^2 + 4w - 3)$$
-        </div>
+            <div class="question">
+                 <div class="question-header">
+                    <h3>[14]</h3>
+                    <p>Find the product:</p>
+                </div>
+                $$(2w-1)(w^2 + 4w - 3)$$
+                <div class="workspace medium-space"></div>
+            </div>
 
-        <div class="question">
-            <h3>Question 15:</h3>
-            <p>State the Greatest Common Factor of:</p>
-            $$18a^3, 27a^5$$
-        </div>
+            <div class="question">
+                 <div class="question-header">
+                    <h3>[15]</h3>
+                    <p>State the Greatest Common Factor of:</p>
+                </div>
+                $$18a^3, 27a^5$$
+                <div class="workspace medium-space"></div>
+            </div>
 
-        <div class="question">
-            <h3>Question 16:</h3>
-            <p>State the Greatest Common Factor of:</p>
-            $$12xy^2, 30x^2y, 6x^3y^3$$
-        </div>
+            <div class="question">
+                 <div class="question-header">
+                    <h3>[16]</h3>
+                    <p>State the Greatest Common Factor of:</p>
+                </div>
+                $$12xy^2, 30x^2y, 6x^3y^3$$
+                <div class="workspace medium-space"></div>
+            </div>
 
-        <div class="question">
-            <h3>Question 17:</h3>
-            <p>Factor completely:</p>
-            $$x^2 + 6x - 27$$
-        </div>
+            <div class="question">
+                 <div class="question-header">
+                    <h3>[17]</h3>
+                    <p>Factor completely:</p>
+                </div>
+                $$x^2 + 6x - 27$$
+                <div class="workspace medium-space"></div>
+            </div>
 
-        <div class="question">
-            <h3>Question 18:</h3>
-            <p>Factor completely:</p>
-            $$3y^2 + 10y + 8$$
-        </div>
+            <div class="question">
+                 <div class="question-header">
+                    <h3>[18]</h3>
+                    <p>Factor completely:</p>
+                </div>
+                $$3y^2 + 10y + 8$$
+                <div class="workspace medium-space"></div>
+            </div>
 
-        <div class="question">
-            <h3>Question 19:</h3>
-            <p>Solve the quadratic equation:</p>
-            $$(p-9)(p+2)=0$$
-        </div>
+            <div class="question">
+                 <div class="question-header">
+                    <h3>[19]</h3>
+                    <p>Solve the quadratic equation:</p>
+                </div>
+                $$(p-9)(p+2)=0$$
+                <div class="workspace medium-space"></div>
+            </div>
 
-        <div class="question">
-            <h3>Question 20:</h3>
-            <p>State the vertex of the function shown in the graph.</p>
-        </div>
+            <div class="question">
+                <div class="question-header">
+                    <h3>Figure 1:</h3>
+                </div>
+                <img src="./images/desmos-graph-fig-1.png" alt="Graph of y = -x^2 + 6x - 5" style="height: 30em;">
+            </div>
 
-        <div class="question">
-            <h3>Question 21:</h3>
-            <p>Does the graph have a maximum or minimum?</p>
-        </div>
+            <div class="question">
+                 <div class="question-header">
+                    <h3>[20]</h3>
+                    <p>State the vertex of the function shown in Figure 1.</p>
+                </div>
+                </div>
 
-        <div class="question">
-            <h3>Question 22:</h3>
-            <p>State the roots of the function shown in the graph.</p>
-        </div>
+            <div class="question">
+                 <div class="question-header">
+                    <h3>[21]</h3>
+                    <p>Does the graph in Figure 1 have a maximum or minimum?</p>
+                 </div>
+                 </div>
 
-        <div class="question">
-            <h3>Question 23:</h3>
-            <p>State the y-intercept of the function shown in the graph.</p>
-        </div>
+            <div class="question">
+                 <div class="question-header">
+                    <h3>[22]</h3>
+                    <p>State the roots of the function shown in Figure 1.</p>
+                </div>
+                 </div>
 
-        <div class="question">
-            <h3>Question 24:</h3>
-            <p>Calculate the discriminant and determine the number of solutions:</p>
-            $$x^2 - 6x + 9 = 0$$
-        </div>
+            <div class="question">
+                 <div class="question-header">
+                    <h3>[23]</h3>
+                    <p>State the y-intercept of the function shown in Figure 1.</p>
+                </div>
+                 </div>
 
-        <div class="question">
-            <h3>Question 25:</h3>
-            <p>Calculate the discriminant and determine the number of solutions:</p>
-            $$2k^2 + 3k + 4 = 0$$
-        </div>
+            <div class="question">
+                 <div class="question-header">
+                    <h3>[24]</h3>
+                    <p>Calculate the discriminant and determine the number of solutions:</p>
+                </div>
+                $$x^2 - 6x + 9 = 0$$
+                <div class="workspace medium-space"></div>
+            </div>
 
-        <div class="question">
-            <h3>Question 26:</h3>
-            <p>Calculate the discriminant and determine the number of solutions:</p>
-            $$3n^2 - 7n + 2 = 0$$
-        </div>
+            <div class="question">
+                 <div class="question-header">
+                    <h3>[25]</h3>
+                    <p>Calculate the discriminant and determine the number of solutions:</p>
+                </div>
+                $$2k^2 + 3k + 4 = 0$$
+                <div class="workspace medium-space"></div>
+            </div>
 
-        <div class="question">
-            <h3>Question 27:</h3>
-            <p>For the quadratic function $$y = -x^2 + 6x - 5$$, state the y-intercept.</p>
-        </div>
+            <div class="question">
+                 <div class="question-header">
+                    <h3>[26]</h3>
+                    <p>Calculate the discriminant and determine the number of solutions:</p>
+                </div>
+                $$3n^2 - 7n + 2 = 0$$
+                <div class="workspace medium-space"></div>
+            </div>
 
-        <div class="question">
-            <h3>Question 28:</h3>
-            <p>For the quadratic function $$y = -x^2 + 6x - 5$$, does it open UP or DOWN?</p>
-        </div>
+             <div class="question">
+                 <div class="question-header">
+                    <h3>[27]</h3>
+                    <p>For the quadratic function $$y = -x^2 + 6x - 5$$, state the y-intercept.</p>
+                </div>
+                </div>
 
-        <div class="question">
-            <h3>Question 29:</h3>
-            <p>For the quadratic function $$y = -x^2 + 6x - 5$$, state the Vertex.</p>
-        </div>
+            <div class="question">
+                 <div class="question-header">
+                    <h3>[28]</h3>
+                    <p>For the quadratic function $$y = -x^2 + 6x - 5$$, does it open UP or DOWN?</p>
+                </div>
+                </div>
 
-        <div class="question">
-            <h3>Question 30:</h3>
-            <p>For the quadratic function $$y = -x^2 + 6x - 5$$, state the Axis of Symmetry.</p>
-        </div>
+            <div class="question">
+                 <div class="question-header">
+                    <h3>[30]</h3>
+                    <p>For the quadratic function $$y = -x^2 + 6x - 5$$, state the Axis of Symmetry.</p>
+                </div>
+                <div class="workspace medium-space"></div>
+            </div>
 
-        <div class="question">
-            <h3>Question 31:</h3>
-            <p>Create a table of values for the quadratic function $$y = -x^2 + 6x - 5$$. (This question is not graded in this mockup.)</p>
-            <img src="./images/table_of_values.png" alt="Table of Values Template" style="height: 15em;">
-        </div>
+            <div class="question">
+                 <div class="question-header">
+                    <h3>[29]</h3>
+                    <p>For the quadratic function $$y = -x^2 + 6x - 5$$, state the Vertex.</p>
+                </div>
+                <div class="workspace medium-space"></div>
+            </div>
 
-        <div class="question">
-            <h3>Question 32:</h3>
-            <p>Graph the quadratic function $$y = -x^2 + 6x - 5$$. (This question is not graded in this mockup.)</p>
-            <img src="./images/desmos-graph.png" alt="Graphing Grid" style="height: 30em;">
-        </div>
+            <div class="question">
+                 <div class="question-header">
+                    <h3>[31]</h3>
+                    <p>Create a table of values for the quadratic function $$y = -x^2 + 6x - 5$$. (This question is not graded in this mockup.)</p>
+                </div>
+                <img src="./images/table_of_values.png" alt="Table of Values Template" style="height: 15em;">
+                <div class="workspace large-space"></div>
+            </div>
 
-        <div class="question">
-            <h3>Question 33:</h3>
-            <p>Solve the equation using the quadratic formula:</p>
-            $$3x^2 + 5x - 2 = 0$$
-        </div>
+             <div class="question">
+                 <div class="question-header">
+                    <h3>[32]</h3>
+                    <p>Graph the quadratic function $$y = -x^2 + 6x - 5$$. (This question is not graded in this mockup.)</p>
+                </div>
+                <img src="./images/desmos-graph.png" alt="Graphing Grid" style="height: 30em;">
+                <div class="workspace large-space"></div>
+            </div>
 
-        <div class="question">
-            <h3>Question 34:</h3>
-            <p>Simplify the radical expression:</p>
-            $$\sqrt{75}$$
-        </div>
+            <div class="question">
+                 <div class="question-header">
+                    <h3>[33]</h3>
+                    <p>Solve the equation using the quadratic formula:</p>
+                </div>
+                $$3x^2 + 5x - 2 = 0$$
+                <div class="workspace medium-space"></div>
+            </div>
 
-        <div class="question">
-            <h3>Question 35:</h3>
-            <p>Simplify the radical expression:</p>
-            $$4\sqrt{32}$$
-        </div>
+            <div class="question">
+                 <div class="question-header">
+                    <h3>[34]</h3>
+                    <p>Simplify the radical expression:</p>
+                </div>
+                $$\sqrt{75}$$
+                <div class="workspace medium-space"></div>
+            </div>
 
-        <div class="question">
-            <h3>Question 36:</h3>
-            <p>Find the mean for the following data set (round to the tenths place):<br>Scores on a Math Quiz: 85, 92, 78, 88, 95, 78, 90, 85, 92, 88</p>
-        </div>
+            <div class="question">
+                 <div class="question-header">
+                    <h3>[35]</h3>
+                    <p>Simplify the radical expression:</p>
+                </div>
+                $$4\sqrt{32}$$
+                <div class="workspace medium-space"></div>
+            </div>
 
-        <div class="question">
-            <h3>Question 37:</h3>
-            <p>Find the median for the following data set:<br>Scores on a Math Quiz: 85, 92, 78, 88, 95, 78, 90, 85, 92, 88</p>
-        </div>
+            <div class="question">
+                <div class="question-header">
+                    <h3>Figure 2:</h3>
+                </div>
+                <img src="./images/fig-2.png" alt="Data Set Table">
+            </div>
 
-        <div class="question">
-            <h3>Question 38:</h3>
-            <p>Find the mode for the following data set:<br>Scores on a Math Quiz: 85, 92, 78, 88, 95, 78, 90, 85, 92, 88</p>
-        </div>
+            <div class="question">
+                 <div class="question-header">
+                    <h3>[36]</h3>
+                    <p>Find the mean for the data set in Figure 2 (round to the tenths place).</p>
+                </div>
+                <div class="workspace medium-space"></div>
+            </div>
 
-        <div class="question">
-            <h3>Question 39:</h3>
-            <p>If a bag had 69 pieces of chocolate in it, which bar would it be added to? (Refer to the histogram in the original document.)</p>
-        </div>
+            <div class="question">
+                 <div class="question-header">
+                    <h3>[37]</h3>
+                    <p>Find the median for the data set in Figure 2.</p>
+                </div>
+                <div class="workspace medium-space"></div>
+            </div>
 
-        <div class="question">
-            <h3>Question 40:</h3>
-            <p>How many bags had between 0-19 pieces of chocolate? (Refer to the histogram in the original document.)</p>
-        </div>
+            <div class="question">
+                 <div class="question-header">
+                    <h3>[38]</h3>
+                    <p>Find the mode for the data set in Figure 2.</p>
+                </div>
+                </div>
 
+            <div class="question">
+                <div class="question-header">
+                    <h3>Figure 3:</h3>
+                </div>
+                <img src="./images/fig-3.png" alt="Histogram">
+            </div>
+
+             <div class="question">
+                 <div class="question-header">
+                    <h3>[39]</h3>
+                    <p>Based on Figure 3, which age range has the highest number of family households?</p>
+                </div>
+                </div>
+
+            <div class="question">
+                 <div class="question-header">
+                    <h3>[40]</h3>
+                    <p>Based on Figure 3, approximately how many family households are in the 25-29 years age range (in thousands)?</p>
+                </div>
+                </div>
+        </div>
     </div>
 </body>
 </html>
