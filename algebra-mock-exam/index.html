@@ -6,6 +6,7 @@
     <title>Algebra 1 Mock Exam Questions</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
+        // Configure MathJax
         MathJax = {
             tex: {
                 inlineMath: [['$', '$'], ['\\(', '\\)']],
@@ -14,8 +15,8 @@
                 processEnvironments: true
             },
             options: {
-                // Process elements with class 'mathjax-process' if needed, though MathJax often processes the whole document
-                // ignoreHtmlClass: 'tex2jax_ignore' // Ignore elements with this class
+                // Use a class to mark elements that should be processed by MathJax if needed
+                // ignoreHtmlClass: 'tex2jax_ignore'
             },
             loader: {
                 load: ['input/tex', 'output/chtml']
@@ -44,6 +45,8 @@
             color: #1f2937;
             margin-bottom: 20px;
         }
+         /* Removed .download-button-container styles */
+
         /* Container for two-column layout */
         .questions-container {
             display: grid;
@@ -176,6 +179,7 @@
                 margin: 0;
                 padding: 0;
             }
+             /* Removed .download-button-container display: none; */
             .questions-container {
                 gap: 4mm; /* Reduced gap for printing */
             }
@@ -187,11 +191,17 @@
                 break-inside: avoid; /* Avoid breaking questions across pages */
                 page-break-inside: avoid; /* Older property for print breaking */
                 border-bottom: none; /* Ensure no border at the bottom in print */
-                margin-bottom: 4mm; /* Added margin bottom for print */
+                /* Removed margin-bottom: 4mm; */
+                page-break-after: always; /* Force a page break after each question */
             }
              .question:last-child {
                 border-bottom: none; /* Ensure the last question also has no border at the bottom in print */
-            }
+             }
+             /* Don't force a page break after the last question */
+             .questions-container .question:last-child {
+                 page-break-after: auto;
+             }
+
             .show-answer-btn, .submit-btn {
                 display: none; /* Hide buttons in print */
             }
@@ -237,7 +247,13 @@
                 grid-column: span 2; /* Make this group span both columns of the main grid */
                 break-inside: avoid !important; /* Avoid breaking the group across pages */
                 page-break-inside: avoid !important; /* Older property for print breaking */
+                page-break-after: always; /* Force a page break after the group */
             }
+             /* Don't force a page break after the last group */
+             .questions-container .figure-and-questions-group:last-child {
+                 page-break-after: auto;
+             }
+
 
             .figure-box {
                 border: 1px solid #000; /* Black border for printing */
@@ -263,6 +279,7 @@
                  break-inside: avoid; /* Avoid breaking questions across pages */
                  page-break-inside: avoid; /* Older property for print breaking */
                  margin-bottom: 0 !important; /* Remove margin bottom for questions within the group */
+                 page-break-after: auto; /* Don't force page break after questions within a group */
             }
 
              .figure-and-questions-group .questions-group .question .workspace {
@@ -283,7 +300,12 @@
                 display: grid; /* Use grid for internal layout */
                 grid-template-columns: 1fr 1fr; /* Two columns within this group in print */
                 gap: 4mm; /* Reduced space between questions within the group in print */
+                page-break-after: always; /* Force a page break after the group */
             }
+             /* Don't force a page break after the last group */
+             .questions-container .questions-only-group:last-child {
+                 page-break-after: auto;
+             }
 
             .questions-only-group .question {
                 border: 1px solid #000; /* Black border for questions inside the group in print */
@@ -291,6 +313,7 @@
                 break-inside: avoid; /* Avoid breaking questions across pages */
                 page-break-inside: avoid; /* Older property for print breaking */
                  margin-bottom: 0 !important; /* Remove margin bottom for questions within the group */
+                 page-break-after: auto; /* Don't force page break after questions within a group */
             }
         }
     </style>
@@ -299,7 +322,7 @@
     <div class="container">
         <h1 class="text-2xl font-bold mb-8 text-center text-gray-800">Semester 2 Algebra 1 Mock Exam Questions</h1>
 
-        <div class="questions-container">
+        <div class="questions-container" id="questionsContainer">
             <div class="question">
                 <div class="question-header">
                     <h3>[1]</h3>
@@ -676,21 +699,23 @@
         // Initialize a counter for question numbers
         let questionNumber = 1;
 
-        // Iterate through each question element
-        questions.forEach(question => {
-            // Find the h3 tag within the question-header
-            const questionHeader = question.querySelector('.question-header h3');
+        // Function to update question numbers
+        function updateQuestionNumbers() {
+             questionNumber = 1; // Reset counter
+             questions.forEach(question => {
+                 const questionHeader = question.querySelector('.question-header h3');
+                 if (questionHeader && /^\[\d+\]$/.test(questionHeader.textContent.trim())) {
+                      questionHeader.textContent = '[' + questionNumber + ']';
+                      questionNumber++;
+                 }
+             });
+        }
 
-            // If an h3 tag exists, update its content with the current question number
-            if (questionHeader) {
-                // Check if the h3 content is a number in brackets (e.g., [1], [2])
-                // This prevents changing "Figure 1:", "Figure 2:", etc.
-                if (/^\[\d+\]$/.test(questionHeader.textContent.trim())) {
-                     questionHeader.textContent = '[' + questionNumber + ']';
-                     questionNumber++; // Increment the counter for the next question
-                }
-            }
-        });
+        // Update numbers on page load
+        updateQuestionNumbers();
+
+        // Removed JavaScript for PDF download
+
     </script>
 </body>
 </html>
