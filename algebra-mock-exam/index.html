@@ -627,5 +627,28 @@
 
         </div>
     </div>
+    <script>
+        // Get all elements with the class 'question'
+        const questions = document.querySelectorAll('.question');
+
+        // Initialize a counter for question numbers
+        let questionNumber = 1;
+
+        // Iterate through each question element
+        questions.forEach(question => {
+            // Find the h3 tag within the question-header
+            const questionHeader = question.querySelector('.question-header h3');
+
+            // If an h3 tag exists, update its content with the current question number
+            if (questionHeader) {
+                // Check if the h3 content is a number in brackets (e.g., [1], [2])
+                // This prevents changing "Figure 1:", "Figure 2:", etc.
+                if (/^\[\d+\]$/.test(questionHeader.textContent.trim())) {
+                     questionHeader.textContent = '[' + questionNumber + ']';
+                     questionNumber++; // Increment the counter for the next question
+                }
+            }
+        });
+    </script>
 </body>
 </html>
