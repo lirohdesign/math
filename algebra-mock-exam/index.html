@@ -181,7 +181,7 @@
             }
              /* Removed .download-button-container display: none; */
             .questions-container {
-                gap: 0; /* Removed gap for printing */
+                gap: 4mm; /* Reduced gap for printing */
             }
             .question {
                 border: none !important; /* Removed border for questions in print */
@@ -191,7 +191,8 @@
                 break-inside: avoid !important; /* Avoid breaking questions across pages */
                 page-break-inside: avoid !important; /* Older property for print breaking */
                 border-bottom: none; /* Ensure no border at the bottom in print */
-                page-break-after: always !important; /* Force a page break after each question */
+                /* Removed page-break-after: always !important; */ /* Reverted to allow multiple per page */
+                margin-bottom: 5mm !important; /* Added margin bottom for print */
                 height: auto !important; /* Ensure height is auto */
                 overflow: visible !important; /* Ensure content is not hidden */
             }
@@ -201,6 +202,7 @@
              /* Don't force a page break after the last question */
              .questions-container .question:last-child {
                  page-break-after: auto !important;
+                 margin-bottom: 0 !important; /* Remove margin bottom for the last question */
              }
 
             .show-answer-btn, .submit-btn {
@@ -244,12 +246,13 @@
             .figure-and-questions-group {
                 display: grid; /* Keep grid layout for printing */
                 grid-template-columns: 1fr 1fr; /* Two columns */
-                gap: 0; /* Removed gap for printing */
-                margin-bottom: 0 !important; /* Removed margin below the group */
+                gap: 4mm; /* Reduced gap for printing */
+                /* Removed margin-bottom: 5mm !important; */ /* Reverted to allow multiple per page */
+                margin-bottom: 5mm !important; /* Added margin bottom for print */
                 grid-column: span 2; /* Make this group span both columns of the main grid */
                 break-inside: avoid !important; /* Avoid breaking the group across pages */
                 page-break-inside: avoid !important; /* Older property for print breaking */
-                page-break-after: always !important; /* Force a page break after the group */
+                /* Removed page-break-after: always !important; */ /* Reverted to allow multiple per page */
                 height: auto !important; /* Ensure height is auto */
                 overflow: visible !important; /* Ensure content is not hidden */
                 border: none !important; /* Removed border for the group in print */
@@ -258,6 +261,7 @@
              /* Don't force a page break after the last group */
              .questions-container .figure-and-questions-group:last-child {
                  page-break-after: auto !important;
+                 margin-bottom: 0 !important; /* Remove margin bottom for the last group */
              }
 
 
@@ -273,7 +277,7 @@
              .questions-group {
                  display: flex;
                  flex-direction: column; /* Stack questions vertically */
-                 gap: 0; /* Removed space between questions within the group in print */
+                 gap: 4mm; /* Reduced space between questions within the group in print */
                  /* Removed justify-content: space-between; */
                  height: auto !important; /* Ensure height is auto */
                  overflow: visible !important; /* Ensure content is not hidden */
@@ -305,7 +309,8 @@
             /* Print styles for questions-only group */
             .questions-only-group {
                 grid-column: span 2; /* Span both columns */
-                margin-bottom: 0 !important; /* Removed margin below the group */
+                /* Removed margin-bottom: 5mm !important; */ /* Reverted to allow multiple per page */
+                margin-bottom: 5mm !important; /* Added margin bottom for print */
                 padding: 0 !important; /* Removed padding around the group in print */
                 border: none !important; /* Removed border for the group in print */
                 border-radius: 0; /* Remove rounded corners in print */
@@ -314,14 +319,15 @@
                 page-break-inside: avoid !important; /* Older property for print breaking */
                 display: grid; /* Use grid for internal layout */
                 grid-template-columns: 1fr 1fr; /* Two columns within this group in print */
-                gap: 0; /* Removed space between questions within the group in print */
-                page-break-after: always !important; /* Force a page break after the group */
+                gap: 4mm; /* Reduced space between questions within the group in print */
+                /* Removed page-break-after: always !important; */ /* Reverted to allow multiple per page */
                 height: auto !important; /* Ensure height is auto */
                 overflow: visible !important; /* Ensure content is not hidden */
             }
              /* Don't force a page break after the last group */
              .questions-container .questions-only-group:last-child {
                  page-break-after: auto !important;
+                 margin-bottom: 0 !important; /* Remove margin bottom for the last group */
              }
 
             .questions-only-group .question {
