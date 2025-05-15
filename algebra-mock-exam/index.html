@@ -45,7 +45,6 @@
             color: #1f2937;
             margin-bottom: 20px;
         }
-         /* Removed .download-button-container styles */
 
         /* Container for two-column layout */
         .questions-container {
@@ -132,7 +131,6 @@
              display: flex;
              flex-direction: column; /* Stack questions vertically */
              gap: 10px; /* Space between questions within the group */
-             /* Removed justify-content: space-between; */
         }
 
         /* Style for questions within a figure-and-questions-group to make workspace fill space */
@@ -167,141 +165,170 @@
              background-color: #f9fafb; /* Keep the light background for questions inside the group */
         }
 
+
+        /* Print-specific styles */
         @media print {
-    body {
-        background-color: #fff;
-        padding: 5mm;
-        font-size: 10pt;
-    }
-    .container {
-        box-shadow: none;
-        margin: 0;
-        padding: 0;
-        width: 100%;
-        max-width: 100%;
-    }
-    h1 {
-        margin-bottom: 10mm;
-    }
-    .questions-container {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 5mm;
-    }
+            body {
+                background-color: #fff;
+                padding: 5mm; /* Page margins */
+                font-size: 10pt; /* Optional: Adjust font size. Test for readability. */
+            }
+            .container {
+                box-shadow: none;
+                margin: 0;
+                padding: 0;
+                width: 100%;
+                max-width: 100%;
+            }
+            h1 { /* Ensure h1 also has print styling if needed */
+                text-align: center; /* Keep it centered */
+                color: #000; /* Black for print */
+                margin-bottom: 10mm; /* Space after main title */
+            }
+            .questions-container {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 5mm; /* Space between question blocks */
+            }
 
-    .question,
-    .figure-and-questions-group,
-    .questions-only-group {
-        break-inside: avoid !important;
-        page-break-inside: avoid !important;
-        margin-top: 0 !important;
-        margin-bottom: 5mm !important;
-        padding: 0 !important;
-        border: none !important;
-        background-color: #fff !important;
-        height: auto !important;
-        overflow: visible !important;
-        /* EXPERIMENTAL: display: flow-root can sometimes help make elements
-           more robust against internal breaking. Test this carefully.
-           Start by applying it only to the group containers if issues are severe there. */
-        /* display: flow-root; */
-    }
+            /* Common rule for questions and groups to avoid breaking */
+            .question,
+            .figure-and-questions-group,
+            .questions-only-group {
+                break-inside: avoid !important;
+                page-break-inside: avoid !important; /* Older browsers */
+                margin-top: 0 !important;
+                margin-bottom: 5mm !important; /* Default bottom margin */
+                padding: 0 !important;
+                border: none !important;
+                background-color: #fff !important;
+                height: auto !important;
+                overflow: visible !important;
+            }
 
-    /* If specifically the groups are the primary issue, try flow-root on them first: */
-    .figure-and-questions-group,
-    .questions-only-group {
-        display: flow-root; /* EXPERIMENT: This creates a new block formatting context. */
-                            /* Remove if it causes other layout issues. */
-    }
-
-
-    .questions-container > *:first-child {
-         margin-top: 0 !important;
-    }
-     .questions-container > *:last-child {
-         margin-bottom: 0 !important;
-     }
-
-    .show-answer-btn, .submit-btn, .explanation, .score {
-        display: none !important;
-    }
-
-    .question img, .figure-box img {
-         max-width: 100% !important;
-         height: auto !important;
-         display: block !important;
-         margin-top: 2mm;
-         margin-bottom: 2mm;
-         border: 1px solid #ccc !important;
-         border-radius: 0 !important;
-         break-inside: avoid !important; /* TRY THIS: Prevent image itself from being a break point */
-    }
-
-     .workspace {
-        min-height: 0 !important;
-        margin-top: 3mm !important;
-        border-bottom: none !important;
-     }
-    .workspace.medium-space {
-        min-height: 5em !important;
-    }
-    .workspace.large-space {
-        min-height: 8em !important;
-    }
-
-    /* --- Figure 1 Group Specific Fixes --- */
-    .figure-and-questions-group {
-        /* display: flow-root; (Applied above as an experiment) */
-        /* Existing styles: grid-column: span 2; display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; */
-        /* The break-inside: avoid !important; is on the common rule for groups. */
-    }
-
-    /* VERY IMPORTANT FOR FIGURE GROUP: Make its direct children also avoid breaking */
-    .figure-and-questions-group > .figure-box,
-    .figure-and-questions-group > .questions-group {
-        break-inside: avoid !important;
-        /* These are grid items of .figure-and-questions-group.
-           Their own display type is less critical here than their participation
-           in the parent grid. Adding break-inside: avoid is the key. */
-    }
-    /* --- End Figure 1 Group Specific Fixes --- */
+            /* EXPERIMENTAL: display: flow-root can sometimes help elements be more robust against internal breaking.
+               Apply to groups if they are the primary source of bad breaks. Test carefully. */
+            .figure-and-questions-group,
+            .questions-only-group {
+                display: flow-root; /* This creates a new block formatting context. Remove if it causes other layout issues. */
+            }
+            /* If individual questions (like Q29 with its image) are still splitting badly, you could try adding flow-root here too:
+            .questions-container > .question,
+            .questions-only-group .question,
+            .figure-and-questions-group .questions-group .question {
+                display: flow-root;
+            }
+            */
 
 
-     .questions-group {
-         display: flex;
-         flex-direction: column;
-         gap: 4mm;
-    }
+            /* No top margin for the very first block */
+            .questions-container > *:first-child {
+                 margin-top: 0 !important;
+            }
+            /* No bottom margin for the very last block */
+             .questions-container > *:last-child {
+                 margin-bottom: 0 !important;
+             }
 
-    .figure-and-questions-group .questions-group .question {
-         margin-bottom: 0 !important;
-    }
-     .figure-and-questions-group .questions-group .question:last-child {
-        margin-bottom: 0 !important;
-     }
+            /* Hide non-print elements */
+            .show-answer-btn, .submit-btn, .explanation, .score { /* Add any other classes for buttons/interactive elements */
+                display: none !important;
+            }
 
-    .questions-only-group {
-        /* display: flow-root; (Applied above as an experiment) */
-        grid-column: span 2;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 4mm;
-    }
+            /* Styles for images */
+            .question img, .figure-box img {
+                 max-width: 100% !important;
+                 height: auto !important;
+                 display: block !important; /* Make sure images are block */
+                 margin-top: 2mm;
+                 margin-bottom: 2mm;
+                 border: 1px solid #ccc !important; /* Optional: light border for images in print */
+                 border-radius: 0 !important;
+                 break-inside: avoid !important; /* TRY THIS: Prevent image itself from being a break point */
+            }
 
-    .questions-only-group .question {
-        margin-bottom: 0 !important;
-    }
-    .questions-only-group .question:last-child {
-        margin-bottom: 0 !important;
-    }
+            /* Workspace styles */
+             .workspace {
+                min-height: 0 !important; /* Base min-height */
+                margin-top: 3mm !important;
+                border-bottom: none !important; /* No dashed lines in print */
+             }
+            .workspace.medium-space {
+                min-height: 5em !important; /* Specific height for medium workspace */
+            }
+            .workspace.large-space {
+                min-height: 8em !important; /* Specific height for large workspace */
+            }
 
-    .MathJax_Display, mjx-container {
-        display: block !important;
-        overflow: visible !important;
-        break-inside: avoid !important;
-        margin: 0.5em 0 !important;
-    }
-}
+            /* --- Figure 1 Group Specific Fixes --- */
+            .figure-and-questions-group {
+                /* display: flow-root; (Applied with other groups above as an experiment) */
+                /* Existing styles from base: grid-column: span 2; display: grid; grid-template-columns: 1fr 1fr; gap: 10px (screen) -> updated to 4mm (print) if needed below */
+                /* break-inside: avoid !important; is on the common rule for groups. */
+                 gap: 4mm; /* Print-specific gap for internal grid of this group */
+            }
+
+            /* VERY IMPORTANT FOR FIGURE GROUP: Make its direct children also avoid breaking */
+            .figure-and-questions-group > .figure-box,
+            .figure-and-questions-group > .questions-group {
+                break-inside: avoid !important;
+                /* These are grid items of .figure-and-questions-group. */
+            }
+            /* --- End Figure 1 Group Specific Fixes --- */
+
+            .figure-box {
+                /* Base styles like padding, border, background are reset by common group rule for print */
+            }
+
+             .questions-group { /* Container for questions next to a figure */
+                 display: flex; /* This is from your base styles */
+                 flex-direction: column; /* This is from your base styles */
+                 gap: 4mm; /* Print-specific gap for questions within this sub-group */
+            }
+
+            /* Questions within a figure-and-questions-group */
+            .figure-and-questions-group .questions-group .question {
+                 margin-bottom: 0 !important; /* Rely on parent .questions-group gap */
+                 /* break-inside: avoid is inherited from general .question rule */
+                 /* border, background, padding are reset by general .question rule for print */
+            }
+             .figure-and-questions-group .questions-group .question:last-child {
+                margin-bottom: 0 !important;
+             }
+             /* Workspace within these questions - if it needs specific print flex behavior */
+             .figure-and-questions-group .questions-group .question .workspace {
+                 flex-grow: 0; /* For print, you might not want workspace to grow excessively to fill flex space. Test this. */
+             }
+
+
+            /* Print styles for questions-only group */
+            .questions-only-group {
+                /* display: flow-root; (Applied with other groups above as an experiment) */
+                /* grid-column: span 2; (from base) */
+                /* display: grid; (from base) */
+                /* grid-template-columns: 1fr 1fr; (from base) */
+                gap: 4mm; /* Print-specific gap */
+                /* padding, border, background are reset by common group rule for print */
+            }
+
+            /* Questions within a questions-only-group */
+            .questions-only-group .question {
+                margin-bottom: 0 !important; /* Rely on parent .questions-only-group gap */
+                /* break-inside: avoid is inherited from general .question rule */
+                /* border, background, padding are reset by general .question rule for print */
+            }
+            .questions-only-group .question:last-child {
+                margin-bottom: 0 !important;
+            }
+
+            /* MathJax specific styles for print */
+            .MathJax_Display, mjx-container { /* Target MathJax v2 and v3 */
+                display: block !important;
+                overflow: visible !important;
+                break-inside: avoid !important;
+                margin: 0.5em 0 !important; /* Adjust spacing around math blocks if needed for print */
+            }
+        }
     </style>
 </head>
 <body>
@@ -657,51 +684,23 @@
                     <div class="question-header">
                         <h3>Figure 3:</h3>
                     </div>
-                    <img src="./images/fig-3.png" alt="Histogram">
-                </div>
+                     <img src="./images/fig-3.png" alt="Age Range Data (Placeholder - use actual image if available)"> </div>
                 <div class="questions-group">
-                     <div class="question">
-                         <div class="question-header">
-                            <h3>[39]</h3>
-                            <p>Based on Figure 3, which age range has the highest number of family households?</p>
-                        </div>
-                        </div>
-
                     <div class="question">
-                         <div class="question-header">
+                        <div class="question-header">
+                            <h3>[39]</h3>
+                            <p>Based on Figure 3, which age range has the most presidents?</p>
+                        </div>
+                    </div>
+                    <div class="question">
+                        <div class="question-header">
                             <h3>[40]</h3>
-                            <p>Based on Figure 3, approximately how many family households are in the 25-29 years age range (in thousands)?</p>
+                            <p>How many presidents were in the 50-59 age range at the start of their term, according to Figure 3?</p>
                         </div>
-                        </div>
+                         <div class="workspace medium-space"></div>
+                    </div>
                 </div>
             </div>
 
-        </div>
-    </div>
-    <script>
-        // Get all elements with the class 'question'
-        const questions = document.querySelectorAll('.question');
-
-        // Initialize a counter for question numbers
-        let questionNumber = 1;
-
-        // Function to update question numbers
-        function updateQuestionNumbers() {
-             questionNumber = 1; // Reset counter
-             questions.forEach(question => {
-                 const questionHeader = question.querySelector('.question-header h3');
-                 if (questionHeader && /^\[\d+\]$/.test(questionHeader.textContent.trim())) {
-                      questionHeader.textContent = '[' + questionNumber + ']';
-                      questionNumber++;
-                 }
-             });
-        }
-
-        // Update numbers on page load
-        updateQuestionNumbers();
-
-        // Removed JavaScript for PDF download
-
-    </script>
-</body>
+        </div> </div> </body>
 </html>
