@@ -129,8 +129,22 @@
              display: flex;
              flex-direction: column; /* Stack questions vertically */
              gap: 10px; /* Space between questions within the group */
-             justify-content: space-between; /* Distribute space evenly */
+             /* Removed justify-content: space-between; */
         }
+
+        /* Style for questions within a figure-and-questions-group to make workspace fill space */
+        .figure-and-questions-group .questions-group .question {
+             display: flex;
+             flex-direction: column; /* Arrange content and workspace vertically */
+             flex-grow: 1; /* Allow question box to grow */
+             border: 1px solid #e5e7eb; /* Keep the light grey border for questions inside the group */
+             background-color: #f9fafb; /* Keep the light background for questions inside the group */
+        }
+
+         .figure-and-questions-group .questions-group .question .workspace {
+             flex-grow: 1; /* Make the workspace fill the remaining vertical space */
+         }
+
 
         /* Container for grouped questions */
         .questions-only-group {
@@ -229,8 +243,22 @@
                  display: flex;
                  flex-direction: column; /* Stack questions vertically */
                  gap: 8mm; /* Space between questions within the group in print */
-                 justify-content: space-between; /* Distribute space evenly in print */
+                 /* Removed justify-content: space-between; */
             }
+
+            /* Print styles for questions within a figure-and-questions-group to make workspace fill space */
+            .figure-and-questions-group .questions-group .question {
+                 display: flex;
+                 flex-direction: column; /* Arrange content and workspace vertically */
+                 flex-grow: 1; /* Allow question box to grow */
+                 border: 1px solid #000; /* Black border for questions inside the group in print */
+                 background-color: #fff; /* White background for questions inside the group in print */
+            }
+
+             .figure-and-questions-group .questions-group .question .workspace {
+                 flex-grow: 1; /* Make the workspace fill the remaining vertical space */
+             }
+
 
             /* Print styles for questions-only group */
             .questions-only-group {
