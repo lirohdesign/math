@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algebra 1 Mock Exam</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Configure MathJax before loading it
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true,
+                processEnvironments: true
+            },
+            options: {
+                // Process elements with class 'mathjax-process'
+                processHtmlClass: 'mathjax-process',
+                // Ignore elements with class 'tex2jax_ignore' (optional, but good practice)
+                ignoreHtmlClass: 'tex2jax_ignore'
+            },
+            loader: {
+                load: ['input/tex', 'output/chtml']
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        /* Custom styles for better readability and layout */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #1f2937;
+            margin-bottom: 20px;
+        }
+
+        /* Container for two-column layout */
+        .questions-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Two equal columns */
+            gap: 10px; /* Space between columns and rows */
+        }
+
+        .question {
+            margin-bottom: 0; /* Handled by gap in grid or group */
+            padding: 15px;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            background-color: #f9fafb;
+        }
+        .question h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #1f2937;
+        }
+        .options label {
+            display: block;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+        .explanation {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #e0f2f7; /* Light blue background */
+            border-left: 4px solid #0891b2; /* Cyan border */
+            border-radius: 4px;
+            color: #0e7490; /* Darker cyan text */
+            display: none; /* Initially hidden */
+            white-space: pre-wrap; /* Preserve line breaks in explanations */
+        }
+        .show-answer-btn {
+            margin-top: 10px;
+            padding: 6px 12px;
+            background-color: #60a5fa; /* Blue */
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            display: none; /* Initially hidden */
+        }
+        .show-answer-btn:hover {
+            background-color: #3b82f6; /* Darker blue */
+        }
+        .submit-btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #10b981; /* Green */
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1.1em;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .submit-btn:hover {
+            background-color: #059669; /* Darker green */
+        }
+        .score {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #d1fae5; /* Light green */
+            border: 1px solid #34d399; /* Green border */
+            border-radius: 6px;
+            font-size: 1.2em;
+            font-weight: bold;
+            text-align: center;
+            color: #065f46; /* Dark green text */
+            display: none; /* Initially hidden */
+        }
+         /* Style for dropdowns */
+        .question select {
+            margin-top: 10px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: auto; /* Adjust width as needed */
+            display: inline-block;
+        }
+
+        /* Container for figure and related questions */
+        .figure-and-questions-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Two columns */
+            gap: 10px; /* Space between figure and questions */
+            margin-bottom: 10px; /* Space below the group */
+            grid-column: span 2; /* Make this group span both columns of the main grid */
+        }
+
+        .figure-box {
+             padding: 15px; /* Match question padding */
+             border: 1px solid #e5e7eb; /* Match question border */
+             border-radius: 6px; /* Match question border-radius */
+             background-color: #f9fafb; /* Match question background */
+        }
+         .figure-box img {
+             max-width: 100%; /* Ensure images are responsive */
+             height: auto; /* Maintain aspect ratio */
+             display: block; /* Make image a block element */
+             margin: 0 auto; /* Center the image */
+             border: 1px solid #ccc; /* Optional: Add a light border */
+             border-radius: 4px; /* Optional: Rounded corners */
+         }
+
+
+        .questions-group {
+             display: flex;
+             flex-direction: column; /* Stack questions vertically */
+             gap: 10px; /* Space between questions within the group */
+        }
+
+        /* Style for questions within a figure-and-questions-group */
+        .figure-and-questions-group .questions-group .question {
+             margin-bottom: 0; /* Handled by gap in questions-group */
+             padding: 15px; /* Keep padding */
+             border: 1px solid #e5e7eb; /* Keep border */
+             border-radius: 6px; /* Keep border-radius */
+             background-color: #f9fafb; /* Keep background */
+        }
+
+
+        /* Container for grouped questions */
+        .questions-only-group {
+            grid-column: span 2; /* Span both columns */
+            margin-bottom: 10px; /* Space below the group */
+            padding: 10px; /* Add some padding around the group */
+            border: 1px solid #d1d5db; /* Light grey border for the group */
+            border-radius: 8px;
+            background-color: #e5e7eb; /* Light background for the group */
+            display: grid; /* Use grid for internal layout */
+            grid-template-columns: 1fr 1fr; /* Two columns within this group */
+            gap: 10px; /* Space between questions within the group */
+        }
+
+        .questions-only-group .question {
+             margin-bottom: 0; /* Handled by gap in grid */
+             padding: 15px; /* Keep padding */
+             border: 1px solid #e5e7eb; /* Keep border */
+             border-radius: 6px; /* Keep border-radius */
+             background-color: #f9fafb; /* Keep background */
+        }
+
+        /* Print-specific styles */
+        @media print {
+            body {
+                background-color: #fff; /* White background for printing */
+                padding: 5mm; /* Reduced padding for print margins */
+            }
+            .container {
+                box-shadow: none; /* Remove shadow in print */
+                margin: 0;
+                padding: 0;
+            }
+            .questions-container {
+                 gap: 4mm; /* Reduced gap for printing */
+            }
+            .question {
+                border: 1px solid #000 !important; /* Black border for questions in print */
+                border-radius: 0 !important; /* Remove rounded corners in print */
+                background-color: #fff !important; /* White background for questions in print */
+                padding: 5mm !important; /* Padding inside the box in print */
+                margin-bottom: 10mm !important; /* Add some space between questions */
+                break-inside: avoid !important; /* Avoid breaking questions across pages */
+                page-break-inside: avoid !important; /* Older property for print breaking */
+                page-break-after: auto !important; /* Allow multiple questions per page */
+                height: auto !important; /* Ensure height is auto */
+                overflow: visible !important; /* Ensure content is hidden */
+            }
+             .question:last-child {
+                margin-bottom: 0 !important; /* Remove margin after the last question */
+             }
+
+            .options label {
+                display: block !important; /* Ensure options are block elements in print */
+            }
+
+            .explanation {
+                display: block !important; /* Show explanations in print */
+                background-color: #f0f0f0 !important; /* Light grey background for print */
+                border-left: 4px solid #ccc !important; /* Grey border for print */
+                color: #000 !important; /* Black text for print */
+            }
+            .show-answer-btn, .submit-btn, .score, .navigation-links {
+                display: none !important; /* Hide buttons, score, and navigation in print */
+            }
+             /* Adjust image sizes for print if necessary */
+            .question img {
+                 height: auto !important; /* Ensure height is auto for proportional scaling */
+                 max-width: 100% !important; /* Ensure images don't overflow */
+                 margin: 5mm auto !important; /* Adjust margin for print */
+            }
+             /* Style for dropdowns in print - display as text */
+             .question select {
+                 display: none !important; /* Hide dropdown */
+             }
+             .question .selected-option-print::before {
+                 content: "Selected Answer: " attr(data-selected-option) !important; /* Display selected answer */
+                 display: block !important;
+                 margin-top: 5mm !important;
+                 font-weight: bold !important;
+             }
+
+             /* Print styles for figure and related questions group */
+            .figure-and-questions-group {
+                display: grid; /* Keep grid layout for printing */
+                grid-template-columns: 1fr 1fr; /* Two columns */
+                gap: 4mm; /* Reduced gap for printing */
+                margin-bottom: 10mm !important; /* Add some space below the group */
+                grid-column: span 2; /* Make this group span both columns of the main grid */
+                break-inside: avoid !important; /* Avoid breaking the group across pages */
+                page-break-inside: avoid !important; /* Older property for print breaking */
+                page-break-after: auto !important; /* Allow multiple groups per page */
+                height: auto !important; /* Ensure height is auto */
+                overflow: visible !important; /* Ensure content is not hidden */
+                border: 1px solid #000 !important; /* Black border for the group in print */
+                padding: 5mm !important; /* Padding around the group in print */
+            }
+             /* Don't force a page break after the last group */
+             .questions-container .figure-and-questions-group:last-child {
+                 margin-bottom: 0 !important; /* Remove margin after the last group */
+             }
+
+            .figure-box {
+                border: none !important; /* Removed border for printing */
+                border-radius: 0; /* Remove rounded corners in print */
+                background-color: #fff; /* White background for printing */
+                padding: 0 !important; /* Removed padding in print */
+                height: auto !important; /* Ensure height is auto */
+                overflow: visible !important; /* Ensure content is not hidden */
+            }
+             .figure-box img {
+                 height: auto !important; /* Ensure height is auto for proportional scaling */
+                 max-width: 100% !important; /* Ensure images don't overflow */
+                 margin: 0 auto !important; /* Adjust margin for print */
+            }
+
+             .questions-group {
+                 display: flex;
+                 flex-direction: column; /* Stack questions vertically */
+                 gap: 4mm; /* Reduced space between questions within the group in print */
+                 height: auto !important; /* Ensure height is auto */
+                 overflow: visible !important; /* Ensure content is not hidden */
+            }
+
+            /* Print styles for questions within a figure-and-questions-group to make workspace fill space */
+            .figure-and-questions-group .questions-group .question {
+                 border: 1px solid #000 !important; /* Black border for questions inside the group in print */
+                 background-color: #fff !important; /* White background for questions inside the group in print */
+                 break-inside: avoid !important; /* Avoid breaking questions across pages */
+                 page-break-inside: avoid !important; /* Older property for print breaking */
+                 margin-bottom: 0 !important; /* Remove margin bottom for questions within the group */
+                 page-break-after: auto !important; /* Don't force page break after questions within a group */
+                 height: auto !important; /* Ensure height is auto */
+                 overflow: visible !important; /* Ensure content is not hidden */
+                 padding: 5mm !important; /* Padding for questions within the group */
+            }
+
+             .figure-and-questions-group .questions-group .question .workspace {
+                 flex-grow: 1; /* Make the workspace fill the remaining vertical space */
+                 height: auto !important; /* Ensure height is auto */
+                 overflow: visible !important; /* Ensure content is not hidden */
+             }
+
+
+            /* Print styles for questions-only group */
+            .questions-only-group {
+                grid-column: span 2; /* Span both columns */
+                margin-bottom: 10mm !important; /* Add some space below the group */
+                padding: 5mm !important; /* Padding around the group in print */
+                border: 1px solid #000 !important; /* Black border for the group in print */
+                border-radius: 0; /* Remove rounded corners in print */
+                background-color: #fff !important; /* White background for the group in print */
+                break-inside: avoid !important; /* Avoid breaking the group across pages */
+                page-break-inside: avoid !important; /* Older property for print breaking */
+                display: grid; /* Use grid for internal layout */
+                grid-template-columns: 1fr 1fr; /* Two columns within this group in print */
+                gap: 4mm; /* Reduced space between questions within the group in print */
+                page-break-after: auto !important; /* Allow multiple groups per page */
+                height: auto !important; /* Ensure height is auto */
+                overflow: visible !important; /* Ensure content is not hidden */
+            }
+             /* Don't force a page break after the last group */
+             .questions-container .questions-only-group:last-child {
+                 margin-bottom: 0 !important; /* Remove margin after the last group */
+             }
+
+            .questions-only-group .question {
+                border: 1px solid #000 !important; /* Black border for questions inside the group in print */
+                background-color: #fff !important; /* White background for questions inside the group in print */
+                break-inside: avoid !important; /* Avoid breaking questions across pages */
+                page-break-inside: avoid !important; /* Older property for print breaking */
+                 margin-bottom: 0 !important; /* Remove margin bottom for questions within the group */
+                 page-break-after: auto !important; /* Don't force page break after questions within a group */
+                 height: auto !important; /* Ensure height is auto */
+                 overflow: visible !important; /* Ensure content is not hidden */
+                 padding: 5mm !important; /* Padding for questions within the group */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-2xl font-bold mb-6 text-center text-gray-800">Semester 2 Algebra 1 Mock Exam</h1>
+
+        <form id="examForm">
+            <div class="questions-container" id="questionsContainer">
+                </div>
+        </form>
+
+        <button type="button" class="submit-btn" id="submitExam">Submit Exam</button>
+        <div class="score" id="examScore"></div>
+    </div>
+
+    <script>
+        // Define all questions and groups with their content
+        const examData = [
+             // Individual Questions (1-19)
+            {
+                id: 'q1', type: 'multiple-choice', question: 'Solve the system of equations:\n$$2x+y=11$$\n$$x-2y=8$$',
+                options: { a: '(6, -1)', b: '(-6, 1)', c: '(5, 1)', d: '(4, 3)' }, correctAnswer: 'a',
+                explanation: 'You can solve this system using substitution or elimination.\nUsing substitution:\nSolve equation (1) for y: $y = 11 - 2x$.\nSubstitute this expression for y into equation (2): $x - 2(11 - 2x) = 8$.\nSimplify and solve for x: $x - 22 + 4x = 8$.\nCombine like terms: $5x - 22 = 8$.\nAdd 22 to both sides: $5x = 30$.\nDivide by 5: $x = 6$.\nSubstitute x=6 back into the equation for y: $y = 11 - 2(6) = 11 - 12 = -1$.\nThe solution is (6, -1).\n\nExplanation (Elimination Method):\nMultiply equation (1) by 2 to make the coefficients of y opposites:\n$2 \\times (2x + y = 11) \\Rightarrow 4x + 2y = 22$.\nAdd this new equation to equation (2):\n$(4x + 2y) + (x - 2y) = 22 + 8$.\nCombine like terms: $5x = 30$.\nDivide by 5: $x = 6$.\nSubstitute x=6 back into either original equation, for example equation (1):\n$2(6) + y = 11$.\nSimplify: $12 + y = 11$.\nSubtract 12 from both sides: $y = 11 - 12 = -1$.\nThe solution is (6, -1).'
+            },
+            {
+                id: 'q2', type: 'multiple-choice', question: 'Solve the system of equations:\n$$y=3x-5$$\n$$y=-x+7$$',
+                options: { a: '(3, 4)', b: '(4, 3)', c: '(-3, -4)', d: '(-4, -3)' }, correctAnswer: 'a',
+                explanation: 'Since both equations are already solved for y, you can set them equal to each other:\n$3x - 5 = -x + 7$.\nAdd x to both sides: $3x + x - 5 = 7 \\Rightarrow 4x - 5 = 7$.\nAdd 5 to both sides: $4x = 12$.\nDivide by 4: $x = 3$.\nSubstitute x=3 into either equation, for example $y = 3x - 5$:\n$y = 3(3) - 5 = 9 - 5 = 4$.\nThe solution is (3, 4).'
+            },
+            {
+                id: 'q3', type: 'multiple-choice', displayType: 'dropdown', question: 'Determine if the polynomial is a monomial, binomial or trinomial:\n$$5k^{3} + 2k$$',
+                 options: { a: 'Monomial', b: 'Binomial', c: 'Trinomial' }, correctAnswer: 'b',
+                explanation: 'A binomial is a polynomial with two terms. This expression has two terms: $5k^3$ and $2k$.'
+            },
+            {
+                id: 'q4', type: 'multiple-choice', displayType: 'dropdown', question: 'Determine if the polynomial is a monomial, binomial or trinomial:\n$$-7b^{4} + b^{2} - 1$$',
+                 options: { a: 'Monomial', b: 'Binomial', c: 'Trinomial' }, correctAnswer: 'c',
+                explanation: 'A trinomial is a polynomial with three terms. This expression has three terms: $-7b^4$, $b^2$, and $-1$.'
+            },
+            {
+                id: 'q5', type: 'multiple-choice', displayType: 'dropdown', question: 'Determine if the polynomial is a monomial, binomial or trinomial:\n$$12p^{7}$$',
+                 options: { a: 'Monomial', b: 'Binomial', c: 'Trinomial' }, correctAnswer: 'a',
+                explanation: 'A monomial is a polynomial with one term. This expression has one term: $12p^7$.'
+            },
+             {
+                id: 'q6', type: 'multiple-choice', displayType: 'dropdown', question: 'Determine the degree of the polynomial:\n$$a^{3} + a^{7} - 5$$',
+                 options: { a: '3', b: '7', c: '5', d: '1' }, correctAnswer: 'b',
+                explanation: 'The degree of a polynomial is the highest power of the variable in the polynomial. The highest power of \'a\' is 7.'
+            },
+            {
+                id: 'q7', type: 'multiple-choice', displayType: 'dropdown', question: 'Determine the degree of the polynomial:\n$$4y^{8} - 3y^{2} + 9y^{5}$$',
+                 options: { a: '2', b: '5', c: '8', d: '4' }, correctAnswer: 'c',
+                explanation: 'The highest power of \'y\' in the polynomial is 8.'
+            },
+            {
+                id: 'q8', type: 'multiple-choice', displayType: 'dropdown', question: 'Determine the degree of the polynomial:\n$$-25z^{10}$$',
+                 options: { a: '1', b: '10', c: '0', d: '25' }, correctAnswer: 'b',
+                explanation: 'The highest power of \'z\' in the polynomial is 10.'
+            },
+            {
+                id: 'q9', type: 'multiple-choice', question: 'Simplify the sum:\n$$(3m^2 - 5m + 2) + (m^2 + 4m - 9)$$',
+                options: { A: '$4m^2 - m - 7$', B: '$4m^2 - 9m - 7$', C: '$2m^2 - m - 7$', D: '$4m^2 - m - 11$' }, correctAnswer: 'A',
+                explanation: 'Combine like terms:\n$(3m^2 + m^2) + (-5m + 4m) + (2 - 9)$\n$4m^2 - m - 7$.'
+            },
+            {
+                id: 'q10', type: 'multiple-choice', question: 'Simplify the difference:\n$$(7c^4 + 2c^2 - c) - (3c^4 - c^3 + 5c^2)$$',
+                options: { A: '$4c^4 - c^3 - 3c^2 - c$', B: '$4c^4 + c^3 - 3c^2 - c$', C: '$10c^4 - c^3 + 7c^2 - c$', D: '$4c^4 + c^3 + 7c^2 - c$' }, correctAnswer: 'B',
+                explanation: 'Distribute the negative sign to the second polynomial:\n$7c^4 + 2c^2 - c - 3c^4 + c^3 - 5c^2$.\nCombine like terms:\n$(7c^4 - 3c^4) + c^3 + (2c^2 - 5c^2) - c$\n$4c^4 + c^3 - 3c^2 - c$.'
+            },
+            {
+                id: 'q11', type: 'multiple-choice', question: 'Find the product:\n$$-3x(2x^2 - 5x + 1)$$',
+                options: { A: '$-6x^3 + 15x^2 - 3x$', B: '$-6x^3 - 15x^2 + 3x$', C: '$-6x^3 + 15x^2 + 3x$', D: '$-6x^3 - 15x^2 - 3x$' }, correctAnswer: 'A',
+                explanation: 'Distribute $-3x$ to each term inside the parentheses:\n$(-3x)(2x^2) + (-3x)(-5x) + (-3x)(1)$\n$-6x^3 + 15x^2 - 3x$.'
+            },
+            {
+                id: 'q12', type: 'multiple-choice', question: 'Find the product:\n$$(4y+1)^2$$',
+                options: { A: '$16y^2 + 1$', B: '$16y^2 + 8y + 1$', C: '$8y^2 + 8y + 1$', D: '$16y^2 + 4y + 1$' }, correctAnswer: 'B',
+                explanation: 'Expand the expression: $(4y+1)(4y+1)$.\nUse the FOIL method (First, Outer, Inner, Last):\n$(4y)(4y) + (4y)(1) + (1)(4y) + (1)(1)$\n$16y^2 + 4y + 4y + 1$\nCombine like terms: $16y^2 + 8y + 1$.'
+            },
+            {
+                id: 'q13', type: 'multiple-choice', question: 'Find the product:\n$$(b+5)(2b-3)$$',
+                options: { A: '$2b^2 + 7b - 15$', B: '$2b^2 - 7b - 15$', C: '$2b^2 + 13b - 15$', D: '$2b^2 - 13b - 15$' }, correctAnswer: 'A',
+                explanation: 'Use the FOIL method:\n$(b)(2b) + (b)(-3) + (5)(2b) + (5)(-3)$\n$2b^2 - 3b + 10b - 15$\nCombine like terms: $2b^2 + 7b - 15$.'
+            },
+            {
+                id: 'q14', type: 'multiple-choice', question: 'Find the product:\n$$(2w-1)(w^2 + 4w - 3)$$',
+                options: { A: '$2w^3 + 9w^2 - 10w + 3$', B: '$2w^3 + 7w^2 - 10w + 3$', C: '$2w^3 + 9w^2 - 2w + 3$', D: '$2w^3 + 7w^2 - 2w + 3$' }, correctAnswer: 'B',
+                explanation: 'Distribute each term from the first binomial to the trinomial:\n$2w(w^2 + 4w - 3) - 1(w^2 + 4w - 3)$\n$(2w^3 + 8w^2 - 6w) - (w^2 + 4w - 3)$\n$2w^3 + 8w^2 - 6w - w^2 - 4w + 3$.\nCombine like terms:\n$2w^3 + (8w^2 - w^2) + (-6w - 4w) + 3$\n$2w^3 + 7w^2 - 10w + 3$.'
+            },
+            {
+                id: 'q15', type: 'multiple-choice', question: 'State the Greatest Common Factor of:\n$$18a^3, 27a^5$$',
+                options: { a: '$3a$', b: '$9a$', c: '$9a^3$', d: '$27a^5$' }, correctAnswer: 'c',
+                explanation: 'To find the Greatest Common Factor (GCF), find the GCF of the coefficients and the GCF of the variables separately.\n\nCoefficients: 18 and 27\nFactors of 18:\n1, 18\n2, 9\n3, 6\nFactors of 27:\n1, 27\n3, 9\nThe greatest common factor of 18 and 27 is 9.\n\nVariables: $a^3$ and $a^5$\n$a^3 = a \\times a \\times a$\n$a^5 = a \\times a \\times a \\times a \\times a$\nThe common factors are $a \\times a \\times a$, which is $a^3$.\n\nMultiply the GCF of the coefficients and the GCF of the variables: $9 \\times a^3 = 9a^3$.\nThe GCF is $9a^3$.',
+            },
+            {
+                id: 'q16', type: 'multiple-choice', question: 'State the Greatest Common Factor of:\n$$12xy^2, 30x^2y, 6x^3y^3$$',
+                options: { a: '$6x^3y^3$', b: '$12xy$', c: '$6xy$', d: '$30x^2y$' }, correctAnswer: 'c',
+                explanation: 'To find the Greatest Common Factor (GCF), find the GCF of the coefficients and the GCF of the variables separately.\n\nCoefficients: 12, 30, and 6\nFactors of 12:\n1, 12\n2, 6\n3, 4\nFactors of 30:\n1, 30\n2, 15\n3, 10\n5, 6\nFactors of 6:\n1, 6\n2, 3\nThe greatest common factor of 12, 30, and 6 is 6.\n\nVariables: $xy^2$, $x^2y$, $x^3y^3$\n$xy^2 = x \\times y \\times y$\n$x^2y = x \\times x \\times y$\n$x^3y^3 = x \\times x \\times x \\times y \\times y \\times y$\nThe lowest power of x present in all terms is $x^1$ (or x).\nThe lowest power of y present in all terms is $y^1$ (or y).\nThe GCF of the variables is $x \\times y = xy$.\n\nMultiply the GCF of the coefficients and the GCF of the variables: $6 \\times xy = 6xy$.\nThe GCF is $6xy$.',
+            },
+            {
+                id: 'q17', type: 'multiple-choice', question: 'Factor completely:\n$$x^2 + 6x - 27$$',
+                options: { a: '$(x+9)(x+3)$', b: '$(x-9)(x+3)$', c: '$(x+9)(x-3)$', d: '$(x-9)(x-3)$' }, correctAnswer: 'c',
+                explanation: 'Look for two numbers that multiply to -27 and add to 6. These numbers are 9 and -3.',
+            },
+            {
+                id: 'q18', type: 'multiple-choice', question: 'Factor completely:\n$$3y^2 + 10y + 8$$',
+                options: { a: '$(3y+8)(y+1)$', b: '$(3y+2)(y+4)$', c: '$(3y+4)(y+2)$', d: '$(3y-4)(y-2)$' }, correctAnswer: 'c',
+                explanation: 'Use the AC method or trial and error.\nMultiply a*c (3*8 = 24).\nFind two numbers that multiply to 24 and add to 10 (6 and 4).\nRewrite the middle term: $3y^2 + 6y + 4y + 8$.\nFactor by grouping:\n$3y(y + 2) + 4(y + 2)$\n$(3y + 4)(y + 2)$.',
+            },
+            {
+                id: 'q19', type: 'multiple-choice', question: 'Solve the quadratic equation:\n$$(p-9)(p+2)=0$$',
+                options: { a: '$p=9, p=2$', b: '$p=-9, p=2$', c: '$p=9, p=-2$', d: '$p=-9, p=-2$' }, correctAnswer: 'c',
+                explanation: 'Use the Zero Product Property. If the product of two factors is zero, at least one of the factors must be zero.\nSet each factor equal to zero and solve:\n$p-9 = 0 \\Rightarrow p = 9$.\n$p+2 = 0 \\Rightarrow p = -2$.',
+            },
+
+            // Figure 1 Group (Questions 20-23)
+            {
+                type: 'figure-group',
+                figure: { src: './images/desmos-graph-fig-1.png', alt: 'Graph of y = -x^2 + 6x - 5', title: 'Figure 1:' },
+                content: [
+                    {
+                        id: 'q20', type: 'multiple-choice', question: 'State the vertex of the function shown in Figure 1.',
+                        options: { a: '(4,3)', b: '(3,4)', c: '(-4,-3)', d: '(-3,-4)' }, correctAnswer: 'a',
+                        explanation: 'The vertex is the highest or lowest point on the parabola. Identify the coordinates of this point from the graph.'
+                    },
+                    {
+                        id: 'q21', type: 'multiple-choice', question: 'Does the graph in Figure 1 have a maximum or minimum?',
+                        options: { a: 'Maximum', b: 'Minimum' }, correctAnswer: 'a',
+                        explanation: 'A parabola that opens upwards has a minimum point (the vertex). A parabola that opens downwards has a maximum point (the vertex).'
+                    },
+                    {
+                        id: 'q22', type: 'multiple-choice', question: 'State the roots of the function shown in Figure 1.',
+                        options: { a: '(1,0) (-2,0)', b: '(-1,0) (2,0)', c: '(0,0) (-2,0)', d: '(.5,0) (-2.5,0)' }, correctAnswer: 'b',
+                        explanation: 'The roots (or x-intercepts) are the points where the graph crosses the x-axis. Identify the coordinates of these points from the graph.'
+                    },
+                    {
+                        id: 'q23', type: 'multiple-choice', question: 'State the y-intercept of the function shown in Figure 1.',
+                        options: { a: '(-1,0)', b: '(-1, -3)', c: '(-3, 5)', d: '(0,-1)' }, correctAnswer: 'd',
+                        explanation: 'The y-intercept is the point where the graph crosses the y-axis. Identify the coordinates of this point from the graph.'
+                    }
+                ]
+            },
+
+            // Individual Questions (24-26)
+            {
+                id: 'q24', type: 'multiple-choice', question: 'Calculate the discriminant and determine the number of solutions:\n$$x^2 - 6x + 9 = 0$$',
+                options: { A: '0; one real solution', B: '36; two real solutions', C: '-36; no solutions', D: '12; two real solutions' }, correctAnswer: 'A',
+                explanation: 'Identify a=1, b=-6, c=9.\nCalculate the discriminant: $(-6)^2 - 4(1)(9) = 36 - 36 = 0$.\nIf the discriminant is 0, there is one real solution.'
+            },
+            {
+                id: 'q25', type: 'multiple-choice', question: 'Calculate the discriminant and determine the number of solutions:\n$$2k^2 + 3k + 4 = 0$$',
+                options: { A: '25; two real solutions', B: '-23; no solutions', C: '41; two real solutions', D: '9; one real solution' }, correctAnswer: 'B',
+                explanation: 'Identify a=2, b=3, c=4.\nCalculate the discriminant: $(3)^2 - 4(2)(4) = 9 - 32 = -23$.\nIf the discriminant is negative, there are no real solutions.'
+            },
+            {
+                id: 'q26', type: 'multiple-choice', question: 'Calculate the discriminant and determine the number of solutions:\n$$3n^2 - 7n + 2 = 0$$',
+                options: { A: '25; two real solutions', B: '-25; no solutions', C: '0; one real solution', D: '49; two real solutions' }, correctAnswer: 'A',
+                explanation: 'Identify a=3, b=-7, c=2.\nCalculate the discriminant: $(-7)^2 - 4(3)(2) = 49 - 24 = 25$.\nIf the discriminant is positive, there are two real solutions.'
+            },
+
+            // Questions Only Group (Questions 27-32)
+            {
+                type: 'questions-only-group',
+                content: [
+                    {
+                        id: 'q27', type: 'multiple-choice', question: 'For the quadratic function $$y = -x^2 + 6x - 5$$, state the y-intercept.',
+                        options: { a: '(0, 5)', b: '(0, -5)', c: '(5, 0)', d: '(-5, 0)' }, correctAnswer: 'b',
+                        explanation: 'The y-intercept is the value of y when x=0.\nSubstitute x=0 into the equation: $y = -(0)^2 + 6(0) - 5 = 0 + 0 - 5 = -5$.\nThe y-intercept is (0, -5).',
+                    },
+                    {
+                        id: 'q28', type: 'multiple-choice', question: 'For the quadratic function $$y = -x^2 + 6x - 5$$, does it open UP or DOWN?',
+                        options: { a: 'UP', b: 'DOWN' }, correctAnswer: 'b',
+                        explanation: 'The parabola opens down because the coefficient of the $x^2$ term (a) is negative (-1).'
+                    },
+                    {
+                        id: 'q29', type: 'multiple-choice', question: 'For the quadratic function $$y = -x^2 + 6x - 5$$, state the Vertex.',
+                        options: { a: '(-3, 4)', b: '(3, -4)', c: '(-3, -4)', d: '(3, 4)' }, correctAnswer: 'd',
+                        explanation: 'The x-coordinate of the vertex is found using $x = \\frac{-b}{2a}$. Here, a=-1 and b=6.\n$x = \\frac{-6}{2(-1)} = \\frac{-6}{-2} = 3$.\nSubstitute x=3 into the equation to find the y-coordinate:\n$y = -(3)^2 + 6(3) - 5 = -9 + 18 - 5 = 4$.\nThe vertex is (3, 4).',
+                    },
+                    {
+                        id: 'q30', type: 'multiple-choice', question: 'For the quadratic function $$y = -x^2 + 6x - 5$$, state the Axis of Symmetry.',
+                        options: { a: '$x=-3$', b: '$y=3$', c: '$x=3$', d: '$y=-3$' }, correctAnswer: 'c',
+                        explanation: 'The axis of symmetry is a vertical line that passes through the vertex. Its equation is $x = \\frac{-b}{2a}$, which we calculated in the vertex explanation to be $x=3$.',
+                    },
+                    {
+                        id: 'q31', type: 'text-only', question: 'Create a table of values for the quadratic function $$y = -x^2 + 6x - 5$$. (This question is not graded in this mockup.)',
+                         // Updated image URL for Table of Values
+                         image: { src: 'https://file.gen-2.storage.googleapis.com/b5dcd960-bdca-44d5-aa60-19426917127d', alt: 'Table of values for y = -x^2 + 6x - 5' },
+                        explanation: 'To create a table of values, choose several x-values (including the vertex\'s x-value and points on either side) and substitute them into the equation $y = -x^2 + 6x - 5$ to find the corresponding y-values.\n\n| x | Substitution | y |\n|---|---|---|\n| 0 | $y = -(0)^2 + 6(0) - 5 = 0 + 0 - 5 = -5$ | -5 |\n| 1 | $y = -(1)^2 + 6(1) - 5 = -1 + 6 - 5 = 0$ | 0 |\n| 2 | $y = -(2)^2 + 6(2) - 5 = -4 + 12 - 5 = 3$ | 3 |\
+| 3 | $y = -(3)^2 + 6(3) - 5 = -9 + 18 - 5 = 4$ | 4 (Vertex) |\n| 4 | $y = -(4)^2 + 6(4) - 5 = -16 + 24 - 5 = 3$ | 3 |\n| 5 | $y = -(5)^2 + 6(5) - 5 = -25 + 30 - 5 = 0$ | 0 |\n| 6 | $y = -(6)^2 + 6(6) - 5 = -36 + 36 - 5 = -5$ | -5 |',
+                    },
+                     {
+                        id: 'q32', type: 'text-only', question: 'Graph the quadratic function $$y = -x^2 + 6x - 5$$. (This question is not graded in this mockup.)',
+                         // Updated image URL for Graphing Grid
+                         image: { src: 'https://file.gen-2.storage.googleapis.com/7222860c-f3eb-4ac5-94c6-165938607a32', alt: 'Graph of y = -x^2 + 6x - 5' },
+                        explanation: 'Plot the points from your table of values on a coordinate plane. Since it\'s a quadratic function, the graph will be a parabola. Connect the points with a smooth curve, remembering that the parabola opens downwards and has its vertex at (3, 4).'
+                    }
+                ]
+            },
+
+            // Individual Questions (33-35)
+            {
+                id: 'q33', type: 'multiple-choice', question: 'Solve the equation using the quadratic formula:\n$$3x^2 + 5x - 2 = 0$$',
+                options: { a: '$x = \\frac{1}{3}, x = -2$', b: '$x = -\\frac{1}{3}, x = 2$', c: '$x = \\frac{2}{3}, x = -1$', d: '$x = -\\frac{2}{3}, x = 1$' }, correctAnswer: 'a',
+                explanation: 'First, ensure the equation is in standard form ($ax^2 + bx + c = 0$). The equation $3x^2 + 5x - 2 = 0$ is already in standard form.\nIdentify the coefficients: $a=3$, $b=5$, $c=-2$.\n\nCalculate the discriminant ($b^2 - 4ac$):\nDiscriminant $= (5)^2 - 4(3)(-2)$\nDiscriminant $= 25 - (-24)$\nDiscriminant $= 25 + 24$\nDiscriminant $= 49$.\n\nNow, substitute the values of a, b, and the discriminant into the quadratic formula:\n$x = \\frac{-b\\pm\\sqrt{\\text{Discriminant}}}{2a}$\n$x = \\frac{-5\\pm\\sqrt{49}}{6}$\n$x = \\frac{-5\\pm7}{6}$.\n\nSolve for the two possible values of x:\n$x_1 = \\frac{-5+7}{6} = \\frac{2}{6} = \\frac{1}{3}$\n$x_2 = \\frac{-5-7}{6} = \\frac{-12}{6} = -2$.\nThe solutions are $x = \\frac{1}{3}$ and $x = -2$.',
+            },
+            {
+                id: 'q34', type: 'multiple-choice', question: 'Simplify the radical expression:\n$$\\sqrt{75}$$',
+                options: { a: '$5\\sqrt{3}$', b: '$3\\sqrt{5}$', c: '$25\\sqrt{3}$', d: '$15\\sqrt{5}$' }, correctAnswer: 'a',
+                explanation: 'Find the largest perfect square factor of 75, which is 25.\nRewrite the radical as $\\sqrt{25 \\times 3}$.\nSeparate the radicals: $\\sqrt{25} \\times \\sqrt{3}$.\nSimplify the perfect square: $5\\sqrt{3}$.'
+            },
+            {
+                id: 'q35', type: 'multiple-choice', question: 'Simplify the radical expression:\n$$4\\sqrt{32}$$',
+                options: { a: '$8\\sqrt{2}$', b: '$16\\sqrt{2}$', c: '$4\\sqrt{8}$', d: '$32\\sqrt{2}$' }, correctAnswer: 'b',
+                explanation: 'Find the largest perfect square factor of 32, which is 16.\nRewrite the radical: $4\\sqrt{16 \\times 2}$.\nSeparate the radicals: $4 \\times \\sqrt{16} \\times \\sqrt{2}$.\nSimplify the perfect square: $4 \\times 4 \\times \\sqrt{2}$.\nMultiply: $16\\sqrt{2}$.'
+            },
+
+             // Figure 2 Group (Questions 36-38) - Updated content
+            {
+                type: 'figure-group',
+                figure: { src: 'Screenshot 2025-05-15 at 12.05.25 PM.jpg', alt: 'Table of Presidential Ages at Start of Term', title: 'Figure 2:' },
+                content: [
+                    {
+                        id: 'q36', type: 'multiple-choice', question: 'Find the mean age for the data set in Figure 2 (round to the tenths place).',
+                        options: { a: '60.0', b: '60.1', c: '60.2', d: '60.3' }, correctAnswer: 'c', // Calculated mean: (78+78+70+51+47+58+54+50+46+64+73+69+52+61+60) / 15 = 901 / 15 = 60.066...
+                        explanation: 'To find the mean, sum all the ages and divide by the number of presidents.\nSum of ages: $78+78+70+51+47+58+54+50+46+64+73+69+52+61+60 = 901$.\nNumber of presidents: 15.\nMean: $901 \\div 15 \\approx 60.066... \\approx 60.1$ (rounded to the tenths place).' // Corrected calculation and explanation
+                    },
+                    {
+                        id: 'q37', type: 'multiple-choice', question: 'Find the median age for the data set in Figure 2.',
+                        options: { a: '58', b: '60', c: '61', d: '64' }, correctAnswer: 'b', // Sorted ages: 46, 47, 50, 51, 52, 54, 58, 60, 61, 64, 69, 70, 73, 78, 78. Median is the 8th value.
+                        explanation: 'To find the median, arrange the ages in order and find the middle value. There are 15 data points, so the median is the 8th value.\nOrdered ages: 46, 47, 50, 51, 52, 54, 58, **60**, 61, 64, 69, 70, 73, 78, 78.\nThe median age is 60.'
+                    },
+                    {
+                        id: 'q38', type: 'multiple-choice', question: 'Find the mode age for the data set in Figure 2.',
+                        options: { a: '78', b: '60', c: '78, 60', d: '78, 58' }, correctAnswer: 'a', // 78 appears twice, other ages appear once.
+                        explanation: 'The mode is the age that appears most frequently in the data set.\nLooking at the list, the age 78 appears 2 times, which is more frequent than any other age.'
+                    }
+                ]
+            },
+
+             // Figure 3 Group (Questions 39-40) - Updated content
+            {
+                type: 'figure-group',
+                figure: { src: 'Screenshot 2025-05-15 at 12.05.34 PM.png', alt: 'Histogram of Age of Householder, Family Households, 2023 Data', title: 'Figure 3:' },
+                content: [
+                     {
+                        id: 'q39', type: 'multiple-choice', question: 'Based on Figure 3, which age range has the most family households?',
+                        options: { a: '30-34 years', b: '35-39 years', c: '40-44 years', d: '45-49 years', e: '50-54 years' }, correctAnswer: 'c', // Based on histogram bar heights
+                        explanation: 'Look at the height of each bar in the histogram. The tallest bar represents the age range with the highest number of family households. The bar for 40-44 years is the tallest.'
+                    },
+                    {
+                        id: 'q40', type: 'multiple-choice', question: 'Based on Figure 3, approximately how many family households are in the 50-54 years age range (in thousands)?',
+                        options: { a: '7,743', b: '8,641', c: '8,219', d: '8,242' }, correctAnswer: 'd', // Based on the label above the bar for 50-54 years
+                        explanation: 'Locate the bar for the 50-54 years age range on the histogram. The number above this bar indicates the approximate number of households in thousands.'
+                    }
+                ]
+            }
+        ];
+
+        const questionsContainer = document.getElementById('questionsContainer');
+        const submitButton = document.getElementById('submitExam');
+        const scoreDisplay = document.getElementById('examScore');
+
+        // Function to render questions based on structured data
+        function renderQuestions(data) {
+            questionsContainer.innerHTML = ''; // Clear existing content
+            let questionNumber = 1; // Initialize question number
+
+            data.forEach(block => {
+                if (block.type === 'figure-group') {
+                    const groupElement = document.createElement('div');
+                    groupElement.classList.add('figure-and-questions-group');
+
+                    const figureBox = document.createElement('div');
+                    figureBox.classList.add('figure-box');
+                    figureBox.innerHTML = `<h3>${block.figure.title}</h3><img src="${block.figure.src}" alt="${block.figure.alt}">`;
+                    groupElement.appendChild(figureBox);
+
+                    const questionsGroup = document.createElement('div');
+                    questionsGroup.classList.add('questions-group');
+
+                    block.content.forEach(q => {
+                        const questionElement = createQuestionElement(q, questionNumber++);
+                        questionsGroup.appendChild(questionElement);
+                    });
+
+                    groupElement.appendChild(questionsGroup);
+                    questionsContainer.appendChild(groupElement);
+
+                } else if (block.type === 'questions-only-group') {
+                    const groupElement = document.createElement('div');
+                    groupElement.classList.add('questions-only-group');
+
+                     block.content.forEach(q => {
+                        const questionElement = createQuestionElement(q, questionNumber++);
+                        groupElement.appendChild(questionElement);
+                    });
+
+                    questionsContainer.appendChild(groupElement);
+
+                } else {
+                    // Individual question
+                    const questionElement = createQuestionElement(block, questionNumber++);
+                    questionsContainer.appendChild(questionElement);
+                }
+            });
+
+            // After rendering, typeset the MathJax content in the container
+            MathJax.typesetPromise([questionsContainer]);
+
+             // Show "Show Answer" buttons after rendering
+            document.querySelectorAll('.show-answer-btn').forEach(button => {
+                button.style.display = 'inline-block';
+            });
+        }
+
+        // Helper function to create a single question element
+        function createQuestionElement(q, number) {
+            const questionElement = document.createElement('div');
+            questionElement.classList.add('question');
+            // Add mathjax-process class to the question text container
+            questionElement.innerHTML = `<h3>[${number}]</h3><p class="mathjax-process">${q.question}</p>`;
+
+            if (q.type === 'multiple-choice') {
+                const optionsDiv = document.createElement('div');
+                optionsDiv.classList.add('options', 'mt-4', 'mathjax-process'); // Add mathjax-process here too
+
+                if (q.displayType === 'dropdown') {
+                    // Render as a dropdown
+                    const selectElement = document.createElement('select');
+                    selectElement.name = q.id;
+                    selectElement.classList.add('p-2', 'border', 'rounded');
+
+                    // Add a default "Select an answer" option
+                    const defaultOption = document.createElement('option');
+                    defaultOption.value = '';
+                    defaultOption.textContent = 'Select an answer';
+                    selectElement.appendChild(defaultOption);
+
+                    for (const [key, value] of Object.entries(q.options)) {
+                        const option = document.createElement('option');
+                        option.value = key; // Use the key as the value
+                        option.textContent = value; // MathJax will process this later
+                        selectElement.appendChild(option);
+                    }
+                    optionsDiv.appendChild(selectElement);
+
+                     // Add a div to display selected option in print
+                    const selectedOptionPrint = document.createElement('div');
+                    selectedOptionPrint.classList.add('selected-option-print');
+                    // Data attribute will be set when an option is selected
+                    optionsDiv.appendChild(selectedOptionPrint);
+
+                    // Add event listener to update data attribute on change
+                    selectElement.addEventListener('change', () => {
+                        const selectedText = selectElement.options[selectElement.selectedIndex].text;
+                        selectedOptionPrint.setAttribute('data-selected-option', selectedText);
+                    });
+
+
+                } else {
+                    // Render as radio buttons (default multiple-choice)
+                    for (const [key, value] of Object.entries(q.options)) {
+                        const label = document.createElement('label');
+                        label.innerHTML = `
+                            <input type="radio" name="${q.id}" value="${key}" class="mr-2">
+                            <span class="mathjax-process">${value}</span>`; // Add mathjax-process to the text
+                        optionsDiv.appendChild(label);
+                    }
+                }
+                 questionElement.appendChild(optionsDiv);
+
+                 // Add explanation area (initially hidden)
+                const explanationElement = document.createElement('div');
+                explanationElement.classList.add('explanation', 'mathjax-process'); // Add mathjax-process
+                explanationElement.innerHTML = `<strong>Explanation:</strong> ${q.explanation}`;
+                questionElement.appendChild(explanationElement);
+
+                // Add show answer button
+                const showAnswerButton = document.createElement('button');
+                showAnswerButton.classList.add('show-answer-btn');
+                showAnswerButton.textContent = 'Show Answer';
+                showAnswerButton.type = 'button'; // Prevent form submission
+                showAnswerButton.addEventListener('click', () => {
+                    explanationElement.style.display = 'block';
+                    // Optional: Hide the button after showing the explanation
+                    // showAnswerButton.style.display = 'none';
+                     // Trigger MathJax typesetting for the explanation
+                     MathJax.typesetPromise([explanationElement]);
+                });
+                questionElement.appendChild(showAnswerButton);
+
+
+            } else if (q.type === 'text-only') {
+                 // For text-only questions (like graph/table tasks)
+                 // Add image if available
+                if (q.image) {
+                    const imgElement = document.createElement('img');
+                    imgElement.src = q.image.src;
+                    imgElement.alt = q.image.alt;
+                    imgElement.classList.add('mt-4', 'mb-4'); // Add some margin
+                    questionElement.appendChild(imgElement);
+                }
+
+                // Add explanation area (initially hidden)
+                const explanationElement = document.createElement('div');
+                explanationElement.classList.add('explanation', 'mathjax-process'); // Add mathjax-process
+                explanationElement.innerHTML = `<strong>Explanation:</strong> ${q.explanation}`;
+                questionElement.appendChild(explanationElement);
+
+                // Add show answer button
+                const showAnswerButton = document.createElement('button');
+                showAnswerButton.classList.add('show-answer-btn');
+                showAnswerButton.textContent = 'Show Explanation'; // Changed button text
+                showAnswerButton.type = 'button'; // Prevent form submission
+                 showAnswerButton.addEventListener('click', () => {
+                    explanationElement.style.display = 'block';
+                    // Optional: Hide the button after showing the explanation
+                    // showAnswerButton.style.display = 'none';
+                     // Trigger MathJax typesetting for the explanation
+                     MathJax.typesetPromise([explanationElement]);
+                });
+                questionElement.appendChild(showAnswerButton);
+            }
+
+            return questionElement;
+        }
+
+
+        // Render all questions on page load
+        window.onload = () => {
+            renderQuestions(examData);
+        };
+
+        // Submit button functionality for all questions
+        submitButton.addEventListener('click', () => {
+            let score = 0;
+            let totalGradedQuestions = 0;
+
+            // Iterate through the structured data to find graded questions
+            examData.forEach(block => {
+                if (block.type === 'multiple-choice') {
+                     totalGradedQuestions++;
+                    const selectedOption = document.forms["examForm"].elements[block.id].value;
+                    if (selectedOption === block.correctAnswer) {
+                        score++;
+                    }
+                } else if (block.type === 'figure-group' || block.type === 'questions-only-group') {
+                    block.content.forEach(q => {
+                        if (q.type === 'multiple-choice') {
+                            totalGradedQuestions++;
+                            const selectedOption = document.forms["examForm"].elements[q.id].value;
+                            if (selectedOption === q.correctAnswer) {
+                                score++;
+                            }
+                        }
+                    });
+                }
+                // Text-only questions are not graded in this mockup
+            });
+
+
+            scoreDisplay.textContent = `Your Score: ${score} out of ${totalGradedQuestions}`;
+            scoreDisplay.style.display = 'block';
+        });
+
+    </script>
+</body>
+</html>
