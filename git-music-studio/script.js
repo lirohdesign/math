@@ -1,16 +1,19 @@
 // --- Sound Setup ---
 // Get the audio elements from the HTML
 const sounds = {
-    kick: document.getElementById('kick-sound'),
-    snare: document.getElementById('snare-sound'),
-    hihat: document.getElementById('hihat-sound')
-    // Add more sounds here if you like, remember to add them in index.html too
+    '0': document.getElementById('bass-sound'), // Bass sound for '0'
+    '-': document.getElementById('snare-sound'), // Snare sound for '-'
+    "'": document.getElementById('hihat-sound'), // HiHat sound for "'"
+    ' ': null // Space represents a rest, no sound needed
 };
 
+// Tempo and timing
+const tempo = 100; // BPM (Beats Per Minute)
+const sixteenthNoteTime = (60 / tempo) / 4; // Time in seconds for a 1/16 note
+
 // --- Git Simulation Data Structure ---
-// This is a simplified model! Real Git is much more complex with diffs, trees, etc.
-// 'commits' stores snapshots of sequences, keyed by a simple commit ID.
-// { commitId: ['sound1', 'sound2', ...], ... }
+// 'commits' stores snapshots of sequences (now text strings), keyed by a simple commit ID.
+// { commitId: '0- ''0 ', ... }
 let commits = {};
 // 'branches' maps branch names to the commitId they currently point to.
 // 'main' is the default branch. null means no commits on this branch yet.
@@ -19,42 +22,80 @@ let branches = {
 };
 // 'currentBranch' tracks which branch the user is currently working on.
 let currentBranch = 'main';
-// 'currentSequence' holds the sequence of sounds being actively edited.
-let currentSequence = [];
+// 'currentSequence' holds the sequence text string being actively edited.
+let currentSequence = '';
 // Simple counter to generate unique commit IDs.
 let commitCounter = 0;
 
 // --- UI Elements ---
 // Get references to the HTML elements we'll interact with
-const sequenceDisplay = document.getElementById('current-sequence');
+const currentBranchNameDisplay = document.getElementById('current-branch-name');
+const currentBranchEditor = document.getElementById('current-branch-editor');
+const branchListDisplay = document.getElementById('branch-list');
 const historyDisplay = document.getElementById('history');
-const branchSelect = document.getElementById('branch-select');
-const mergeSelect = document.getElementById('merge-select');
 const playButton = document.getElementById('play-btn');
 const commitButton = document.getElementById('commit-btn');
 const createBranchButton = document.getElementById('create-branch-btn');
-const switchBranchButton = document.getElementById('switch-branch-btn');
+const mergeSelect = document.getElementById('merge-select');
 const mergeButton = document.getElementById('merge-btn');
-// Get all buttons within the sound-buttons div
-const soundButtons = document.querySelectorAll('.sound-buttons button');
 
 // --- Functions ---
 
-// Updates the visual display of the current song sequence in the UI
+// Updates the visual display of the current song sequence in the editor
 function renderSequence() {
-    sequenceDisplay.innerHTML = ''; // Clear current display
-    if (currentSequence.length === 0) {
-        sequenceDisplay.innerHTML = '<p class="text-gray-500">Add some sounds!</p>';
-        return;
-    }
-    // Create a visual block for each sound in the sequence
-    currentSequence.forEach(sound => {
-        const soundBlock = document.createElement('span');
-        soundBlock.classList.add('sound-block'); // Apply CSS class for styling
-        soundBlock.textContent = sound; // Display the sound name
-        sequenceDisplay.appendChild(soundBlock); // Add to the display area
-    });
+    currentBranchEditor.textContent = currentSequence; // Set the text content of the editable div
+     currentBranchNameDisplay.textContent = currentBranch; // Update the current branch name display
 }
+
+// Updates the list of branches in the sidebar
+function renderBranchList() {
+    branchListDisplay.innerHTML = ''; // Clear current list
+
+    // Sort branches alphabetically
+    const sortedBranchNames = Object.keys(branches).sort();
+
+    sortedBranchNames.forEach(branchName => {
+        const branchItem = document.createElement('div');
+        branchItem.classList.add('branch-item');
+        if (branchName === currentBranch) {
+            branchItem.classList.add('current'); // Highlight the current branch
+        }
+
+        const branchNameSpan = document.createElement('span');
+        branchNameSpan.classList.add('branch-name');
+        branchNameSpan.textContent = branchName;
+        branchItem.appendChild(branchNameSpan);
+
+        const sequencePreviewSpan = document.createElement('span');
+        sequencePreviewSpan.classList.add('branch-sequence-preview');
+        // Show the sequence of the commit this branch points to, or a default message
+        const commitId = branches[branchName];
+        sequencePreviewSpan.textContent = commitId ? commits[commitId] : 'No commits yet';
+        branchItem.appendChild(sequencePreviewSpan);
+
+
+        // Add a Checkout button if it's not the current branch
+        if (branchName !== currentBranch) {
+            const checkoutButton = document.createElement('button');
+            checkoutButton.classList.add('checkout-button');
+            checkoutButton.textContent = 'Checkout';
+            // Use a data attribute to store the branch name for the event listener
+            checkoutButton.dataset.branchName = branchName;
+            branchItem.appendChild(checkoutButton);
+        }
+
+        branchListDisplay.appendChild(branchItem);
+    });
+
+     // Add event listeners to the new checkout buttons
+     branchListDisplay.querySelectorAll('.checkout-button').forEach(button => {
+         button.addEventListener('click', (event) => {
+             const branchToCheckout = event.target.dataset.branchName;
+             switchBranch(branchToCheckout); // Call the switchBranch function
+         });
+     });
+}
+
 
 // Updates the history display area
 function renderHistory() {
@@ -77,7 +118,7 @@ function renderHistory() {
          const headPointer = isHead ? ' (HEAD)' : ''; // Indicate the commit the current branch points to (HEAD)
 
         // Add a line to the history text for this commit
-        historyText += `- Commit ${commitId}${branchPointers}${headPointer}: [${commits[commitId].join(', ')}]\n`;
+        historyText += `- Commit ${commitId}${branchPointers}${headPointer}: "${commits[commitId]}"\n`;
     });
 
     // If there are no commits yet, display an initial state message
@@ -90,20 +131,12 @@ function renderHistory() {
 }
 
 
-// Updates the options in the branch selection dropdowns (switch and merge)
-function renderBranchSelects() {
-    branchSelect.innerHTML = ''; // Clear current options for switching
+// Updates the options in the merge selection dropdown
+function renderMergeSelect() {
     mergeSelect.innerHTML = '<option value="">-- Select Branch --</option>'; // Clear current options for merging
 
-    // Add each branch as an option
+    // Add each branch as an option, but exclude the current branch
     Object.keys(branches).forEach(branchName => {
-        const option = document.createElement('option');
-        option.value = branchName;
-        // Indicate the current branch in the switch dropdown
-        option.textContent = branchName + (branchName === currentBranch ? ' (current)' : '');
-        branchSelect.appendChild(option);
-
-         // Add to merge select, but exclude the current branch itself
         if (branchName !== currentBranch) {
              const mergeOption = document.createElement('option');
              mergeOption.value = branchName;
@@ -111,52 +144,54 @@ function renderBranchSelects() {
              mergeSelect.appendChild(mergeOption);
         }
     });
-    // Ensure the switch dropdown shows the currently active branch
-    branchSelect.value = currentBranch;
 }
 
 
-// Adds a sound to the current sequence being edited
-function addSound(soundName) {
-    console.log(`Adding sound: ${soundName}`); // Log for debugging
-    currentSequence.push(soundName); // Add the sound name to the array
-    renderSequence(); // Update the visual display
-}
-
-// Plays the current sequence of sounds
+// Plays the current sequence of sounds based on the text string
 async function playSequence() {
     console.log("Playing sequence..."); // Log for debugging
     playButton.disabled = true; // Disable button during playback to prevent issues
-    for (const soundName of currentSequence) {
-        if (sounds[soundName]) {
+
+    const sequenceText = currentBranchEditor.textContent; // Get the current text from the editor
+
+    for (const char of sequenceText) {
+        const soundKey = char; // The character is the key for the sound
+
+        if (sounds[soundKey]) { // Check if there's a defined sound for this character
             // Clone the audio element to allow rapid playback without cutting off previous sounds
-            const soundToPlay = sounds[soundName].cloneNode();
+            const soundToPlay = sounds[soundKey].cloneNode();
             soundToPlay.volume = 0.7; // Adjust volume if needed (0.0 to 1.0)
             soundToPlay.play(); // Play the sound
-            // Wait a short duration before playing the next sound to create a rhythm
-            await new Promise(resolve => setTimeout(resolve, 300)); // Wait for 300 milliseconds
-        } else {
-             console.warn(`Sound file not found for: ${soundName}`); // Warn if sound file is missing
+        } else if (soundKey !== ' ') {
+             console.warn(`Unknown character in sequence: '${soundKey}'. Skipping.`); // Warn for unknown characters (excluding space)
         }
+
+        // Wait for the duration of a 1/16 note before the next character/sound
+        await new Promise(resolve => setTimeout(resolve, sixteenthNoteTime * 1000)); // Convert seconds to milliseconds
     }
+
     playButton.disabled = false; // Re-enable the play button after playback
     console.log("Finished playing sequence."); // Log for debugging
 }
 
-// Saves the current sequence as a new commit
+// Saves the current sequence text as a new commit
 function commit() {
     console.log("Attempting to commit..."); // Log for debugging
+
+    // Get the current text from the editor
+    const sequenceToCommit = currentBranchEditor.textContent;
+
     // Prevent committing if the sequence is empty and there are no previous commits on this branch
-    if (currentSequence.length === 0 && branches[currentBranch] === null) {
-        alert("Nothing to commit. Add some sounds first.");
+    if (sequenceToCommit.length === 0 && branches[currentBranch] === null) {
+        alert("Nothing to commit. Add some sounds (type in the editor) first.");
         console.log("Commit failed: Nothing to commit."); // Log for debugging
         return;
     }
 
     // Generate a unique commit ID
     const commitId = 'c' + commitCounter++;
-    // Store a *copy* of the current sequence in the commits object
-    commits[commitId] = [...currentSequence];
+    // Store the current sequence text in the commits object
+    commits[commitId] = sequenceToCommit;
     // Update the current branch to point to this new commit (its HEAD moves)
     branches[currentBranch] = commitId;
 
@@ -166,7 +201,8 @@ function commit() {
 
     // Update the UI displays
     renderHistory();
-    renderBranchSelects(); // Update branch display in case a branch pointer moved
+    renderBranchList(); // Update branch list to show updated commit pointer
+    renderMergeSelect(); // Update merge options
 }
 
 // Creates a new branch pointing to the current commit
@@ -196,14 +232,15 @@ function createBranch() {
     console.log(`Branch created: '${newBranchName}' pointing to ${branches[currentBranch]}.`); // Log for debugging
 
     // Update the UI displays
-    renderBranchSelects(); // Add the new branch to the dropdowns
+    renderBranchList(); // Add the new branch to the list
+    renderMergeSelect(); // Add the new branch to merge options
     renderHistory(); // History display might show the new branch pointer
 }
 
 // Switches the working directory and HEAD to a different branch
-function switchBranch() {
-    console.log("Attempting to switch branch..."); // Log for debugging
-    const targetBranch = branchSelect.value; // Get the selected branch name
+// This function is now called by the checkout buttons in the branch list
+function switchBranch(targetBranch) {
+    console.log(`Attempting to switch to branch: ${targetBranch}`); // Log for debugging
     if (targetBranch === currentBranch) {
         alert(`You are already on branch '${targetBranch}'.`);
         console.log(`Switch branch failed: Already on branch '${targetBranch}'.`); // Log for debugging
@@ -219,11 +256,11 @@ function switchBranch() {
      // Load the sequence corresponding to the commit the target branch points to
      if (branches[targetBranch] === null) {
          // Switching to a branch with no commits means an empty sequence
-         currentSequence = [];
+         currentSequence = '';
          console.log(`Switched to branch '${targetBranch}'. Branch has no commits, sequence is empty.`); // Log for debugging
      } else {
         const targetCommitId = branches[targetBranch];
-        currentSequence = [...commits[targetCommitId]]; // Load a copy of the sequence from the commit
+        currentSequence = commits[targetCommitId]; // Load the sequence text from the commit
         console.log(`Switched to branch '${targetBranch}'. Loaded sequence from commit ${targetCommitId}.`); // Log for debugging
      }
 
@@ -232,8 +269,9 @@ function switchBranch() {
     alert(`Switched to branch '${currentBranch}'.`);
 
     // Update the UI displays
-    renderSequence(); // Show the sequence of the new branch
-    renderBranchSelects(); // Update dropdowns to show current branch
+    renderSequence(); // Show the sequence of the new branch in the editor
+    renderBranchList(); // Update branch list to highlight the current branch
+    renderMergeSelect(); // Update merge options (current branch can't be merged into itself)
     renderHistory(); // History display might highlight the new HEAD
 }
 
@@ -271,19 +309,20 @@ function mergeBranch() {
      }
 
 
-    // --- Simplified Merge Logic ---
+    // --- Simplified Text Merge Logic ---
     // In real Git, merge is a complex process involving finding a common ancestor,
-    // calculating differences (diffs), and applying changes. Conflicts can occur.
-    // Here, for simplicity, we will just append the entire sequence from the
-    // source branch's latest commit to the current sequence.
+    // calculating differences (diffs), and applying changes line by line. Conflicts can occur.
+    // Here, for simplicity, we will just append the entire sequence string from the
+    // source branch's latest commit to the current sequence string.
     // This is NOT how Git merge truly works but serves as a basic illustration
     // of bringing work from one line of development into another.
 
     const sourceCommitId = branches[sourceBranch];
     const sourceSequence = commits[sourceCommitId];
+    const currentSequenceText = currentBranchEditor.textContent; // Get current text from editor
 
     // Create a new sequence by combining the current sequence and the source sequence
-    const mergedSequence = [...currentSequence, ...sourceSequence];
+    const mergedSequence = currentSequenceText + sourceSequence;
 
 
     // Create a new commit on the current branch with the merged sequence
@@ -299,38 +338,45 @@ function mergeBranch() {
     console.log(`Merge successful: '${sourceBranch}' into '${currentBranch}'. New commit ${newCommitId}.`); // Log for debugging
 
     // Update the UI displays
-    renderSequence(); // Show the new merged sequence
+    renderSequence(); // Show the new merged sequence in the editor
     renderHistory(); // History will show the new merge commit and the updated branch pointer
-    renderBranchSelects(); // Update branch pointers in dropdowns
+    renderBranchList(); // Update branch list
+    renderMergeSelect(); // Update merge options
     mergeSelect.value = ""; // Reset merge select dropdown
 }
 
 
 // --- Event Listeners ---
-// Add event listeners to the sound buttons to add sounds to the sequence
-// Ensure the DOM is fully loaded before attaching listeners
+// Ensure the DOM is fully loaded before attaching listeners and initializing
 document.addEventListener('DOMContentLoaded', (event) => {
     console.log('DOM fully loaded and parsed'); // Confirm DOM is ready
-
-    soundButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const sound = button.dataset.sound; // Get the sound name from the data attribute
-            addSound(sound); // Call the function to add the sound
-        });
-    });
 
     // Add event listeners to the Git action buttons
     if (playButton) playButton.addEventListener('click', playSequence); else console.error("Play button not found!");
     if (commitButton) commitButton.addEventListener('click', commit); else console.error("Commit button not found!");
     if (createBranchButton) createBranchButton.addEventListener('click', createBranch); else console.error("Create Branch button not found!");
-    if (switchBranchButton) switchBranchButton.addEventListener('click', switchBranch); else console.error("Switch Branch button not found!");
     if (mergeButton) mergeButton.addEventListener('click', mergeBranch); else console.error("Merge button not found!");
+
+    // Listen for input on the editable editor area to keep currentSequence updated
+    if (currentBranchEditor) {
+        currentBranchEditor.addEventListener('input', () => {
+            currentSequence = currentBranchEditor.textContent;
+            // No need to re-render the editor here, as the input event handles it.
+            // But we might want to update the branch list preview if the user stops typing for a bit?
+            // For simplicity, we'll only update previews on commit/switch/merge.
+        });
+    } else {
+        console.error("Current branch editor not found!");
+    }
+
 
     // --- Initialization ---
     // Render the initial state of the UI when the page loads
-    renderSequence(); // Display the initial empty sequence
+    renderSequence(); // Display the initial empty sequence in the editor
+    renderBranchList(); // Display the initial branch list ('main')
+    renderMergeSelect(); // Populate merge dropdown (empty initially)
     renderHistory(); // Display initial history state (no commits)
-    renderBranchSelects(); // Populate branch dropdowns (only 'main' initially)
+
 
     console.log("Event listeners attached and initial render complete."); // Confirm setup is done
 });
