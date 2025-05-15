@@ -109,6 +109,46 @@
             min-height: 13em; /* Large space (medium + 3em) */
         }
 
+        /* Container for figure and related questions */
+        .figure-and-questions-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Two columns */
+            gap: 10px; /* Space between figure and questions */
+            margin-bottom: 10px; /* Space below the group */
+            grid-column: span 2; /* Make this group span both columns of the main grid */
+        }
+
+        .figure-box {
+             padding: 5px; /* Match question padding */
+             border: 1px solid #e5e7eb; /* Match question border */
+             border-radius: 6px; /* Match question border-radius */
+             background-color: #f9fafb; /* Match question background */
+        }
+
+        .questions-group {
+             display: flex;
+             flex-direction: column; /* Stack questions vertically */
+             gap: 10px; /* Space between questions within the group */
+        }
+
+        /* Container for grouped questions */
+        .questions-only-group {
+            grid-column: span 2; /* Span both columns */
+            margin-bottom: 10px; /* Space below the group */
+            padding: 10px; /* Add some padding around the group */
+            border: 1px solid #d1d5db; /* Light grey border for the group */
+            border-radius: 8px;
+            background-color: #e5e7eb; /* Light background for the group */
+            display: grid; /* Use grid for internal layout */
+            grid-template-columns: 1fr 1fr; /* Two columns within this group */
+            gap: 10px; /* Space between questions within the group */
+        }
+
+        .questions-only-group .question {
+             border: 1px solid #e5e7eb; /* Keep the light grey border for questions inside the group */
+             background-color: #f9fafb; /* Keep the light background for questions inside the group */
+        }
+
 
         /* Print-specific styles */
         @media print {
@@ -165,6 +205,48 @@
             .workspace.large-space {
                 min-height: 8em; /* Large space in print */
                  border-bottom: 1px dashed #000; /* Dashed line in print */
+            }
+
+            /* Print styles for figure and related questions group */
+            .figure-and-questions-group {
+                display: grid; /* Keep grid layout for printing */
+                grid-template-columns: 1fr 1fr; /* Two columns */
+                gap: 8mm; /* Adjust gap for printing */
+                margin-bottom: 8mm; /* Space below the group */
+                grid-column: span 2; /* Make this group span both columns of the main grid */
+                break-inside: avoid; /* Avoid breaking the group across pages */
+            }
+
+            .figure-box {
+                border: 1px solid #000; /* Black border for printing */
+                border-radius: 0; /* Remove rounded corners in print */
+                background-color: #fff; /* White background for printing */
+                padding: 5px; /* Match question padding in print */
+            }
+
+             .questions-group {
+                 display: flex;
+                 flex-direction: column; /* Stack questions vertically */
+                 gap: 8mm; /* Space between questions within the group in print */
+            }
+
+            /* Print styles for questions-only group */
+            .questions-only-group {
+                grid-column: span 2; /* Span both columns */
+                margin-bottom: 8mm; /* Space below the group */
+                padding: 8mm; /* Add some padding around the group in print */
+                border: 1px solid #000; /* Black border for the group in print */
+                border-radius: 0; /* Remove rounded corners in print */
+                background-color: #fff; /* White background for the group in print */
+                break-inside: avoid; /* Avoid breaking the group across pages */
+                display: grid; /* Use grid for internal layout */
+                grid-template-columns: 1fr 1fr; /* Two columns within this group in print */
+                gap: 8mm; /* Space between questions within the group in print */
+            }
+
+            .questions-only-group .question {
+                border: 1px solid #000; /* Black border for questions inside the group in print */
+                background-color: #fff; /* White background for questions inside the group in print */
             }
         }
     </style>
@@ -341,40 +423,94 @@
                 <div class="workspace medium-space"></div>
             </div>
 
-            <div class="question">
-                <div class="question-header">
-                    <h3>Figure 1:</h3>
+            <div class="figure-and-questions-group">
+                <div class="figure-box">
+                    <div class="question-header">
+                        <h3>Figure 1:</h3>
+                    </div>
+                    <img src="./images/desmos-graph-fig-1.png" alt="Graph of y = -x^2 + 6x - 5" style="height: 30em;">
                 </div>
-                <img src="./images/desmos-graph-fig-1.png" alt="Graph of y = -x^2 + 6x - 5" style="height: 30em;">
+                <div class="questions-group">
+                    <div class="question">
+                         <div class="question-header">
+                            <h3>[20]</h3>
+                            <p>State the vertex of the function shown in Figure 1.</p>
+                        </div>
+                        </div>
+
+                    <div class="question">
+                         <div class="question-header">
+                            <h3>[21]</h3>
+                            <p>Does the graph in Figure 1 have a maximum or minimum?</p>
+                         </div>
+                         </div>
+
+                    <div class="question">
+                         <div class="question-header">
+                            <h3>[22]</h3>
+                            <p>State the roots of the function shown in Figure 1.</p>
+                        </div>
+                         </div>
+
+                    <div class="question">
+                         <div class="question-header">
+                            <h3>[23]</h3>
+                            <p>State the y-intercept of the function shown in Figure 1.</p>
+                        </div>
+                         </div>
+                </div>
             </div>
 
-            <div class="question">
-                 <div class="question-header">
-                    <h3>[20]</h3>
-                    <p>State the vertex of the function shown in Figure 1.</p>
-                </div>
+            <div class="questions-only-group">
+                <div class="question">
+                     <div class="question-header">
+                        <h3>[27]</h3>
+                        <p>For the quadratic function $$y = -x^2 + 6x - 5$$, state the y-intercept.</p>
+                    </div>
+                    </div>
+
+                <div class="question">
+                     <div class="question-header">
+                        <h3>[28]</h3>
+                        <p>For the quadratic function $$y = -x^2 + 6x - 5$$, does it open UP or DOWN?</p>
+                    </div>
+                    </div>
+
+                <div class="question">
+                     <div class="question-header">
+                        <h3>[30]</h3>
+                        <p>For the quadratic function $$y = -x^2 + 6x - 5$$, state the Axis of Symmetry.</p>
+                    </div>
+                    <div class="workspace medium-space"></div>
                 </div>
 
-            <div class="question">
-                 <div class="question-header">
-                    <h3>[21]</h3>
-                    <p>Does the graph in Figure 1 have a maximum or minimum?</p>
-                 </div>
-                 </div>
-
-            <div class="question">
-                 <div class="question-header">
-                    <h3>[22]</h3>
-                    <p>State the roots of the function shown in Figure 1.</p>
+                <div class="question">
+                     <div class="question-header">
+                        <h3>[29]</h3>
+                        <p>For the quadratic function $$y = -x^2 + 6x - 5$$, state the Vertex.</p>
+                    </div>
+                    <div class="workspace medium-space"></div>
                 </div>
-                 </div>
 
-            <div class="question">
-                 <div class="question-header">
-                    <h3>[23]</h3>
-                    <p>State the y-intercept of the function shown in Figure 1.</p>
+                <div class="question">
+                     <div class="question-header">
+                        <h3>[31]</h3>
+                        <p>Create a table of values for the quadratic function $$y = -x^2 + 6x - 5$$. (This question is not graded in this mockup.)</p>
+                    </div>
+                    <img src="./images/table_of_values.png" alt="Table of Values Template" style="height: 15em;">
+                    <div class="workspace large-space"></div>
                 </div>
-                 </div>
+
+                 <div class="question">
+                     <div class="question-header">
+                        <h3>[32]</h3>
+                        <p>Graph the quadratic function $$y = -x^2 + 6x - 5$$. (This question is not graded in this mockup.)</p>
+                    </div>
+                    <img src="./images/desmos-graph.png" alt="Graphing Grid" style="height: 30em;">
+                    <div class="workspace large-space"></div>
+                </div>
+            </div>
+
 
             <div class="question">
                  <div class="question-header">
@@ -401,54 +537,6 @@
                 </div>
                 $$3n^2 - 7n + 2 = 0$$
                 <div class="workspace medium-space"></div>
-            </div>
-
-             <div class="question">
-                 <div class="question-header">
-                    <h3>[27]</h3>
-                    <p>For the quadratic function $$y = -x^2 + 6x - 5$$, state the y-intercept.</p>
-                </div>
-                </div>
-
-            <div class="question">
-                 <div class="question-header">
-                    <h3>[28]</h3>
-                    <p>For the quadratic function $$y = -x^2 + 6x - 5$$, does it open UP or DOWN?</p>
-                </div>
-                </div>
-
-            <div class="question">
-                 <div class="question-header">
-                    <h3>[30]</h3>
-                    <p>For the quadratic function $$y = -x^2 + 6x - 5$$, state the Axis of Symmetry.</p>
-                </div>
-                <div class="workspace medium-space"></div>
-            </div>
-
-            <div class="question">
-                 <div class="question-header">
-                    <h3>[29]</h3>
-                    <p>For the quadratic function $$y = -x^2 + 6x - 5$$, state the Vertex.</p>
-                </div>
-                <div class="workspace medium-space"></div>
-            </div>
-
-            <div class="question">
-                 <div class="question-header">
-                    <h3>[31]</h3>
-                    <p>Create a table of values for the quadratic function $$y = -x^2 + 6x - 5$$. (This question is not graded in this mockup.)</p>
-                </div>
-                <img src="./images/table_of_values.png" alt="Table of Values Template" style="height: 15em;">
-                <div class="workspace large-space"></div>
-            </div>
-
-             <div class="question">
-                 <div class="question-header">
-                    <h3>[32]</h3>
-                    <p>Graph the quadratic function $$y = -x^2 + 6x - 5$$. (This question is not graded in this mockup.)</p>
-                </div>
-                <img src="./images/desmos-graph.png" alt="Graphing Grid" style="height: 30em;">
-                <div class="workspace large-space"></div>
             </div>
 
             <div class="question">
@@ -478,56 +566,63 @@
                 <div class="workspace medium-space"></div>
             </div>
 
-            <div class="question">
-                <div class="question-header">
-                    <h3>Figure 2:</h3>
+            <div class="figure-and-questions-group">
+                <div class="figure-box">
+                    <div class="question-header">
+                        <h3>Figure 2:</h3>
+                    </div>
+                    <img src="./images/fig-2.png" alt="Data Set Table" style="height: 30em;">
                 </div>
-                <img src="./images/fig-2.png" alt="Data Set Table" style="height: 30em;">
+                <div class="questions-group">
+                    <div class="question">
+                         <div class="question-header">
+                            <h3>[36]</h3>
+                            <p>Find the mean for the data set in Figure 2 (round to the tenths place).</p>
+                        </div>
+                        <div class="workspace medium-space"></div>
+                    </div>
+
+                    <div class="question">
+                         <div class="question-header">
+                            <h3>[37]</h3>
+                            <p>Find the median for the data set in Figure 2.</p>
+                        </div>
+                        <div class="workspace medium-space"></div>
+                    </div>
+
+                    <div class="question">
+                         <div class="question-header">
+                            <h3>[38]</h3>
+                            <p>Find the mode for the data set in Figure 2.</p>
+                        </div>
+                        </div>
+                </div>
             </div>
 
-            <div class="question">
-                 <div class="question-header">
-                    <h3>[36]</h3>
-                    <p>Find the mean for the data set in Figure 2 (round to the tenths place).</p>
+            <div class="figure-and-questions-group">
+                <div class="figure-box">
+                    <div class="question-header">
+                        <h3>Figure 3:</h3>
+                    </div>
+                    <img src="./images/fig-3.png" alt="Histogram">
                 </div>
-                <div class="workspace medium-space"></div>
+                <div class="questions-group">
+                     <div class="question">
+                         <div class="question-header">
+                            <h3>[39]</h3>
+                            <p>Based on Figure 3, which age range has the highest number of family households?</p>
+                        </div>
+                        </div>
+
+                    <div class="question">
+                         <div class="question-header">
+                            <h3>[40]</h3>
+                            <p>Based on Figure 3, approximately how many family households are in the 25-29 years age range (in thousands)?</p>
+                        </div>
+                        </div>
+                </div>
             </div>
 
-            <div class="question">
-                 <div class="question-header">
-                    <h3>[37]</h3>
-                    <p>Find the median for the data set in Figure 2.</p>
-                </div>
-                <div class="workspace medium-space"></div>
-            </div>
-
-            <div class="question">
-                 <div class="question-header">
-                    <h3>[38]</h3>
-                    <p>Find the mode for the data set in Figure 2.</p>
-                </div>
-                </div>
-
-            <div class="question">
-                <div class="question-header">
-                    <h3>Figure 3:</h3>
-                </div>
-                <img src="./images/fig-3.png" alt="Histogram">
-            </div>
-
-             <div class="question">
-                 <div class="question-header">
-                    <h3>[39]</h3>
-                    <p>Based on Figure 3, which age range has the highest number of family households?</p>
-                </div>
-                </div>
-
-            <div class="question">
-                 <div class="question-header">
-                    <h3>[40]</h3>
-                    <p>Based on Figure 3, approximately how many family households are in the 25-29 years age range (in thousands)?</p>
-                </div>
-                </div>
         </div>
     </div>
 </body>
