@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Card Game</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #008000; /* Classic Solitaire green */
+            margin: 0;
+            font-family: sans-serif; /* Simple font */
+            overflow: hidden; /* Prevent scrollbars due to splash screen */
+        }
+        canvas {
+            border: 1px solid #000;
+            background-color: #006400; /* Darker green for table */
+            box-shadow: 5px 5px 10px rgba(0,0,0,0.5);
+        }
+        #game-container {
+            text-align: center;
+            position: relative; /* Needed for absolute positioning of splash */
+        }
+        #message-box {
+            margin-top: 10px;
+            color: white;
+            font-size: 1.2em;
+            min-height: 1.5em; /* Reserve space to prevent layout shift */
+        }
+         #controls {
+            margin-top: 20px;
+        }
+        #controls button {
+            padding: 10px 20px;
+            font-size: 1em;
+            margin: 0 5px;
+            cursor: pointer;
+            border: 2px outset #ccc; /* Windows 3.0 button style */
+            background-color: #eee;
+            color: #000;
+        }
+         #controls button:active {
+            border: 2px inset #ccc;
+            background-color: #ddd;
+        }
+
+        /* --- Splash Screen Styles --- */
+        #splash-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent black overlay */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10; /* Above game canvas */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        #splash-screen.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        #splash-equals {
+            font-size: 200px; /* Giant '=' sign */
+            color: #ffff00; /* Yellow */
+            text-shadow: 5px 5px 10px rgba(0,0,0,0.5);
+            margin-bottom: 20px;
+            position: relative; /* Needed for z-index to work */
+            z-index: 1; /* Ensure it's above the confetti canvas within the splash screen */
+        }
+
+        /* --- Spinning Animation --- */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        #splash-equals.spin {
+            animation: spin 1s ease-out forwards; /* 1 second duration, ease-out timing, stays at end state */
+        }
+
+
+        #confetti-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* Allow clicks to pass through to elements below */
+             z-index: 0; /* Ensure it's below the equals sign within the splash screen */
+        }
+
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+        <div id="message-box"></div>
+         <div id="controls">
+            <button id="applyChangesBtn">Apply Changes</button>
+            <button id="newRoundBtn">New Round</button>
+        </div>
+
+        <div id="splash-screen">
+            <div id="splash-equals">=</div>
+            <canvas id="confetti-canvas"></canvas>
+        </div>
+
+    </div>
+
+    <script>
+        // --- Canvas Setup ---
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const messageBox = document.getElementById('message-box');
+        const applyChangesBtn = document.getElementById('applyChangesBtn');
+        newRoundBtn.addEventListener('click', dealCards);
+
+        // --- Splash Screen Elements ---
+        const splashScreen = document.getElementById('splash-screen');
+        const splashEquals = document.getElementById('splash-equals'); // Get the equals sign element
+        const confettiCanvas = document.getElementById('confetti-canvas');
+        const confettiCtx = confettiCanvas.getContext('2d');
+
+        // Set confetti canvas size to match container
+        confettiCanvas.width = canvas.width;
+        confettiCanvas.height = canvas.height;
+
+
+        // --- Game State Variables ---
+        let deck = []; // Array of card objects { value: '5', color: 'blue', type: 'number' }
+        let tableLayout = []; // Array matching the YBYYB=YB positions (8 positions including '=')
+        let playerHand = []; // Array of 5 card objects
+        let equalsSigns = 0; // Player's score
+        let selectedHandCards = []; // Indices of cards selected from hand
+        let selectedLayoutPositions = []; // Indices of layout positions to change (0-4, 6, 7)
+
+        // --- Constants ---
+        const CARD_WIDTH = 70;
+        const CARD_HEIGHT = 100;
+        const CARD_MARGIN = 10;
+        const LAYOUT_Y = 150; // Y position for the main layout row
+        const HAND_Y = 450; // Y position for the player's hand
+        const EQUALS_SIGN_X_OFFSET = CARD_WIDTH + CARD_MARGIN; // Space for the '=' sign
+        const SCORE_X = 50;
+        const SCORE_Y = 50;
+
+        // --- Confetti Variables ---
+        let confetti = [];
+        const confettiCount = 100;
+        const confettiColors = ['#f00', '#0f0', '#00f', '#ff0', '#0ff', '#f0f']; // Red, Green, Blue, Yellow, Cyan, Magenta
+
+        // --- Drawing Functions ---
+
+        // Draws a single card
+        function drawCard(card, x, y, isSelected = false) {
+            // Card back (simple rectangle)
+            if (!card || card.type === 'back') {
+                 ctx.fillStyle = '#c0c0c0'; // Grey back
+                 ctx.fillRect(x, y, CARD_WIDTH, CARD_HEIGHT);
+                 ctx.strokeStyle = '#808080';
+                 ctx.lineWidth = 2;
+                 ctx.strokeRect(x, y, CARD_WIDTH, CARD_HEIGHT);
+                 return; // Don't draw front for back
+            }
+
+            // Card front
+            ctx.fillStyle = '#fff'; // White card background
+            ctx.fillRect(x, y, CARD_WIDTH, CARD_HEIGHT);
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(x, y, CARD_WIDTH, CARD_HEIGHT);
+
+            // Highlight if selected
+            if (isSelected) {
+                // Determine highlight color based on card color
+                if (card.color === 'yellow') {
+                    ctx.strokeStyle = '#ffff00'; // Yellow highlight for yellow cards
+                } else if (card.color === 'blue') {
+                    ctx.strokeStyle = '#0000ff'; // Blue highlight for blue cards
+                } else {
+                     ctx.strokeStyle = '#000'; // Default black highlight
+                }
+                ctx.lineWidth = 3;
+                ctx.strokeRect(x - 1, y - 1, CARD_WIDTH + 2, CARD_HEIGHT + 2);
+            }
+
+            // Card value/symbol
+            ctx.font = 'bold 30px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            if (card.color === 'blue') {
+                ctx.fillStyle = '#0000ff'; // Blue text
+            } else if (card.color === 'yellow') {
+                ctx.fillStyle = '#ffff00'; // Yellow text (might need outline for visibility)
+                ctx.strokeStyle = '#000'; // Black outline for yellow text
+                ctx.lineWidth = 1;
+            } else {
+                ctx.fillStyle = '#000'; // Default black
+            }
+
+            const textX = x + CARD_WIDTH / 2;
+            const textY = y + CARD_HEIGHT / 2;
+
+            if (card.color === 'yellow') {
+                 ctx.strokeText(card.value, textX, textY);
+            }
+            ctx.fillText(card.value, textX, textY);
+        }
+
+        // Draws the main layout row (YBYYB = YB)
+        function drawLayout() {
+            // Calculate total width of cards and margins
+            // 5 cards + '=' + 2 cards = 8 positions in tableLayout array
+            // 7 cards drawn + 1 '=' space
+            let totalLayoutWidth = (7 * CARD_WIDTH) + (6 * CARD_MARGIN) + EQUALS_SIGN_X_OFFSET;
+            let currentX = (canvas.width - totalLayoutWidth) / 2; // Center the layout
+
+            for (let i = 0; i < tableLayout.length; i++) {
+                const card = tableLayout[i];
+                const isSelected = selectedLayoutPositions.includes(i);
+
+                if (card.type === 'equals') {
+                    // Draw the '=' sign
+                    ctx.font = 'bold 50px sans-serif';
+                    ctx.fillStyle = '#fff';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText('=', currentX + CARD_WIDTH / 2, LAYOUT_Y + CARD_HEIGHT / 2);
+                     currentX += EQUALS_SIGN_X_OFFSET; // Add extra space for '='
+                } else {
+                    drawCard(card, currentX, LAYOUT_Y, isSelected);
+                    currentX += CARD_WIDTH + CARD_MARGIN;
+                }
+            }
+        }
+
+        // Draws the player's hand at the bottom
+        function drawPlayerHand() {
+            const startX = (canvas.width - (playerHand.length * CARD_WIDTH + (playerHand.length - 1) * CARD_MARGIN)) / 2;
+            for (let i = 0; i < playerHand.length; i++) {
+                const card = playerHand[i];
+                const isSelected = selectedHandCards.includes(i);
+                drawCard(card, startX + i * (CARD_WIDTH + CARD_MARGIN), HAND_Y, isSelected);
+            }
+        }
+
+        // Draws the current score (equals signs collected)
+        function drawScore() {
+            ctx.font = 'bold 24px sans-serif';
+            ctx.fillStyle = '#fff';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'top';
+            ctx.fillText(`Equals Signs: ${equalsSigns}`, SCORE_X, SCORE_Y);
+        }
+
+        // Main drawing function
+        function drawGame() {
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw everything
+            drawLayout();
+            drawPlayerHand();
+            drawScore();
+        }
+
+        // --- Confetti Functions ---
+        function createConfetti() {
+            confetti = [];
+            for (let i = 0; i < confettiCount; i++) {
+                confetti.push({
+                    x: Math.random() * confettiCanvas.width,
+                    y: Math.random() * confettiCanvas.height - confettiCanvas.height, // Start above canvas
+                    size: Math.random() * 10 + 5,
+                    speedY: Math.random() * 5 + 1,
+                    speedX: Math.random() * 4 - 2, // Move left or right
+                    color: confettiColors[Math.floor(Math.random() * confettiColors.length)],
+                    rotation: Math.random() * 360,
+                    rotationSpeed: Math.random() * 10 - 5
+                });
+            }
+        }
+
+        function updateConfetti() {
+            confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+            for (let i = 0; i < confetti.length; i++) {
+                const piece = confetti[i];
+
+                piece.y += piece.speedY;
+                piece.x += piece.speedX;
+                piece.rotation += piece.rotationSpeed;
+
+                // Draw confetti piece
+                confettiCtx.save();
+                confettiCtx.translate(piece.x + piece.size / 2, piece.y + piece.size / 2);
+                confettiCtx.rotate(piece.rotation * Math.PI / 180);
+                confettiCtx.fillStyle = piece.color;
+                confettiCtx.fillRect(-piece.size / 2, -piece.size / 2, piece.size, piece.size);
+                confettiCtx.restore();
+
+
+                // Reset confetti if it falls off screen
+                if (piece.y > confettiCanvas.height) {
+                    piece.y = -piece.size; // Reset to top
+                    piece.x = Math.random() * confettiCanvas.width;
+                    piece.speedY = Math.random() * 5 + 1;
+                    piece.speedX = Math.random() * 4 - 2;
+                    piece.rotation = Math.random() * 360;
+                    piece.rotationSpeed = Math.random() * 10 - 5;
+                }
+            }
+             requestAnimationFrame(updateConfetti); // Continue animation
+        }
+
+        function showSplash() {
+            splashScreen.classList.add('visible');
+            splashEquals.classList.add('spin'); // Add spin class to the equals sign
+            createConfetti(); // Create new confetti for the splash
+            updateConfetti(); // Start confetti animation
+
+            // Remove the spin class after the animation ends
+            splashEquals.addEventListener('animationend', function handler() {
+                splashEquals.classList.remove('spin');
+                splashEquals.removeEventListener('animationend', handler); // Remove listener after it fires
+            });
+        }
+
+        function hideSplash() {
+            splashScreen.classList.remove('visible');
+            // Confetti animation will continue but be hidden by the game canvas
+        }
+
+
+        // --- Game Logic Functions ---
+
+        // Creates a standard deck of cards
+        function createDeck() {
+            deck = [];
+            // Add 0-9 blue number cards (let's add 3 copies of each to ensure enough for layout and hand)
+            for (let k = 0; k < 3; k++) {
+                for (let i = 0; i <= 9; i++) {
+                    deck.push({ value: String(i), color: 'blue', type: 'number' });
+                }
+            }
+            // Add + and - yellow symbol cards (let's add 8 copies of each to ensure enough)
+            for (let k = 0; k < 8; k++) {
+                 deck.push({ value: '+', color: 'yellow', type: 'symbol' });
+                 deck.push({ value: '-', color: 'yellow', type: 'symbol' });
+            }
+        }
+
+        // Shuffles an array using Fisher-Yates algorithm
+        function shuffleDeck(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+            }
+        }
+
+        // Deals the initial layout and player hand, guaranteeing a solution
+        function dealCards() {
+            let solutionFound = false;
+            let attempts = 0;
+            const maxAttempts = 1000; // Prevent infinite loops in case of logic error or insufficient cards
+
+            while (!solutionFound && attempts < maxAttempts) {
+                createDeck(); // Start with a fresh deck each attempt
+                shuffleDeck(deck);
+
+                // Define the pattern of card types for the layout (excluding '=')
+                // Y B Y Y B   Y B
+                // 0 1 2 3 4 = 6 7
+                const requiredLayoutTypes = ['symbol', 'number', 'symbol', 'symbol', 'number', 'symbol', 'number'];
+
+                tableLayout = [];
+                let tempDeck = [...deck]; // Use a temporary deck for dealing
+
+                for (const type of requiredLayoutTypes) {
+                    const cardIndex = tempDeck.findIndex(card => card.type === type);
+                    if (cardIndex !== -1) {
+                        tableLayout.push(tempDeck[cardIndex]);
+                        tempDeck.splice(cardIndex, 1); // Remove from temp deck
+                    } else {
+                        console.error(`Could not find a card of type ${type} for layout during attempt ${attempts}.`);
+                        // If we can't even deal the layout, break and try again
+                        tableLayout = []; // Clear incomplete layout
+                        break;
+                    }
+                }
+
+                if (tableLayout.length === requiredLayoutTypes.length) {
+                     // Insert the '=' placeholder at the correct position (index 5)
+                     tableLayout.splice(5, 0, { value: '=', color: null, type: 'equals' });
+
+                     // Now deal the player's hand: 2 symbols, 3 numbers
+                     playerHand = [];
+                     const numSymbolsNeeded = 2;
+                     const numNumbersNeeded = 3;
+
+                     // Select symbols for hand
+                     const symbolCardsInDeck = tempDeck.filter(card => card.type === 'symbol');
+                     if (symbolCardsInDeck.length >= numSymbolsNeeded) {
+                         // Take random symbols
+                         for(let i = 0; i < numSymbolsNeeded; i++) {
+                             const randomIndex = Math.floor(Math.random() * symbolCardsInDeck.length);
+                             const card = symbolCardsInDeck.splice(randomIndex, 1)[0];
+                             playerHand.push(card);
+                             // Remove from tempDeck based on value and type (might be duplicates)
+                             const originalIndex = tempDeck.findIndex(c => c.value === card.value && c.type === card.type);
+                             if(originalIndex !== -1) tempDeck.splice(originalIndex, 1);
+                         }
+                     } else {
+                          console.warn(`Not enough symbol cards for hand during attempt ${attempts}.`);
+                          playerHand = []; // Clear hand if not enough cards
+                          attempts++;
+                          continue; // Try dealing again
+                     }
+
+                     // Select numbers for hand
+                     const numberCardsInDeck = tempDeck.filter(card => card.type === 'number');
+                      if (numberCardsInDeck.length >= numNumbersNeeded) {
+                         // Take random numbers
+                         for(let i = 0; i < numNumbersNeeded; i++) {
+                             const randomIndex = Math.floor(Math.random() * numberCardsInDeck.length);
+                             const card = numberCardsInDeck.splice(randomIndex, 1)[0];
+                             playerHand.push(card);
+                              // Remove from tempDeck based on value and type (might be duplicates)
+                             const originalIndex = tempDeck.findIndex(c => c.value === card.value && c.type === card.type);
+                             if(originalIndex !== -1) tempDeck.splice(originalIndex, 1);
+                         }
+                     } else {
+                         console.warn(`Not enough number cards for hand during attempt ${attempts}.`);
+                         playerHand = []; // Clear hand if not enough cards
+                         attempts++;
+                         continue; // Try dealing again
+                     }
+
+
+                     // Check if a solution exists with this layout and hand
+                     if (checkIfSolutionExists(tableLayout, playerHand)) {
+                         solutionFound = true;
+                         // The remaining cards in tempDeck are not used this round.
+                         // The main 'deck' variable is not used directly for dealing anymore,
+                         // but we could put tempDeck back into it if we wanted a persistent deck across rounds.
+                         // For simplicity, we recreate the deck each round attempt.
+                     } else {
+                         attempts++;
+                         // If no solution, the loop will continue and try dealing again
+                     }
+                } else {
+                    // Layout dealing failed, increment attempts and loop
+                    attempts++;
+                }
+            }
+
+            if (!solutionFound) {
+                showMessage(`Could not find a solvable deal after ${maxAttempts} attempts. There might be an issue with card distribution or logic.`);
+                // Optionally, deal a fixed known solvable layout/hand here
+                // Or end the game
+            } else {
+                 // Reset selections for the new round
+                selectedHandCards = [];
+                selectedLayoutPositions = [];
+                drawGame(); // Draw the new solvable layout and hand
+                showMessage("New round! Select one yellow and one blue card from your hand, and two layout positions (one symbol, one number) to change. A solution exists!");
+            }
+        }
+
+        // Checks if there is at least one valid move that makes the equation true
+        function checkIfSolutionExists(currentLayout, currentHand) {
+            const yellowHandCards = currentHand.filter(card => card.color === 'yellow');
+            const blueHandCards = currentHand.filter(card => card.color === 'blue');
+
+            // Changeable layout positions and their types
+            // Y B Y Y B   Y B
+            // 0 1 2 3 4 = 6 7
+            const changeableLayoutPositions = [
+                { index: 0, type: 'symbol' },
+                { index: 1, type: 'number' },
+                { index: 2, type: 'symbol' },
+                { index: 3, type: 'symbol' },
+                { index: 4, type: 'number' },
+                { index: 6, type: 'symbol' }, // Right side symbol
+                { index: 7, type: 'number' }  // Right side number
+            ];
+
+            const yellowLayoutPositions = changeableLayoutPositions.filter(pos => pos.type === 'symbol');
+            const blueLayoutPositions = changeableLayoutPositions.filter(pos => pos.type === 'number');
+
+            // Iterate through all combinations of playing one yellow and one blue card
+            for (const yellowHandCard of yellowHandCards) {
+                for (const blueHandCard of blueHandCards) {
+                    // Iterate through all combinations of yellow and blue layout positions to replace
+                    for (const yellowLayoutPos of yellowLayoutPositions) {
+                        for (const blueLayoutPos of blueLayoutPositions) {
+
+                            // Create a temporary layout with the potential changes
+                            const tempLayout = JSON.parse(JSON.stringify(currentLayout));
+                            tempLayout[yellowLayoutPos.index] = yellowHandCard;
+                            tempLayout[blueLayoutPos.index] = blueHandCard;
+
+                            // Check if this modified layout makes the equation true
+                            if (evaluateEquation(tempLayout)) {
+                                // Found at least one solution!
+                                console.log("Solution found:",
+                                    yellowHandCard, "-> layout[", yellowLayoutPos.index, "]",
+                                    blueHandCard, "-> layout[", blueLayoutPos.index, "]"
+                                );
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // If the loops complete without finding a solution
+            return false;
+        }
+
+
+        // Evaluates the equation based on the current table layout
+        function evaluateEquation(layout) {
+            // Construct the equation string from the relevant layout positions
+            // Layout indices for the equation parts: 0, 1, 2, 3, 4 (left side), 6, 7 (right side)
+            const leftSide = layout[0].value + layout[1].value + layout[2].value + layout[3].value + layout[4].value;
+            // Capture both the symbol and number for the right side
+            const rightSideString = layout[6].value + layout[7].value; // e.g., "+6"
+
+            // Simple parsing for the left side. Handles multiple signs.
+            let equationString = leftSide;
+            // Replace combined symbols: -- becomes +, +- becomes -, -+ becomes -, ++ becomes +
+            equationString = equationString.replace(/--/g, '+');
+            equationString = equationString.replace(/\+\-/g, '-');
+            equationString = equationString.replace(/\-\+/g, '-');
+            equationString = equationString.replace(/\+\+/g, '+');
+
+            let calculatedValue;
+            try {
+                // Use Function constructor for safer evaluation than eval()
+                calculatedValue = Function(`return ${equationString}`)();
+            } catch (e) {
+                console.error("Error evaluating left side:", equationString, e);
+                return NaN; // Return NaN for invalid equations
+            }
+
+            let targetValue;
+             // Need to parse the right side string (e.g., "+6" or "-9")
+             try {
+                 targetValue = Function(`return ${rightSideString}`)();
+             } catch (e) {
+                 console.error("Error evaluating right side:", rightSideString, e);
+                 return NaN; // Return NaN for invalid target
+             }
+
+
+            // Check if the calculated value equals the target value
+            // Use a small tolerance for floating point comparisons if needed, but here we expect integers
+            return calculatedValue === targetValue;
+        }
+
+
+        // Handles mouse clicks on the canvas
+        function handleClick(event) {
+            const rect = canvas.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+
+            // Check clicks on player's hand
+            const handStartX = (canvas.width - (playerHand.length * CARD_WIDTH + (playerHand.length - 1) * CARD_MARGIN)) / 2;
+            for (let i = 0; i < playerHand.length; i++) {
+                const cardX = handStartX + i * (CARD_WIDTH + CARD_MARGIN);
+                const cardY = HAND_Y;
+                const card = playerHand[i];
+
+                if (x > cardX && x < cardX + CARD_WIDTH && y > cardY && y < cardY + CARD_HEIGHT) {
+                    // Clicked a card in hand
+                    const index = selectedHandCards.indexOf(i);
+                    if (index > -1) {
+                        // Deselect
+                        selectedHandCards.splice(index, 1);
+                    } else {
+                        // Select (up to 2)
+                        if (selectedHandCards.length < 2) {
+                             // Check if adding this card maintains the one yellow, one blue rule
+                             const tempSelection = [...selectedHandCards, i];
+                             const numYellow = tempSelection.filter(idx => playerHand[idx].color === 'yellow').length;
+                             const numBlue = tempSelection.filter(idx => playerHand[idx].color === 'blue').length;
+
+                             // Allow selecting the first card (either color), but require the second to complete the pair
+                             if (tempSelection.length === 1 || (tempSelection.length === 2 && numYellow === 1 && numBlue === 1)) {
+                                 selectedHandCards.push(i);
+                             } else if (tempSelection.length === 2) {
+                                 showMessage("You must select one yellow and one blue card from your hand.");
+                             } // If tempSelection.length is > 2, the initial < 2 check prevents adding
+                        } else {
+                             showMessage("You can only select up to 2 cards from your hand.");
+                        }
+                    }
+                    drawGame(); // Redraw to show selection
+                    return; // Stop checking other cards
+                }
+            }
+
+            // Check clicks on layout cards (positions 0-4, 6, and 7)
+            // Changeable positions: 0 (Y), 1 (B), 2 (Y), 3 (Y), 4 (B), 6 (Y), 7 (B)
+            const layoutPositionsToCheck = [0, 1, 2, 3, 4, 6, 7];
+            let currentX = (canvas.width - (7 * CARD_WIDTH + 6 * CARD_MARGIN + EQUALS_SIGN_X_OFFSET)) / 2; // Start X for layout
+
+            for (let i = 0; i < tableLayout.length; i++) {
+                const card = tableLayout[i];
+
+                if (card.type === 'equals') {
+                     currentX += EQUALS_SIGN_X_OFFSET; // Skip '=' position in layout check
+                     continue; // Move to next iteration
+                }
+
+                const cardX = currentX;
+                const cardY = LAYOUT_Y;
+
+                 // Check if this index is one of the changeable positions
+                 if (layoutPositionsToCheck.includes(i) && x > cardX && x < cardX + CARD_WIDTH && y > cardY && y < cardY + CARD_HEIGHT) {
+                    // Clicked a changeable card in the layout
+                    const index = selectedLayoutPositions.indexOf(i);
+                    if (index > -1) {
+                        // Deselect
+                        selectedLayoutPositions.splice(index, 1);
+                    } else {
+                        // Select (up to 2)
+                         if (selectedLayoutPositions.length < 2) {
+                             selectedLayoutPositions.push(i);
+                         } else {
+                             showMessage("You can only select up to 2 layout positions.");
+                         }
+                    }
+                    drawGame(); // Redraw to show selection
+                    return; // Stop checking other cards
+                }
+
+                 currentX += CARD_WIDTH + CARD_MARGIN; // Advance X for the next card position
+            }
+        }
+
+        // Applies the selected card changes to the layout
+        function applyChanges() {
+            // Check if exactly one yellow and one blue card are selected from hand
+            const yellowHandCards = selectedHandCards.filter(idx => playerHand[idx].color === 'yellow');
+            const blueHandCards = selectedHandCards.filter(idx => playerHand[idx].color === 'blue');
+
+            // Check if exactly two layout positions are selected
+            const yellowLayoutPositions = selectedLayoutPositions.filter(idx => tableLayout[idx].color === 'yellow');
+            const blueLayoutPositions = selectedLayoutPositions.filter(idx => tableLayout[idx].color === 'blue');
+
+
+            if (yellowHandCards.length === 1 && blueHandCards.length === 1 &&
+                yellowLayoutPositions.length === 1 && blueLayoutPositions.length === 1) {
+
+                // Create a temporary copy of the layout to test the changes
+                const tempLayout = JSON.parse(JSON.stringify(tableLayout)); // Deep copy
+
+                // Get the indices of the selected hand cards and layout positions
+                const yellowHandIndex = selectedHandCards.find(idx => playerHand[idx].color === 'yellow');
+                const blueHandIndex = selectedHandCards.find(idx => playerHand[idx].color === 'blue');
+                const yellowLayoutIndex = selectedLayoutPositions.find(idx => tableLayout[idx].color === 'yellow');
+                const blueLayoutIndex = selectedLayoutPositions.find(idx => tableLayout[idx].color === 'blue');
+
+                // Apply the changes to the temporary layout
+                tempLayout[yellowLayoutIndex] = playerHand[yellowHandIndex];
+                tempLayout[blueLayoutIndex] = playerHand[blueHandIndex];
+
+
+                // Check if the modified equation is true
+                if (evaluateEquation(tempLayout)) {
+                    showMessage("Success! The equation is true!");
+                    equalsSigns++; // Award the '=' sign
+
+                    // --- Implement the '3' card win condition here ---
+                    // Based on your description: "if you have a 3 card, you can win the round and keep the = sign"
+                    // This is ambiguous. Does having *a* 3 card mean you automatically win *if* the equation is true?
+                    // Or does it mean you win *regardless* of the equation if you have a 3?
+                    // Or something else?
+                    // For now, the win is based on the equation being true.
+                    // Add your specific '3' card logic here if it's different.
+                    // Example: if (playerHand.some(card => card.value === '3')) { // Special 3 card bonus/win logic }
+
+                    // Permanently apply the changes to the actual tableLayout
+                    const cardsToReturnToDeck = [];
+                    cardsToReturnToDeck.push(tableLayout[yellowLayoutIndex]);
+                    cardsToReturnToDeck.push(tableLayout[blueLayoutIndex]);
+
+                    tableLayout[yellowLayoutIndex] = playerHand[yellowHandIndex];
+                    tableLayout[blueLayoutIndex] = playerHand[blueHandIndex];
+
+                    // Remove the used cards from the player's hand (in reverse order to avoid index issues)
+                    const usedHandIndices = [yellowHandIndex, blueHandIndex].sort((a, b) => b - a);
+                    usedHandIndices.forEach(index => {
+                         playerHand.splice(index, 1);
+                    });
+
+
+                    // Add the replaced layout cards back to the deck and shuffle
+                    deck.push(...cardsToReturnToDeck);
+                    shuffleDeck(deck);
+
+                    // Deal new cards to the hand to bring it back to 5
+                    // Ensure the hand composition rule (2 yellow, 3 blue) is maintained
+                    while (playerHand.length < 5 && deck.length > 0) {
+                         const currentYellow = playerHand.filter(card => card.color === 'yellow').length;
+                         const currentBlue = playerHand.filter(card => card.color === 'blue').length;
+
+                         if (currentYellow < 2) {
+                             const symbolCardIndex = deck.findIndex(card => card.type === 'symbol');
+                             if (symbolCardIndex !== -1) {
+                                 playerHand.push(deck.splice(symbolCardIndex, 1)[0]);
+                             } else {
+                                 console.warn("Not enough symbol cards in deck to refill hand.");
+                                 break; // Cannot refill hand with required type
+                             }
+                         } else if (currentBlue < 3) {
+                             const numberCardIndex = deck.findIndex(card => card.type === 'number');
+                              if (numberCardIndex !== -1) {
+                                 playerHand.push(deck.splice(numberCardIndex, 1)[0]);
+                             } else {
+                                 console.warn("Not enough number cards in deck to refill hand.");
+                                 break; // Cannot refill hand with required type
+                             }
+                         } else {
+                             // Should not happen if hand is less than 5 but has correct composition
+                             // Just take the next card if composition is already met but hand isn't full
+                             if (deck.length > 0) playerHand.push(deck.shift());
+                             else break; // Deck is empty
+                         }
+                    }
+
+
+                    // --- Win Animation and Next Round ---
+                    showSplash(); // Show the splash screen and start confetti and equals spin
+                    setTimeout(() => {
+                        hideSplash(); // Hide the splash screen
+                        dealCards(); // Start a new round
+                    }, 3000); // Show splash for 3 seconds
+
+
+                } else {
+                    showMessage("That combination doesn't make the equation true. Try again!");
+                    // If incorrect, the cards are not used, and layout doesn't change.
+                    // Player can try again with different cards/positions.
+                }
+
+                // Reset selections after attempting to apply changes
+                selectedHandCards = [];
+                selectedLayoutPositions = [];
+                drawGame(); // Redraw to clear selections
+
+            } else {
+                 // Updated message for the new rule
+                showMessage("Please select exactly one yellow and one blue card from your hand AND two layout positions (one yellow symbol, one blue number) to replace.");
+            }
+        }
+
+        // Displays a message to the user
+        function showMessage(msg) {
+            messageBox.textContent = msg;
+        }
+
+        // --- Event Listeners ---
+        canvas.addEventListener('click', handleClick);
+        applyChangesBtn.addEventListener('click', applyChanges);
+        newRoundBtn.addEventListener('click', dealCards); // Clicking New Round starts a new round
+
+        // --- Initialization ---
+        dealCards(); // Start the first round on page load
+
+    </script>
+</body>
+</html>

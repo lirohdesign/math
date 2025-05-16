@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laser Sweep Collect Mockup with Win/Lose and New Game Button</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #222;
+            margin: 0;
+            font-family: sans-serif;
+            color: #fff;
+            flex-direction: column;
+        }
+        canvas {
+            border: 2px solid #555;
+            background-color: #333;
+            display: block;
+            margin-bottom: 20px;
+        }
+        #score-display {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+        #controls {
+            margin-top: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            margin: 0 5px;
+            border: none;
+            border-radius: 5px;
+            background-color: #555;
+            color: #fff;
+        }
+        button:hover {
+            background-color: #777;
+        }
+
+        /* Splash screen styling */
+        #splash-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8); /* Semi-transparent black background */
+            color: white;
+            display: flex;
+            flex-direction: column; /* Stack message and button vertically */
+            justify-content: center;
+            align-items: center;
+            font-size: 3em;
+            text-align: center;
+            z-index: 10; /* Ensure it's on top of the canvas */
+            pointer-events: none; /* Allow clicks to pass through when hidden */
+            opacity: 0; /* Start hidden */
+            transition: opacity 0.5s ease-in-out; /* Smooth fade effect */
+        }
+
+        #splash-screen.visible {
+            opacity: 1;
+            pointer-events: auto; /* Enable clicks when visible */
+        }
+
+        #splash-screen button {
+            margin-top: 20px; /* Space between message and button */
+            font-size: 0.5em; /* Smaller button text */
+            padding: 15px 30px;
+             pointer-events: auto; /* Ensure button is clickable when splash is visible */
+        }
+
+         #new-game-button {
+             display: none; /* Initially hide the new game button */
+         }
+    </style>
+</head>
+<body>
+    <div id="score-display">
+        Player Red: <span id="score-red">0</span> | Player Blue (Bot): <span id="score-blue">0</span>
+    </div>
+    <canvas id="gameCanvas"></canvas>
+    <div id="controls">
+        <button id="increase-speed">Increase Speed</button>
+        <button id="reset-game">Reset Game</button>
+    </div>
+
+    <div id="splash-screen">
+        <span id="splash-message"></span>
+        <button id="new-game-button">New Game</button> </div>
+
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const splashScreen = document.getElementById('splash-screen');
+        const splashMessage = document.getElementById('splash-message');
+        const newGameButton = document.getElementById('new-game-button');
+        const resetButton = document.getElementById('reset-game'); // Get the existing reset button
+
+
+        // Set canvas size (responsive)
+        const aspectRatio = 1; // Square canvas
+        const maxCanvasSize = 600;
+        let canvasSize = Math.min(maxCanvasSize, window.innerWidth * 0.8, window.innerHeight * 0.6);
+        canvas.width = canvasSize;
+        canvas.height = canvasSize;
+
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        let arenaRadius = canvas.width * 0.4; // Radius of the circular arena
+
+        let rotationAngle = 0; // Angle of the green dividing line in radians
+        let rotationSpeed = 0.005; // Radians per frame (adjust for speed)
+        const dotCount = 30; // Reduced number of dots
+        const dotRadius = 5;
+        const flashInterval = 2000; // Milliseconds between color changes
+        const botMoveSpeed = 0.8; // Pixels per frame for bot movement
+        const botCollectDistance = 10; // Distance for bot to be considered "at" the dot
+        const winScore = 60; // Score needed to win
+        const newGameButtonDelay = 5000; // Delay before New Game button appears (5 seconds)
+
+
+        let dots = [];
+        let scoreRed = 0;
+        let scoreBlue = 0;
+        let lastFlashTime = 0;
+        let gameActive = true; // Flag to control game state
+
+        // Bot state
+        let bot = {
+            x: centerX,
+            y: centerY,
+            size: 10, // Size of the bot triangle
+            targetDot: null // The dot the bot is currently moving towards
+        };
+
+        // Player assignments (fixed for this mockup)
+        const playerRedHalf = 'right'; // Dots in the right half of the line
+        const playerBlueHalf = 'left'; // Dots in the left half of the line
+
+        // Function to generate random dots
+        function createDots() {
+            dots = [];
+            for (let i = 0; i < dotCount; i++) {
+                // Generate random position within the circle
+                let x, y;
+                do {
+                    x = Math.random() * canvas.width;
+                    y = Math.random() * canvas.height;
+                    // Check if point is within the circle
+                } while (Math.sqrt((x - centerX) ** 2 + (y - centerY) ** 2) > arenaRadius);
+
+                dots.push({
+                    x: x,
+                    y: y,
+                    color: 'black', // 'black', 'red', or 'blue'
+                    collected: false // Whether the dot has been collected in its current flash cycle
+                });
+            }
+        }
+
+        // Function to update dot colors randomly
+        function updateDotColors(currentTime) {
+            if (!gameActive) return; // Don't update if game is over
+
+            if (currentTime - lastFlashTime > flashInterval) {
+                dots.forEach(dot => {
+                    // Reset collected state when color changes
+                    dot.collected = false;
+                    // Randomly set color to red, blue, or black (off)
+                    const random = Math.random();
+                    if (random < 0.4) { // 40% chance of flashing red
+                        dot.color = 'red';
+                    } else if (random < 0.8) { // 40% chance of flashing blue
+                        dot.color = 'blue';
+                    } else { // 20% chance of being black (off)
+                        dot.color = 'black';
+                    }
+                });
+                lastFlashTime = currentTime;
+                 // When colors change, the bot's target might become invalid, so clear it
+                 bot.targetDot = null;
+            }
+        }
+
+        // Function to determine which half a point is in
+        // Returns 'left' or 'right' relative to the current rotationAngle
+        function getHalf(x, y, angle) {
+            // Calculate the angle of the dot relative to the center
+            const dotAngle = Math.atan2(y - centerY, x - centerX);
+
+            // Normalize angles to be within 0 to 2*PI
+            const normalizedDotAngle = (dotAngle + 2 * Math.PI) % (2 * Math.PI);
+            const normalizedRotationAngle = (angle + 2 * Math.PI) % (2 * Math.PI);
+
+            // Determine the angles defining the two halves
+            let half1Start = normalizedRotationAngle;
+            let half1End = (normalizedRotationAngle + Math.PI) % (2 * Math.PI);
+
+            // Check if the dot's angle falls within the first half
+            let inHalf1;
+            if (half1Start < half1End) {
+                inHalf1 = normalizedDotAngle >= half1Start && normalizedDotAngle < half1End;
+            } else { // Handles wrapping around 0/2*PI
+                inHalf1 = normalizedDotAngle >= half1Start || normalizedDotAngle < half1End;
+            }
+
+            // Assign halves based on the definition of playerRedHalf and playerBlueHalf
+            // For simplicity in the mockup, let's define 'right' as the half from angle to angle + PI
+            // and 'left' as the half from angle + PI to angle + 2*PI
+            if (inHalf1) {
+                 // This half corresponds to the area swept from the line's current position
+                 // Let's arbitrarily assign this to 'right' for the mockup
+                 return 'right';
+            } else {
+                 // The other half
+                 return 'left';
+            }
+        }
+
+
+        // Bot player logic (movement and collection)
+        function botMove() {
+            if (!gameActive) return; // Don't move if game is over
+
+            // If the bot doesn't have a target, find one
+            if (!bot.targetDot) {
+                // Find eligible dots (flashing blue and in blue half) that haven't been collected
+                const eligibleDots = dots.filter(dot =>
+                    dot.color === 'blue' &&
+                    getHalf(dot.x, dot.y, rotationAngle) === playerBlueHalf &&
+                    !dot.collected
+                );
+
+                // If there are eligible dots, pick the closest one as the target
+                if (eligibleDots.length > 0) {
+                    let closestDot = null;
+                    let minDistance = Infinity;
+
+                    eligibleDots.forEach(dot => {
+                        const distance = Math.sqrt((bot.x - dot.x) ** 2 + (bot.y - dot.y) ** 2);
+                        if (distance < minDistance) {
+                            minDistance = distance;
+                            closestDot = dot;
+                        }
+                    });
+                    bot.targetDot = closestDot;
+                }
+            }
+
+            // If the bot has a target, move towards it
+            if (bot.targetDot) {
+                const targetX = bot.targetDot.x;
+                const targetY = bot.targetDot.y;
+
+                const dx = targetX - bot.x;
+                const dy = targetY - bot.y;
+                const distanceToTarget = Math.sqrt(dx * dx + dy * dy);
+
+                // Check if bot is close enough to collect
+                if (distanceToTarget < botCollectDistance) {
+                    bot.targetDot.collected = true;
+                    scoreBlue++;
+                    document.getElementById('score-blue').textContent = scoreBlue;
+                    bot.targetDot = null; // Clear target after collection
+                    checkWinCondition(); // Check if bot won
+                } else {
+                    // Move towards the target
+                    const moveX = (dx / distanceToTarget) * botMoveSpeed;
+                    const moveY = (dy / distanceToTarget) * botMoveSpeed;
+                    bot.x += moveX;
+                    bot.y += moveY;
+
+                    // Ensure bot stays within the arena bounds (optional, but good practice)
+                     const distFromCenter = Math.sqrt((bot.x - centerX)**2 + (bot.y - centerY)**2);
+                     if (distFromCenter > arenaRadius - bot.size) { // Keep bot slightly within the boundary
+                         const angle = Math.atan2(bot.y - centerY, bot.x - centerX);
+                         bot.x = centerX + (arenaRadius - bot.size) * Math.cos(angle);
+                         bot.y = centerY + (arenaRadius - bot.size) * Math.sin(angle);
+                     }
+                }
+            }
+        }
+
+        // Handle human player clicks
+        canvas.addEventListener('click', function(event) {
+            if (!gameActive) return; // Ignore clicks if game is over
+
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = event.clientX - rect.left;
+            const mouseY = event.clientY - rect.top;
+
+            dots.forEach(dot => {
+                // Check if click is within dot radius
+                const distance = Math.sqrt((mouseX - dot.x) ** 2 + (mouseY - dot.y) ** 2);
+                if (distance < dotRadius + 5) { // Increase clickable area slightly
+                    // Check if the dot is eligible for the human player (Player Red)
+                    const dotInRedHalf = getHalf(dot.x, dot.y, rotationAngle) === playerRedHalf;
+                    const isFlashingRed = dot.color === 'red';
+
+                    if (dotInRedHalf && isFlashingRed && !dot.collected) {
+                        // Human player collects the point
+                        dot.collected = true;
+                        scoreRed++;
+                        document.getElementById('score-red').textContent = scoreRed;
+                        checkWinCondition(); // Check if human player won
+                    }
+                }
+            });
+        });
+
+        // Check for win condition
+        function checkWinCondition() {
+            if (scoreRed >= winScore || scoreBlue >= winScore) {
+                gameActive = false; // Stop the game
+                showSplashScreen();
+            }
+        }
+
+        // Show the win/lose splash screen
+        function showSplashScreen() {
+            if (scoreRed >= winScore) {
+                splashMessage.textContent = "Player Red Wins!";
+                splashMessage.style.color = 'red';
+            } else if (scoreBlue >= winScore) {
+                splashMessage.textContent = "Player Blue (Bot) Wins!";
+                 splashMessage.style.color = 'blue';
+            }
+            splashScreen.classList.add('visible'); // Make splash screen visible
+
+            // Show the New Game button after a delay
+            setTimeout(() => {
+                newGameButton.style.display = 'inline-block';
+            }, newGameButtonDelay);
+        }
+
+        // Hide the splash screen
+        function hideSplashScreen() {
+            splashScreen.classList.remove('visible');
+            newGameButton.style.display = 'none'; // Hide the button when splash is hidden
+        }
+
+
+        // Draw everything on the canvas
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw the circular arena boundary
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, arenaRadius, 0, Math.PI * 2);
+            ctx.strokeStyle = '#555';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Draw the rotating green dividing line
+            ctx.beginPath();
+            const lineEndX = centerX + arenaRadius * Math.cos(rotationAngle);
+            const lineEndY = centerY + arenaRadius * Math.sin(rotationAngle);
+            const lineStartX = centerX - arenaRadius * Math.cos(rotationAngle);
+            const lineStartY = centerY - arenaRadius * Math.sin(rotationAngle);
+            ctx.moveTo(lineStartX, lineStartY);
+            ctx.lineTo(lineEndX, lineEndY);
+            ctx.strokeStyle = 'green';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Draw dots
+            dots.forEach(dot => {
+                ctx.beginPath();
+                ctx.arc(dot.x, dot.y, dotRadius, 0, Math.PI * 2);
+                // Change color if collected in the current flash cycle
+                if (dot.collected) {
+                     ctx.fillStyle = '#888'; // Grey out collected dots
+                } else {
+                    ctx.fillStyle = dot.color;
+                }
+                ctx.fill();
+            });
+
+            // Draw the bot (triangle)
+            ctx.fillStyle = 'blue'; // Bot color
+            ctx.beginPath();
+            // Calculate triangle vertices based on bot position and size
+            // Simple upright triangle for now
+            const botAngle = Math.atan2(bot.targetDot ? bot.targetDot.y - bot.y : 0, bot.targetDot ? bot.targetDot.x - bot.x : 1); // Point towards target if exists
+             const angleOffset = Math.PI / 2; // Adjust for upright triangle
+
+             const p1x = bot.x + bot.size * Math.cos(botAngle - angleOffset);
+             const p1y = bot.y + bot.size * Math.sin(botAngle - angleOffset);
+             const p2x = bot.x + bot.size * Math.cos(botAngle + Math.PI / 2 - angleOffset);
+             const p2y = bot.y + bot.size * Math.sin(botAngle + Math.PI / 2 - angleOffset);
+             const p3x = bot.x + bot.size * Math.cos(botAngle - Math.PI / 2 - angleOffset);
+             const p3y = bot.y + bot.size * Math.sin(botAngle - Math.PI / 2 - angleOffset);
+
+
+            ctx.moveTo(p1x, p1y);
+            ctx.lineTo(p2x, p2y);
+            ctx.lineTo(p3x, p3y);
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        // Game loop
+        function gameLoop(currentTime) {
+            if (gameActive) {
+                rotationAngle += rotationSpeed; // Update rotation angle
+
+                updateDotColors(currentTime); // Update dot colors
+                botMove(); // Bot makes its move
+
+                draw(); // Redraw everything
+
+                requestAnimationFrame(gameLoop); // Continue the loop
+            } else {
+                // Game is over, draw the final state and splash screen
+                draw();
+                // The splash screen is a separate HTML element, so no need to draw it on canvas
+            }
+        }
+
+        // Control buttons
+        document.getElementById('increase-speed').addEventListener('click', () => {
+            if (gameActive) {
+                rotationSpeed += 0.002; // Increase speed
+            }
+        });
+
+        // Event listener for the original Reset Game button
+        resetButton.addEventListener('click', () => {
+            scoreRed = 0;
+            scoreBlue = 0;
+            document.getElementById('score-red').textContent = scoreRed;
+            document.getElementById('score-blue').textContent = scoreBlue;
+            rotationAngle = 0;
+            rotationSpeed = 0.005; // Reset speed
+            createDots(); // Recreate dots
+            lastFlashTime = 0; // Reset flash timer
+            // Reset bot position and target
+            bot.x = centerX;
+            bot.y = centerY;
+            bot.targetDot = null;
+            gameActive = true; // Set game to active
+            hideSplashScreen(); // Hide splash screen
+
+            gameLoop(0); // Start the game loop
+        });
+
+        // Event listener for the new New Game button on the splash screen
+        newGameButton.addEventListener('click', () => {
+            // Trigger a click on the existing reset button to reuse its logic
+            resetButton.click();
+        });
+
+
+        // Initial setup
+        createDots();
+        gameLoop(0); // Start the game loop
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            canvasSize = Math.min(maxCanvasSize, window.innerWidth * 0.8, window.innerHeight * 0.6);
+            canvas.width = canvasSize;
+            canvas.height = canvasSize;
+            centerX = canvas.width / 2;
+            centerY = canvas.height / 2;
+            arenaRadius = canvas.width * 0.4;
+            // Recreate dots to fit new size
+            createDots();
+             // Reset bot position on resize
+            bot.x = centerX;
+            bot.y = centerY;
+            bot.targetDot = null;
+            draw(); // Redraw after resize
+        });
+
+    </script>
+</body>
+</html>

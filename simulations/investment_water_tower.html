@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>8-Bit Retirement Cistern</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Press Start 2P', cursive; /* Use 8-bit font for main body */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #1d2b53; /* Dark blue background */
+            color: #fff; /* White text */
+            padding: 20px;
+            image-rendering: pixelated; /* Helps with pixel scaling */
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #000; /* Black container background */
+            padding: 20px;
+            border-radius: 0; /* Sharp corners for 8-bit */
+            box-shadow: 4px 4px 0px #fff; /* Pixelated shadow */
+            border: 2px solid #fff; /* White border */
+            position: relative; /* Needed for absolute positioning of the link and wiki div */
+        }
+        canvas {
+            border: 2px solid #fff; /* White border */
+            background-color: #7fc9ff; /* Lighter blue sky */
+            display: block;
+            margin-bottom: 20px;
+            border-radius: 0; /* Sharp corners */
+            image-rendering: pixelated; /* Helps with pixel scaling */
+        }
+        .controls {
+            margin-bottom: 15px;
+            text-align: center;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            color: #fff; /* White text */
+        }
+         .controls > div {
+             margin: 5px 10px;
+         }
+        button {
+            font-family: 'Press Start 2P', cursive; /* Use 8-bit font */
+            padding: 10px 15px;
+            margin: 0 5px;
+            border: none;
+            border-radius: 0; /* Sharp corners */
+            cursor: pointer;
+            background-color: #ff004f; /* Pink button */
+            color: #fff; /* White text */
+            font-size: 0.8rem; /* Smaller font for 8-bit */
+            transition: background-color 0.1s ease; /* Faster transition */
+            border: 2px solid #fff; /* White border */
+            box-shadow: 2px 2px 0px #fff; /* Pixelated shadow */
+        }
+        button:hover {
+            background-color: #c6003f; /* Darker pink on hover */
+             box-shadow: none; /* Remove shadow on hover */
+        }
+        button:disabled {
+            background-color: #5a5a5a; /* Gray disabled */
+            cursor: not-allowed;
+             box-shadow: none;
+        }
+        .stats {
+            margin-top: 15px; /* Add space above stats */
+            text-align: left; /* Align text left for vertical list */
+            color: #fff; /* White text */
+            display: flex; /* Use flexbox for vertical layout */
+            flex-direction: column; /* Stack items vertically */
+            align-items: flex-start; /* Align items to the start */
+        }
+        .stats div {
+            margin-bottom: 5px;
+            font-size: 0.8rem; /* Smaller font for 8-bit */
+            color: #fff; /* White text */
+        }
+        .danger-text {
+            color: #ff77a8; /* Lighter pink/red for danger */
+            font-weight: normal; /* 8-bit fonts often don't have bold */
+        }
+        .safe-text {
+             color: #00e436; /* Green for safe */
+             font-weight: normal;
+        }
+
+        #startButton {
+            background-color: #008b00; /* Green start button */
+            color: #fff;
+            font-weight: normal;
+            padding: 12px 20px;
+            margin-top: 10px;
+            display: inline-block;
+             box-shadow: 2px 2px 0px #fff;
+        }
+
+         #startButton:hover {
+            background-color: #005f00; /* Darker green on hover */
+             box-shadow: none;
+        }
+
+        /* Style for the Stop button state */
+        #startButton.stop-button {
+            background-color: #ff004f; /* Pink for stop button */
+        }
+
+         #startButton.stop-button:hover {
+            background-color: #c6003f; /* Darker pink on hover */
+        }
+
+
+        input[type="number"] {
+            font-family: 'Press Start 2P', cursive; /* Use 8-bit font */
+            padding: 8px;
+            border: 2px solid #fff; /* White border */
+            border-radius: 0; /* Sharp corners */
+            width: 150px; /* Adjust width as needed */
+            margin-left: 5px;
+            background-color: #3d3d3d; /* Dark gray input background */
+            color: #00ffff; /* Cyan text */
+             box-shadow: 2px 2px 0px #fff;
+        }
+         input[type="number"]:focus {
+             outline: none;
+             box-shadow: 0px 0px 0px 3px #00ffff; /* Cyan focus outline */
+         }
+
+         select {
+             font-family: 'Press Start 2P', cursive; /* Use 8-bit font */
+             padding: 8px;
+             border: 2px solid #fff;
+             border-radius: 0;
+             margin-left: 5px;
+             background-color: #3d3d3d;
+             color: #00ffff;
+             box-shadow: 2px 2px 0px #fff;
+         }
+         select:focus {
+             outline: none;
+             box-shadow: 0px 0px 0px 3px #00ffff;
+         }
+         #inflationNote {
+             margin-top: 10px;
+             font-size: 0.7rem;
+             color: #fff;
+             text-align: center;
+         }
+         #errorMessage {
+             color: #ff77a8; /* Danger text color */
+             margin-top: 15px;
+             font-size: 0.8rem;
+             text-align: center;
+             white-space: pre-wrap; /* Preserve whitespace and break lines */
+         }
+
+         /* Style for the wiki link */
+         #wikiLink {
+             position: absolute;
+             top: 10px;
+             left: 10px;
+             font-family: 'Press Start 2P', cursive;
+             font-size: 0.7rem;
+             color: #00ffff; /* Cyan link color */
+             text-decoration: none; /* No underline */
+             z-index: 10; /* Ensure it's above other elements */
+             cursor: pointer; /* Indicate it's clickable */
+         }
+         #wikiLink:hover {
+             text-decoration: underline; /* Underline on hover */
+         }
+
+         /* Style for the wiki explanation div */
+         #wikiExplanation {
+             display: none; /* Initially hidden */
+             position: absolute;
+             top: 0;
+             left: 0;
+             width: 100%; /* Cover the container */
+             height: 100%; /* Cover the container */
+             background-color: rgba(255, 255, 255, 0.95); /* Semi-transparent white background */
+             color: #333; /* Dark gray text for readability */
+             font-family: sans-serif; /* Standard readable font */
+             font-size: 1rem; /* Standard font size */
+             line-height: 1.5; /* Improved line spacing */
+             padding: 20px;
+             box-sizing: border-box; /* Include padding in width/height */
+             overflow-y: auto; /* Add scroll if content overflows */
+             z-index: 20; /* Ensure it's above everything else */
+         }
+         #wikiExplanation h3 {
+             font-size: 1.2rem; /* Slightly larger heading */
+             margin-bottom: 15px; /* More space below heading */
+             color: #1d2b53; /* Dark blue heading color */
+         }
+         #wikiExplanation p {
+             margin-bottom: 15px; /* More space between paragraphs */
+         }
+          #wikiExplanation ul {
+              margin-bottom: 15px; /* Space below list */
+              padding-left: 20px; /* Indent list items */
+          }
+           #wikiExplanation li {
+               margin-bottom: 5px; /* Space between list items */
+           }
+          #wikiExplanation strong {
+              color: #000; /* Black color for bold */
+          }
+
+          /* Close button for the wiki explanation */
+          #wikiCloseButton {
+              position: absolute;
+              top: 10px;
+              right: 10px;
+              font-family: sans-serif; /* Standard font for button */
+              font-size: 1.2rem; /* Larger close button */
+              color: #ff004f; /* Pink close button */
+              cursor: pointer;
+              border: none;
+              background: none;
+          }
+           #wikiCloseButton:hover {
+               text-decoration: underline;
+           }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="#" id="wikiLink">wiki</a>
+
+        <div id="wikiExplanation">
+            <button id="wikiCloseButton">X</button>
+            <h3>Understanding the 8-Bit Retirement Cistern Simulation</h3>
+            <p>This interactive tool uses a simple 8-bit water cistern analogy to help visualize how a retirement portfolio might have fared if you had started saving with today's purchasing power in a historical year and followed a specific withdrawal strategy.</p>
+
+            <p><strong>Here's what the different elements represent:</strong></p>
+            <ul>
+                <li><strong>The Cistern:</strong> This is your retirement portfolio, holding your savings.</li>
+                <li><strong>The Water Level:</strong> This represents the current value of your portfolio. A higher water level means a larger portfolio.</li>
+                <li><strong>Rain (from the Windmill):</strong> This symbolizes annual market returns (positive returns add to your portfolio, like rain filling the cistern). The speed of the windmill blades can give a visual cue to the magnitude of the annual return.</li>
+                <li><strong>The Spigot:</strong> This represents your annual withdrawals from the portfolio.</li>
+                <li><strong>Inflation (CPI Data):</strong> The historical Consumer Price Index (CPI) data is used to adjust the size of your annual withdrawal. As inflation increases, the amount you need to withdraw (the flow from the spigot) also increases to maintain the same purchasing power.</li>
+            </ul>
+
+            <p><strong>How the Inputs Work:</strong></p>
+            <ul>
+                <li><strong>Present Savings 2025:</strong> You enter the amount of savings you have in today's (2025) dollars. The simulation then calculates what the equivalent purchasing power of that amount would have been in the <code>Start Year</code> you select, using historical CPI data. This calculated historical equivalent is the actual starting value of the portfolio in the simulation.</li>
+                <li><strong>Withdrawal Rate (%):</strong> This is the percentage of your <em>initial</em> portfolio value (the calculated historical equivalent) that you withdraw in the first year. In subsequent years, this withdrawal amount is adjusted upwards based on historical inflation.</li>
+                <li><strong>Start Year:</strong> You select a historical year to begin the simulation. The simulation will then run for 30 years using the actual S&P 500 returns and CPI inflation from that starting point.</li>
+            </ul>
+
+            <p><strong>Potential Use Case:</strong></p>
+            <p>The primary use case for this simulation is to explore the impact of "sequence of return risk." By starting the simulation in different historical years (especially those preceding market downturns like the early 1970s or the early 2000s), you can visually see how a poor sequence of returns early in retirement, combined with inflation-adjusted withdrawals, can significantly impact the longevity of a portfolio that starts with a specific level of purchasing power. It helps illustrate why simply having a large sum might not be enough if the market performance and inflation are unfavorable during your withdrawal phase.</p>
+
+            <p>It allows you to ask: "If I had [Present Savings 2025] today, and retired in [Start Year] with the equivalent purchasing power, how would my savings have held up over the next 30 years?"</p>
+        </div>
+
+
+        <canvas id="cisternCanvas" width="400" height="500"></canvas>
+
+        <div class="controls">
+            <div>
+                <label for="initialInvestmentInput" class="mr-2">Present Savings 2025:</label>
+                <input type="number" id="initialInvestmentInput" value="1000000" min="100000" step="10000">
+            </div>
+             <div>
+                <label for="withdrawalRateInput" class="mr-2">Withdrawal Rate (%):</label>
+                <input type="number" id="withdrawalRateInput" value="4" min="0.5" step="0.1">
+            </div>
+            <div>
+                <label for="startYearSelect" class="mr-2">Start Year:</label>
+                 <select id="startYearSelect" class="p-2 border rounded"></select>
+            </div>
+            <div>
+                <button id="startButton">Start Simulation</button>
+                <button id="resetButton">Reset</button>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div id="year">Year: 0</div>
+            <div id="portfolioValue">Portfolio Value: $0</div>
+            <div id="annualReturn">Annual Return: 0%</div>
+            <div id="withdrawalAmount">Withdrawal: $0</div>
+            <div id="netChange">Net Change: $0</div>
+        </div>
+
+        <div id="inflationNote">*annual withdrawal amount adjusted by historical CPI inflation. Initial portfolio value shown in selected start year equivalent dollars.</div>
+        <div id="errorMessage"></div> </div>
+
+    <script>
+        const canvas = document.getElementById('cisternCanvas');
+        const ctx = canvas ? canvas.getContext('2d') : null; // Get context with a check
+        const startButton = document.getElementById('startButton');
+        const resetButton = document.getElementById('resetButton');
+        const startYearSelect = document.getElementById('startYearSelect');
+        const initialInvestmentInput = document.getElementById('initialInvestmentInput');
+        const withdrawalRateInput = document.getElementById('withdrawalRateInput');
+        const yearDiv = document.getElementById('year');
+        const portfolioValueDiv = document.getElementById('portfolioValue');
+        const annualReturnDiv = document.getElementById('annualReturn');
+        const withdrawalAmountDiv = document.getElementById('withdrawalAmount');
+        const netChangeDiv = document.getElementById('netChange');
+        const inflationNoteDiv = document.getElementById('inflationNote');
+        const errorMessageDiv = document.getElementById('errorMessage'); // Get the error message div
+        const wikiLink = document.getElementById('wikiLink'); // Get the wiki link
+        const wikiExplanationDiv = document.getElementById('wikiExplanation'); // Get the wiki explanation div
+        const wikiCloseButton = document.getElementById('wikiCloseButton'); // Get the wiki close button
+
+
+        // Function to display a critical error on the page
+        function displayCriticalError(message) {
+            if (errorMessageDiv) {
+                errorMessageDiv.textContent = "Critical Error: " + message;
+            }
+            console.error("Critical Error:", message);
+        }
+
+
+        // --- Debugging: Check if elements are found ---
+        console.log("Script started.");
+        let elementsFound = true;
+        if (!canvas) { console.error("Canvas element not found!"); elementsFound = false; } else { console.log("Canvas found."); }
+        if (!ctx) { console.error("Canvas context not found!"); elementsFound = false; } else { console.log("Canvas context found."); }
+        if (!startButton) { console.error("Start Button element not found!"); elementsFound = false; } else { console.log("Start Button found."); }
+        if (!resetButton) { console.error("Reset Button element not found!"); elementsFound = false; } else { console.log("Reset Button found."); }
+        if (!startYearSelect) { console.error("Start Year Select element not found!"); elementsFound = false; } else { console.log("Start Year Select found."); }
+        if (!initialInvestmentInput) { console.error("Initial Investment Input element not found!"); elementsFound = false; } else { console.log("Initial Investment Input found."); }
+        if (!withdrawalRateInput) { console.error("Withdrawal Rate Input element not found!"); elementsFound = false; } else { console.log("Withdrawal Rate Input found."); }
+        if (!yearDiv) { console.error("Year Div element not found!"); elementsFound = false; } else { console.log("Year Div found."); }
+        if (!portfolioValueDiv) { console.error("Portfolio Value Div element not found!"); elementsFound = false; } else { console.log("Portfolio Value Div found."); }
+        if (!annualReturnDiv) { console.error("Annual Return Div element not found!"); elementsFound = false; } else { console.log("Annual Return Div found."); }
+        if (!withdrawalAmountDiv) { console.error("Withdrawal Amount Div element not found!"); elementsFound = false; } else { console.log("Withdrawal Amount Div found."); }
+        if (!netChangeDiv) { console.error("Net Change Div element not found!"); elementsFound = false; } else { console.log("Net Change Div found."); }
+        if (!inflationNoteDiv) { console.error("Inflation Note Div element not found!"); elementsFound = false; } else { console.log("Inflation Note Div found."); }
+        if (!errorMessageDiv) { console.error("Error Message Div element not found!"); elementsFound = false; } else { console.log("Error Message Div found."); }
+        if (!wikiLink) { console.error("Wiki Link element not found!"); elementsFound = false; } else { console.log("Wiki Link found."); }
+        if (!wikiExplanationDiv) { console.error("Wiki Explanation Div element not found!"); elementsFound = false; } else { console.log("Wiki Explanation Div found."); }
+        if (!wikiCloseButton) { console.error("Wiki Close Button element not found!"); elementsFound = false; } else { console.log("Wiki Close Button found."); }
+
+
+        if (!elementsFound) {
+             displayCriticalError("One or more essential HTML elements were not found. Check console for details.");
+        }
+        // --- End Debugging ---
+
+
+        // Simulation Parameters (now dynamic based on inputs)
+        const maxCisternCapacity = 5000000; // Cistern represents up to $5 million
+        const simulationYears = 30; // Simulate for 30 years
+        const simulationSpeedMultiplier = 1.5; // Speed multiplier (1.5x slower)
+        const simulationStepDelay = 1000 * simulationSpeedMultiplier; // Milliseconds per year
+
+        // Cistern Drawing Parameters (adjusted for elevated tower)
+        const cisternTowerHeight = 250; // Height of the elevated cistern tank
+        const cisternTowerWidth = 200; // Width of the elevated cistern tank
+        const cisternTowerBaseY = canvas ? canvas.height - 150 : 350; // Y-coordinate of the base of the tank (add fallback)
+        const cisternTowerTopY = cisternTowerBaseY - cisternTowerHeight; // Y-coordinate of the top of the tank
+        const cisternTowerLeftX = canvas ? (canvas.width - cisternTowerWidth) / 2 : 100; // X-coordinate of the left side (add fallback)
+        const cisternTowerRightX = cisternTowerLeftX + cisternTowerWidth; // X-coordinate of the right side
+        const towerLegHeight = 100; // Height of the supporting legs
+        const towerLegWidth = 10; // Width of the supporting legs
+        const towerLegColor = '#8b4513'; // Brown color for tower structure
+        const crossBraceColor = '#a0a0a0'; // Gray color for cross bracing
+
+        const dangerZoneRatio = 0.3; // Portfolio value below this ratio of *initialInvestment* is the danger zone
+
+        // Historical S&P 500 Annual Returns (Total Return including dividends) and CPI Data
+        // S&P data based on provided data, starting from 1970
+        // CPI data based on FRED CPIAUCSL (January values used for annual simulation)
+        const historicalData = [
+             { year: 1970, return: 0.0401, cpi: 37.900 },
+             { year: 1971, return: 0.1431, cpi: 39.900 },
+             { year: 1972, return: 0.1898, cpi: 41.200 },
+             { year: 1973, return: -0.1466, cpi: 42.700 },
+             { year: 1974, return: -0.2647, cpi: 46.800 },
+             { year: 1975, return: 0.3720, cpi: 52.300 },
+             { year: 1976, return: 0.2384, cpi: 55.800 },
+             { year: 1977, return: -0.0718, cpi: 58.700 },
+             { year: 1978, return: 0.0656, cpi: 62.700 },
+             { year: 1979, return: 0.1844, cpi: 68.500 },
+             { year: 1980, return: 0.3250, cpi: 78.000 },
+             { year: 1981, return: -0.0492, cpi: 87.200 },
+             { year: 1982, return: 0.2155, cpi: 94.400 },
+             { year: 1983, return: 0.2256, cpi: 97.900 },
+             { year: 1984, return: 0.0627, cpi: 102.100 },
+             { year: 1985, return: 0.3173, cpi: 105.700 },
+             { year: 1986, return: 0.1867, cpi: 109.900 },
+             { year: 1987, return: 0.0525, cpi: 111.400 },
+             { year: 1988, return: 0.1661, cpi: 116.000 },
+             { year: 1989, return: 0.3169, cpi: 121.200 },
+             { year: 1990, return: -0.0310, cpi: 127.500 },
+             { year: 1991, return: 0.3047, cpi: 134.700 },
+             { year: 1992, return: 0.0762, cpi: 138.300 },
+             { year: 1993, return: 0.1008, cpi: 142.800 },
+             { year: 1994, return: 0.0132, cpi: 146.300 },
+             { year: 1995, return: 0.3758, cpi: 150.500 },
+             { year: 1996, return: 0.2296, cpi: 154.700 },
+             { year: 1997, return: 0.3336, cpi: 159.400 },
+             { year: 1998, return: 0.2858, cpi: 162.000 },
+             { year: 1999, return: 0.2104, cpi: 164.700 },
+             { year: 2000, return: -0.0910, cpi: 169.300 },
+             { year: 2001, return: -0.1189, cpi: 175.600 },
+             { year: 2002, return: -0.2210, cpi: 177.700 },
+             { year: 2003, return: 0.2868, cpi: 182.600 },
+             { year: 2004, return: 0.1088, cpi: 186.300 },
+             { year: 2005, return: 0.0491, cpi: 191.600 },
+             { year: 2006, return: 0.1579, cpi: 199.300 },
+             { year: 2007, return: 0.0549, cpi: 203.437 },
+             { year: 2008, return: -0.3700, cpi: 212.174 },
+             { year: 2009, return: 0.2646, cpi: 211.933 },
+             { year: 2010, return: 0.1506, cpi: 217.488 },
+             { year: 2011, return: 0.0211, cpi: 221.187 },
+             { year: 2012, return: 0.1600, cpi: 227.842 },
+             { year: 2013, return: 0.3239, cpi: 231.679 },
+             { year: 2014, return: 0.1369, cpi: 235.288 },
+             { year: 2015, return: 0.0138, cpi: 234.747 },
+             { year: 2016, return: 0.1196, cpi: 237.652 },
+             { year: 2017, return: 0.2183, cpi: 243.618 },
+             { year: 2018, return: -0.0438, cpi: 248.859 },
+             { year: 2019, return: 0.3149, cpi: 252.561 },
+             { year: 2020, return: 0.1840, cpi: 259.127 },
+             { year: 2021, return: 0.2871, cpi: 262.639 },
+             { year: 2022, return: -0.1811, cpi: 282.542 },
+             { year: 2023, return: 0.2629, cpi: 300.456 },
+             { year: 2024, return: 0.2502, cpi: 309.794 },
+             { year: 2025, return: 0.0000, cpi: 319.086 } // Added 2025 data with placeholder return
+        ];
+
+        // Function to find the data for a given year
+        function getHistoricalDataForYear(year) {
+            return historicalData.find(data => data.year === year);
+        }
+
+        // Function to find the CPI for a given year
+        function getCPIForYear(year) {
+            const data = historicalData.find(data => data.year === year);
+            return data ? data.cpi : null;
+        }
+
+
+        const presentYear = new Date().getFullYear(); // Get the current year
+
+        let selectedStartYear = 1970; // Default start year
+        let initialInvestment; // This will store the calculated start year equivalent value
+        let withdrawalRate = 0;
+        let portfolioValue = 0; // This will hold the portfolio value
+        let currentYear = 0; // Simulation year (0 to 29)
+        let displayYear = 0; // Year to display (e.g., 1970, 1971, etc.)
+
+        let annualWithdrawalAmount = 0; // Will be calculated on reset and adjusted annually by CPI
+        let animationFrameId = null;
+        let isRunning = false;
+        let simulationTimeoutId = null; // To store the timeout ID for runSimulationStep
+        let windmillBladeAngle = 0; // For windmill animation
+        const pixelSize = 2; // Define pixelSize globally for easier access in drawing
+
+
+        // Function to draw a pixelated rectangle
+        function drawPixelRect(x, y, width, height, color) {
+             if (!ctx) return; // Add check
+            ctx.fillStyle = color;
+            for (let i = 0; i < width; i += pixelSize) {
+                for (let j = 0; j < height; j += pixelSize) {
+                    ctx.fillRect(x + i, y + j, pixelSize, pixelSize);
+                }
+            }
+        }
+
+         // Function to draw a pixelated line (simplified for 8-bit)
+         function drawPixelLine(x1, y1, x2, y2, color, lineWidth) {
+             if (!ctx) return; // Add check
+             ctx.strokeStyle = color;
+             ctx.lineWidth = lineWidth;
+             ctx.beginPath();
+             ctx.moveTo(x1, y1);
+             ctx.lineTo(x2, y2);
+             ctx.stroke();
+             ctx.closePath();
+         }
+
+         // Function to draw the windmill (pixelated)
+        function drawWindmill() {
+             if (!ctx) return; // Add check
+            const windmillBaseX = cisternTowerLeftX - 100; // Position left of the cistern tower
+            const windmillBaseY = canvas ? canvas.height - 50 : 450; // Ground level (add fallback)
+            const windmillHeight = 150;
+            const windmillWidth = 40;
+            const towerColor = '#a0a0a0'; // Gray tower
+
+            // Draw tower base
+            drawPixelRect(windmillBaseX, windmillBaseY - windmillHeight, windmillWidth, windmillHeight, towerColor);
+
+            // Draw blades (simple rotation)
+            const centerX = windmillBaseX + windmillWidth / 2;
+            const centerY = windmillBaseY - windmillHeight - 20; // Top of the tower
+            const bladeLength = 50;
+            const bladeColor = '#ff004f'; // Pink blades
+
+            ctx.save(); // Save current canvas state
+            ctx.translate(centerX, centerY); // Move origin to center of blades
+            ctx.rotate(windmillBladeAngle); // Rotate by the current angle
+
+            // Draw simple blades
+            for (let i = 0; i < 4; i++) {
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.lineTo(bladeLength, 10);
+                ctx.lineTo(bladeLength, -10);
+                ctx.closePath();
+                ctx.fillStyle = bladeColor;
+                ctx.fill();
+                ctx.rotate(Math.PI / 2); // Rotate for the next blade
+            }
+
+            ctx.restore(); // Restore canvas state
+
+            // Draw small pump house at the base
+            const pumpHouseWidth = 30;
+            const pumpHouseHeight = 20;
+            drawPixelRect(windmillBaseX + (windmillWidth - pumpHouseWidth) / 2, windmillBaseY - pumpHouseHeight, pumpHouseWidth, pumpHouseHeight, '#8b4513'); // Brown pump house
+
+        }
+
+        // Function to draw the pipe from the ground to the faucet with an elbow
+        function drawPipe() {
+             if (!ctx) return; // Add check
+            const pipeColor = '#a0a0a0'; // Gray pipe color
+            const pipeThickness = pixelSize * 3; // Pipe thickness
+
+            // Start point: On the ground between windmill and water tower
+            const pipeStartX = cisternTowerLeftX - 50; // Adjust X position as needed
+            const pipeStartY = canvas ? canvas.height - 50 : 450; // Ground level (add fallback)
+
+            // Elbow point: Vertical alignment with start, horizontal alignment with faucet
+            const faucetSpoutX = cisternTowerLeftX + cisternTowerWidth / 2 - 40 + 20 - 15; // X-coord of the faucet spout
+            const faucetSpoutY = cisternTowerTopY - 30 + 10 - 5; // Y-coord of the faucet spout
+            const elbowX = pipeStartX;
+            const elbowY = faucetSpoutY; // Align vertically with faucet spout
+
+            // Draw vertical segment (from ground to elbow)
+            drawPixelRect(pipeStartX - pipeThickness / 2, elbowY, pipeThickness, pipeStartY - elbowY, pipeColor);
+
+            // Draw horizontal segment (the elbow to the faucet)
+            drawPixelRect(elbowX - (pipeThickness / 2), elbowY - pipeThickness / 2, faucetSpoutX - elbowX + (pipeThickness / 2), pipeThickness, pipeColor);
+
+             // Draw a small connection piece at the faucet
+             drawPixelRect(faucetSpoutX - pixelSize * 2, faucetSpoutY - pixelSize * 2, pixelSize * 4, pixelSize * 4, pipeColor);
+
+        }
+
+
+        // Function to draw the faucet at the top of the cistern, off-center (pixelated)
+        function drawFaucet() {
+             if (!ctx) return; // Add check
+            const faucetX = cisternTowerLeftX + cisternTowerWidth / 2 - 40; // Position above the cistern, offset left
+            const faucetY = cisternTowerTopY - 30; // Above the cistern top
+            const faucetWidth = 20;
+            const faucetHeight = 10;
+            const spoutLength = 15;
+            const spoutHeight = 5;
+
+            // Draw faucet body
+            drawPixelRect(faucetX, faucetY, faucetWidth, faucetHeight, '#a0a0a0'); // Gray faucet body
+            // Draw faucet spout (pointing down)
+            drawPixelRect(faucetX + faucetWidth - spoutLength, faucetY + faucetHeight - spoutHeight, spoutLength, spoutHeight, '#a0a0a0'); // Gray spout
+        }
+
+
+        // Function to draw the elevated cistern tower (pixelated)
+        function drawCistern() {
+             if (!ctx) return; // Add check
+            // Draw the elevated cistern tank
+            ctx.strokeStyle = '#8b4513'; // Brown color for the cistern tank
+            ctx.lineWidth = pixelSize * 2; // Pixelated line width
+            drawPixelRect(cisternTowerLeftX, cisternTowerTopY, cisternTowerWidth, cisternTowerHeight, '#5a3a2b'); // Darker brown for tank body
+            drawPixelLine(cisternTowerLeftX, cisternTowerTopY, cisternTowerRightX, cisternTowerTopY, '#8b4513', pixelSize * 2); // Top line
+            drawPixelLine(cisternTowerLeftX, cisternTowerTopY, cisternTowerLeftX, cisternTowerBaseY, '#8b4513', pixelSize * 2); // Left side line
+            drawPixelLine(cisternTowerRightX, cisternTowerTopY, cisternTowerRightX, cisternTowerBaseY, '#8b4513', pixelSize * 2); // Right side line
+             drawPixelLine(cisternTowerLeftX, cisternTowerBaseY, cisternTowerRightX, cisternTowerBaseY, '#8b4513', pixelSize * 2); // Bottom line
+
+
+            // Draw supporting legs
+            drawPixelRect(cisternTowerLeftX + towerLegWidth, cisternTowerBaseY, towerLegWidth, towerLegHeight, towerLegColor); // Left leg
+            drawPixelRect(cisternTowerRightX - towerLegWidth * 2, cisternTowerBaseY, towerLegWidth, towerLegHeight, towerLegColor); // Right leg
+
+            // Draw cross bracing
+            drawPixelLine(cisternTowerLeftX + towerLegWidth, cisternTowerBaseY + towerLegHeight, cisternTowerRightX - towerLegWidth * 2 - pixelSize, cisternTowerBaseY, crossBraceColor, pixelSize); // Bottom-left to top-right brace
+            drawPixelLine(cisternTowerLeftX + towerLegWidth, cisternTowerBaseY, cisternTowerRightX - towerLegWidth * 2 - pixelSize, cisternTowerBaseY + towerLegHeight, crossBraceColor, pixelSize); // Top-left to bottom-right brace
+
+
+            // Draw the danger zone line (based on initial investment)
+            const dangerZoneY = cisternTowerBaseY - (cisternTowerHeight * (initialInvestment * dangerZoneRatio / maxCisternCapacity));
+            drawPixelLine(cisternTowerLeftX - 10, dangerZoneY, cisternTowerRightX + 10, dangerZoneY, '#ff77a8', pixelSize);
+
+            // Add danger zone label
+            ctx.fillStyle = '#ff77a8';
+            ctx.font = '14px "Press Start 2P"';
+            ctx.fillText('Danger Zone', cisternTowerRightX + 25, dangerZoneY + 5);
+
+             // Add Max Capacity Label
+             ctx.fillStyle = '#fff';
+             ctx.font = '14px "Press Start 2P"';
+             ctx.fillText(`Max Capacity: $${maxCisternCapacity.toLocaleString()}`, cisternTowerLeftX - 150, cisternTowerTopY + 15);
+
+        }
+
+        // Function to draw the water level (pixelated)
+        function drawWater() {
+             if (!ctx) return; // Add check
+            // Calculate water height based on portfolio value relative to max capacity within the tank height
+            const waterRatio = Math.max(0, Math.min(1, portfolioValue / maxCisternCapacity)); // Ensure ratio is between 0 and 1
+            const waterHeight = cisternTowerHeight * waterRatio;
+            const waterY = cisternTowerBaseY - waterHeight;
+
+            drawPixelRect(cisternTowerLeftX, waterY, cisternTowerWidth, waterHeight, '#00ffff'); // Cyan water
+        }
+
+        // Function to draw the desert environment (simple pixelated)
+        function drawDesert() {
+             if (!ctx) return; // Add check
+            const groundLevel = canvas ? canvas.height - 50 : 450; // Add fallback
+            drawPixelRect(0, groundLevel, canvas ? canvas.width : 400, canvas ? canvas.height - groundLevel : 50, '#ffcc00'); // Orange/sand color (add fallbacks)
+        }
+
+        // Function to draw the spigot on the right side of the elevated cistern (pixelated)
+        function drawSpigot() {
+             if (!ctx) return; // Add check
+            const spigotLength = 20; // Shorter spigot for vertical stream
+            const spigotHeight = 10;
+            const spigotX = cisternTowerRightX; // Position on the right side
+            const spigotY = cisternTowerBaseY - (cisternTowerHeight * 0.4); // Position slightly above the middle
+
+            drawPixelRect(spigotX, spigotY, spigotLength, spigotHeight, '#a0a0a0'); // Gray spigot
+        }
+
+        // Function to draw the vertical water outflow stream from the spigot (pixelated)
+        function drawOutflowStream() {
+            if (!isRunning || portfolioValue <= 0 || !ctx) return; // Add check
+
+            const spigotX = cisternTowerRightX; // Match spigotX
+            const spigotY = cisternTowerBaseY - (cisternTowerHeight * 0.4); // Match spigotY
+            const streamColor = '#00ffff'; // Cyan water stream
+            const streamThickness = pixelSize * 4; // Constant thickness for outflow stream
+            const streamWidth = streamThickness; // For a simple rectangular stream flowing down
+
+            // Draw the stream as a rectangle downwards from the spigot
+            const groundLevel = canvas ? canvas.height - 50 : 450; // Add fallback
+            const streamHeight = Math.max(0, groundLevel - (spigotY + 10)); // Height from spigot bottom to ground
+
+            if (streamHeight > 0) {
+                 drawPixelRect(spigotX + (20 - streamWidth) / 2, spigotY + 10, streamWidth, streamHeight, streamColor); // Adjust X to center under spigot
+            }
+        }
+
+
+        // Function to draw the water inflow stream from the faucet (pixelated)
+        function drawInflowStream(annualReturn) {
+            if (!isRunning || annualReturn <= 0 || !ctx) return; // Add check
+
+            // Faucet spout position (adjusted for off-center top position)
+            const faucetSpoutX = cisternTowerLeftX + cisternTowerWidth / 2 - 40 + 20 - 15;
+            const faucetSpoutY = cisternTowerTopY - 30 + 10 - 5;
+            const streamColor = '#00ffff'; // Cyan water stream
+
+            // Calculate stream thickness based on return rate (scale it)
+            const maxReturnRate = 0.3758; // Max return rate in our historical data (1995) for scaling
+            const maxStreamThickness = pixelSize * 8; // Max pixel thickness of the stream
+            const streamThickness = Math.max(pixelSize, Math.floor((annualReturn / maxReturnRate) * maxStreamThickness));
+            const streamWidth = streamThickness; // For a simple rectangular stream flowing down
+
+            // Draw the stream as a rectangle from the faucet spout to the water level
+            const waterLevelY = cisternTowerBaseY - (cisternTowerHeight * (portfolioValue / maxCisternCapacity));
+            const streamHeight = Math.max(0, waterLevelY - faucetSpoutY); // Height from spout to water level
+
+            // Adjust streamX to center the stream below the spout
+            const streamX = faucetSpoutX + (15 - streamWidth) / 2;
+
+
+            if (streamHeight > 0) {
+                 drawPixelRect(streamX, faucetSpoutY, streamWidth, streamHeight, streamColor);
+            }
+        }
+
+
+        // Function to update simulation state for the next year
+        function updateSimulation() {
+             console.log(`Updating simulation for year ${currentYear + 1}`);
+            if (!isRunning || currentYear >= simulationYears || portfolioValue <= 0) {
+                stopSimulation();
+                console.log("Simulation ended.");
+                return;
+            }
+
+            try {
+                // Get historical data for the current and previous simulation years
+                const currentSimYear = selectedStartYear + currentYear;
+                const previousSimYear = currentSimYear - 1;
+
+                const currentYearData = getHistoricalDataForYear(currentSimYear);
+                const previousYearData = getHistoricalDataForYear(previousSimYear);
+
+                let annualReturnRate = 0;
+                let currentYearCPI = null;
+                let previousYearCPI = null;
+
+                if (currentYearData) {
+                     annualReturnRate = currentYearData.return;
+                     currentYearCPI = currentYearData.cpi;
+                     console.log(`Year ${currentSimYear} data: Return=${annualReturnRate}, CPI=${currentYearCPI}`);
+                } else {
+                     console.warn(`Historical data missing for year ${currentSimYear}. Stopping simulation.`);
+                     stopSimulation();
+                     console.log("Simulation stopped: Missing historical data.");
+                     return;
+                }
+
+                if (currentYear > 0 && previousYearData) {
+                     previousYearCPI = previousYearData.cpi;
+                     console.log(`Previous year ${previousSimYear} data: CPI=${previousYearCPI}`);
+                } else if (currentYear > 0 && !previousYearData) {
+                     console.warn(`Historical data missing for previous year ${previousSimYear}. Cannot calculate inflation. Using previous year's withdrawal amount.`);
+                     // annualWithdrawalAmount remains the same as the previous year if CPI data is missing
+                }
+
+
+                console.log(`Year ${currentSimYear}: Annual Return Rate = ${annualReturnRate}`);
+
+                // Calculate inflow (gain)
+                const inflow = portfolioValue * annualReturnRate;
+
+                // Adjust withdrawal amount based on historical CPI inflation (from year 1 onwards)
+                if (currentYear > 0 && currentYearCPI !== null && previousYearCPI !== null && previousYearCPI > 0) {
+                     const inflationFactor = currentYearCPI / previousYearCPI;
+                     annualWithdrawalAmount *= inflationFactor;
+                     console.log(`Year ${currentSimYear}: CPI adjusted withdrawal. Inflation Factor: ${inflationFactor.toFixed(3)}`);
+                } else if (currentYear === 0) {
+                     // For the very first year (currentYear 0), annualWithdrawalAmount is already set in resetSimulation
+                     console.log(`Year ${currentSimYear}: First year, using initial withdrawal amount.`);
+                } else { // currentYear > 0 but CPI data is missing/invalid
+                     console.warn(`Cannot calculate CPI inflation for year ${currentSimYear}. Using previous year's withdrawal amount.`);
+                     // annualWithdrawalAmount remains the same as the previous year if CPI data is missing
+                }
+                 console.log(`Year ${currentSimYear}: Withdrawal Amount = $${Math.round(annualWithdrawalAmount).toLocaleString()}`);
+
+
+                // Calculate net change
+                const netChange = inflow - annualWithdrawalAmount;
+
+                // Update portfolio value
+                portfolioValue += netChange;
+
+                // Prevent portfolio value from going below zero
+                portfolioValue = Math.max(0, portfolioValue);
+                 console.log(`Year ${currentSimYear}: New Portfolio Value = $${Math.round(portfolioValue).toLocaleString()}`);
+
+
+                // Update stats display - Add checks before accessing textContent
+                if (yearDiv) yearDiv.textContent = `Year: ${currentSimYear}`; // Display the correct calendar year
+                if (annualReturnDiv) annualReturnDiv.textContent = `Annual Return: ${(annualReturnRate * 100).toFixed(1)}%`;
+                if (withdrawalAmountDiv) withdrawalAmountDiv.textContent = `Withdrawal: $${Math.round(annualWithdrawalAmount).toLocaleString()}`;
+                if (netChangeDiv) netChangeDiv.textContent = `Net Change: $${Math.round(netChange).toLocaleString()}`;
+                 // Update portfolio value display after net change
+                if (portfolioValueDiv) portfolioValueDiv.textContent = `Portfolio Value: $${Math.round(portfolioValue).toLocaleString()}`;
+
+
+                 // Add class for danger zone text color (based on initial investment)
+                if (portfolioValue < initialInvestment * dangerZoneRatio) { // Use initialInvestment for danger zone
+                    if (portfolioValueDiv) { // Add check
+                        portfolioValueDiv.classList.add('danger-text');
+                        portfolioValueDiv.classList.remove('safe-text');
+                    }
+                } else {
+                     if (portfolioValueDiv) { // Add check
+                         portfolioValueDiv.classList.remove('danger-text');
+                         // Only add safe-text if value is above danger zone and not zero
+                         if (portfolioValue > 0) {
+                            portfolioValueDiv.classList.add('safe-text');
+                         } else {
+                             portfolioValueDiv.classList.remove('safe-text');
+                         }
+                     }
+                }
+
+
+                currentYear++; // Increment simulation year
+
+            } catch (error) {
+                console.error("Error in updateSimulation:", error);
+                displayCriticalError("Error during simulation update: " + error.message);
+                stopSimulation(); // Stop simulation on error
+            }
+        }
+
+        // Function to draw everything
+        function draw() {
+             if (!ctx) {
+                 displayCriticalError("Canvas context not available. Drawing failed.");
+                 return;
+             }
+            // console.log("Drawing canvas");
+            // Clear canvas - Clearing the entire canvas at the start of draw
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            drawDesert();
+            drawCistern(); // Draws the elevated tower structure
+            drawWater();
+            drawSpigot();
+            drawWindmill(); // Draw the windmill
+            drawFaucet(); // Draw the faucet
+            drawPipe(); // Draw the pipe connecting windmill to faucet
+
+
+            // Draw inflow and outflow streams only when simulation is running and portfolio > 0
+            if (isRunning && portfolioValue > 0) {
+                 // Get the return rate for the year currently displayed (which is the completed year)
+                 const historicalDataIndex = (selectedStartYear - historicalData[0].year) + currentYear -1;
+                 let annualReturnRateForDrawing = 0;
+                 if (historicalDataIndex >= 0 && historicalDataIndex < historicalData.length) {
+                      annualReturnRateForDrawing = historicalData[historicalDataIndex].return;
+                 }
+                 drawInflowStream(annualReturnRateForDrawing); // Draw inflow based on the completed year's return
+
+                 drawOutflowStream(); // Draw the outflow stream
+            } else if (!isRunning && currentYear > 0 && portfolioValue > 0) {
+                 // If stopped but not finished, draw the last state with appropriate inflow/outflow
+                  const historicalDataIndex = (selectedStartYear - historicalData[0].year) + currentYear -1;
+                  let annualReturnRateForDrawing = 0;
+                   if (historicalDataIndex >= 0 && historicalDataIndex < historicalData.length) {
+                      annualReturnRateForDrawing = historicalData[historicalDataIndex].return;
+                   }
+                   drawInflowStream(annualReturnRateForDrawing); // Draw inflow based on the last completed year's return
+                 drawOutflowStream(); // Draw outflow if portfolio > 0
+            } else if (!isRunning && portfolioValue <= 0) {
+                 // If stopped and out of funds, draw with 0 inflow/outflow
+                 drawInflowStream(0);
+                 // drawOutflowStream is implicitly not drawn if portfolioValue <= 0
+            } else {
+                 // Initial state before simulation starts (Year 0)
+                 drawInflowStream(0); // Draw with 0 inflow
+                 // drawOutflowStream is implicitly not drawn if portfolioValue is initial 0
+            }
+        }
+
+        // Animation loop for visual effects (windmill rotation)
+        function animate() {
+            // Only continue animation if simulation is running
+            if (!isRunning) {
+                cancelAnimationFrame(animationFrameId); // Ensure animation frame is cancelled
+                return;
+            }
+
+            // Update windmill blade angle based on return rate (speed)
+            // Make it spin faster with higher returns, slower with lower/negative returns
+            // Use the return rate for the *previous* year (currentYear - 1) for animation speed
+            const historicalDataIndex = (selectedStartYear - historicalData[0].year) + currentYear -1;
+            let currentReturnRate = 0;
+             if (historicalDataIndex >= 0 && historicalDataIndex < historicalData.length) {
+                currentReturnRate = historicalData[historicalDataIndex].return;
+             }
+
+            const rotationSpeed = Math.max(0, currentReturnRate * 0.1); // Adjust speed multiplier as needed
+            windmillBladeAngle += rotationSpeed;
+
+            // We are now clearing and redrawing the entire canvas in the draw() function,
+            // which is called by runSimulationStep.
+            // The animate function's main role is to update animation states (like rotation)
+            // and request the next animation frame.
+
+            // Request next frame
+            animationFrameId = requestAnimationFrame(animate);
+        }
+
+        // Function to run one step of the simulation per second (adjust as needed)
+        function runSimulationStep() {
+            if (!isRunning) {
+                 clearTimeout(simulationTimeoutId); // Ensure timeout is cleared
+                 return;
+            }
+
+            updateSimulation();
+            // The updateSimulation function now handles stopping if data runs out
+            if (isRunning) { // Only draw and schedule next step if simulation is still running after update
+                draw(); // Redraw everything after updating state
+
+                // Continue simulation if there are years left AND portfolio value > 0
+                if (currentYear < simulationYears && portfolioValue > 0) {
+                     simulationTimeoutId = setTimeout(runSimulationStep, simulationStepDelay); // Schedule next step after adjusted delay
+                } else {
+                     stopSimulation(); // Stop if years are done or portfolio is zero
+                     // Display final status handled in stopSimulation
+                     console.log("Simulation finished.");
+                }
+            } else {
+                 // If updateSimulation stopped the simulation (e.g., data ran out),
+                 // ensure the final state is drawn and stop animation.
+                 draw();
+                 cancelAnimationFrame(animationFrameId);
+            }
+        }
+
+
+        // Function to populate the start year dropdown
+        function populateStartYearDropdown() {
+             try {
+                const firstYear = historicalData[0].year;
+                // Ensure there are enough years for a full simulation (30 years) from the selected start year
+                // We need data for year N and year N-1 to calculate inflation for year N.
+                // So, the latest possible start year is the year of the last data point minus simulationYears.
+                const lastYearPossible = historicalData[historicalData.length - 1].year - simulationYears + 1;
+
+                if (startYearSelect) { // Add check
+                    startYearSelect.innerHTML = ''; // Clear existing options
+
+                    for (let year = firstYear; year <= lastYearPossible; year++) {
+                        const option = document.createElement('option');
+                        option.value = year;
+                        option.textContent = year;
+                        startYearSelect.appendChild(option);
+                    }
+                     // Set default selected year if needed
+                     startYearSelect.value = 1970; // Or any other default year
+                     selectedStartYear = parseInt(startYearSelect.value); // Set initial selected start year
+                     console.log("Start year dropdown populated. Selected year:", selectedStartYear);
+                } else {
+                    console.error("Start year select element not available to populate dropdown.");
+                }
+
+             } catch (error) {
+                 displayCriticalError("Error populating start year dropdown: " + error.message);
+                 console.error("Error populating start year dropdown:", error);
+             }
+        }
+
+
+        // Function to start the simulation
+        function startSimulation() {
+            console.log("Start button clicked. isRunning:", isRunning);
+            if (!isRunning) {
+                isRunning = true;
+                // startButton.disabled = true; // Removed this line
+                if (resetButton) resetButton.disabled = true; // Disable reset while running (add check)
+                if (startYearSelect) startYearSelect.disabled = true; // Disable year select while running (add check)
+                if (initialInvestmentInput) initialInvestmentInput.disabled = true; // Disable inputs while running (add check)
+                if (withdrawalRateInput) withdrawalRateInput.disabled = true; // Disable inputs while running (add check)
+
+
+                // Change button text and style to Stop
+                if (startButton) { // Add check
+                    startButton.textContent = "Stop Simulation";
+                    startButton.classList.add('stop-button');
+                    startButton.classList.remove('start-button'); // Assuming 'start-button' might be a class, though not explicitly used in CSS
+                }
+
+
+                console.log("Simulation starting...");
+                 // Check if initial values are valid before starting the simulation steps
+                 if (initialInvestment > 0 && !isNaN(initialInvestment) && !isNaN(annualWithdrawalAmount)) {
+                    runSimulationStep(); // Start the timed simulation steps
+                    animate(); // Start the animation for visual effects like rain and windmill
+                 } else {
+                     console.error("Cannot start simulation due to invalid initial values.");
+                     displayCriticalError("Cannot start simulation. Invalid initial values.");
+                     stopSimulation(); // Ensure simulation is stopped if values is invalid
+                 }
+
+            } else {
+                 console.log("Stop button clicked. isRunning:", isRunning); // Added log
+                 // If already running, this click should stop it
+                 stopSimulation();
+            }
+        }
+
+        // Function to stop the simulation
+        function stopSimulation() {
+            console.log("Stopping simulation. isRunning:", isRunning);
+            isRunning = false;
+            if (startButton) startButton.disabled = false; // Add check
+            if (resetButton) resetButton.disabled = false; // Enable reset when stopped (add check)
+            if (startYearSelect) startYearSelect.disabled = false; // Enable year select when stopped (add check)
+            if (initialInvestmentInput) initialInvestmentInput.disabled = false; // Enable inputs when stopped (add check)
+            if (withdrawalRateInput) withdrawalRateInput.disabled = false; // Enable inputs when stopped (add check)
+
+
+            // Change button text and style back to Start
+            if (startButton) { // Add check
+                startButton.textContent = "Start Simulation";
+                startButton.classList.remove('stop-button');
+                startButton.classList.add('start-button'); // Assuming 'start-button' might be a class
+            }
+
+
+            cancelAnimationFrame(animationFrameId); // Stop the animation frame loop
+            clearTimeout(simulationTimeoutId); // Clear the scheduled timeout
+            console.log("Simulation stopped.");
+            draw(); // Redraw one last time to show the stopped state
+             // Display final status
+             if (portfolioValue <= 0) {
+                 if (portfolioValueDiv) { // Add check
+                     portfolioValueDiv.textContent = `Portfolio Value: $0 - Ran out of funds!`;
+                     portfolioValueDiv.classList.add('danger-text');
+                     portfolioValueDiv.classList.remove('safe-text');
+                 }
+             } else {
+                 if (portfolioValueDiv) { // Add check
+                     portfolioValueDiv.textContent = `Portfolio Value: $${Math.round(portfolioValue).toLocaleString()}`;
+                     portfolioValueDiv.classList.remove('danger-text');
+                     portfolioValueDiv.classList.add('safe-text');
+                 }
+             }
+             // After simulation stops, update portfolio value display to show current value without the year tag
+             if (portfolioValueDiv) {
+                 portfolioValueDiv.textContent = `Portfolio Value: $${Math.round(portfolioValue).toLocaleString()}`;
+             }
+        }
+
+        // Function to reset the simulation
+        function resetSimulation() {
+            console.log("Reset button clicked. Starting reset process.");
+            displayCriticalError(""); // Clear any previous critical errors
+            stopSimulation(); // Ensure any running simulation is stopped first
+
+            try {
+                // Read the target portfolio value in 2025 dollars from input
+                const targetPortfolio2025 = initialInvestmentInput ? parseFloat(initialInvestmentInput.value) : 0;
+                const inputWithdrawalRate = withdrawalRateInput ? parseFloat(withdrawalRateInput.value) : 0;
+                selectedStartYear = startYearSelect ? parseInt(startYearSelect.value) : 1970; // Add fallback
+
+
+                console.log(`Resetting with Target Portfolio (2025 $): ${targetPortfolio2025}, Withdrawal Rate: ${inputWithdrawalRate}, Start Year: ${selectedStartYear}`);
+
+                // Validate inputs
+                if (isNaN(targetPortfolio2025) || targetPortfolio2025 <= 0) {
+                    console.error("Invalid target portfolio value. Setting to default (2025 $).");
+                    alert("Please enter a valid target portfolio amount in 2025 dollars.");
+                     if (initialInvestmentInput) initialInvestmentInput.value = 1000000; // Reset to default
+                     const defaultTarget2025 = 1000000;
+                     // Calculate start year equivalent for the default
+                     const cpiStartYear = getCPIForYear(selectedStartYear); // Use selected start year
+                     const cpi2025 = getCPIForYear(2025);
+                     if (cpiStartYear !== null && cpi2025 !== null && cpi2025 > 0) {
+                         initialInvestment = defaultTarget2025 * (cpiStartYear / cpi2025);
+                     } else {
+                         console.error(`CPI data for ${selectedStartYear} or 2025 is missing or invalid. Cannot calculate start year equivalent. Setting initial investment to 0.`);
+                         displayCriticalError(`Missing CPI data for ${selectedStartYear} or 2025. Cannot calculate start year equivalent.`);
+                         initialInvestment = 0; // Fallback if CPI data is bad
+                     }
+                     console.log("Resetting to default target 2025 investment and calculated start year equivalent:", initialInvestment);
+
+                } else {
+                    // Calculate the start year equivalent of the target 2025 portfolio value
+                     const cpiStartYear = getCPIForYear(selectedStartYear); // Use selected start year
+                     const cpi2025 = getCPIForYear(2025);
+
+                     if (cpiStartYear !== null && cpi2025 !== null && cpi2025 > 0) {
+                         initialInvestment = targetPortfolio2025 * (cpiStartYear / cpi2025);
+                         console.log(`Calculated ${selectedStartYear} equivalent of ${targetPortfolio2025} (2025 $): ${initialInvestment}`);
+                     } else {
+                         console.error(`CPI data for ${selectedStartYear} or 2025 is missing or invalid. Cannot calculate start year equivalent. Setting initial investment to 0.`);
+                         displayCriticalError(`Missing CPI data for ${selectedStartYear} or 2025. Cannot calculate start year equivalent.`);
+                         initialInvestment = 0; // Fallback if CPI data is bad
+                     }
+                }
+
+
+                 if (isNaN(inputWithdrawalRate) || inputWithdrawalRate <= 0) {
+                    console.error("Invalid withdrawal rate value. Setting to default.");
+                     alert("Please enter a valid withdrawal rate percentage.");
+                     if (withdrawalRateInput) withdrawalRateInput.value = 4; // Reset to default (add check)
+                     withdrawalRate = 0.04;
+                     console.log("Resetting to default withdrawalRate:", withdrawalRate);
+                 } else {
+                     withdrawalRate = inputWithdrawalRate / 100; // Convert percentage to decimal
+                 }
+
+                // Set initial portfolio value to the calculated start year equivalent
+                portfolioValue = initialInvestment;
+                // Calculate initial annual withdrawal amount based on the initial investment (start year equivalent)
+                annualWithdrawalAmount = initialInvestment * withdrawalRate;
+
+
+                 // Check if calculated initial values are valid after potential resets
+                 if (isNaN(portfolioValue) || portfolioValue < 0 || isNaN(annualWithdrawalAmount) || annualWithdrawalAmount < 0) {
+                     console.error("Initial portfolio or withdrawal amount is invalid after reset. Portfolio:", portfolioValue, "Withdrawal:", annualWithdrawalAmount);
+                     displayCriticalError("Simulation cannot be reset due to invalid initial values. Please check inputs.");
+                     // Set values to 0 to prevent further errors and draw a blank state
+                     portfolioValue = 0;
+                     annualWithdrawalAmount = 0;
+                 }
+
+
+                currentYear = 0; // Simulation year starts at 0
+                displayYear = selectedStartYear; // Display year starts at selected year
+                windmillBladeAngle = 0; // Reset windmill angle
+
+                console.log(`Simulation reset complete. Calculated ${selectedStartYear} Initial Investment:`, initialInvestment, "Withdrawal Rate:", withdrawalRate, "Start Year:", selectedStartYear, "Initial Withdrawal Amount:", annualWithdrawalAmount, "Initial Portfolio Value:", portfolioValue);
+
+                // Reset stats display - Add checks before accessing textContent
+                if (yearDiv) yearDiv.textContent = `Year: ${displayYear}`; // Display the actual start year
+                // Display the calculated start year equivalent value
+                if (portfolioValueDiv) portfolioValueDiv.textContent = `Portfolio Value: $${Math.round(portfolioValue).toLocaleString()} (${selectedStartYear} $)`;
+                if (annualReturnDiv) annualReturnDiv.textContent = `Annual Return: 0%`; // Initial state has no return yet
+                // Display the initial withdrawal amount in start year dollars
+                if (withdrawalAmountDiv) withdrawalAmountDiv.textContent = `Withdrawal: $${Math.round(annualWithdrawalAmount).toLocaleString()} (${selectedStartYear} $)`;
+                if (netChangeDiv) netChangeDiv.textContent = `Net Change: $0`;
+                if (portfolioValueDiv) portfolioValueDiv.classList.remove('danger-text', 'safe-text'); // Remove color classes
+
+                console.log("Drawing initial state...");
+                draw(); // Draw initial state (Year 0)
+                console.log("Initial state drawn.");
+
+            } catch (error) {
+                 displayCriticalError("Error during reset process: " + error.message);
+                 console.error("Error during reset process:", error);
+                 stopSimulation(); // Ensure simulation is stopped on error
+            }
+        }
+
+        // Event listeners
+        // Ensure the DOM is fully loaded before adding event listeners
+        document.addEventListener('DOMContentLoaded', (event) => {
+            console.log('DOM fully loaded and parsed');
+
+            // Check if essential elements are found after DOM is loaded
+            if (!canvas || !ctx || !startButton || !resetButton || !startYearSelect || !initialInvestmentInput || !withdrawalRateInput || !yearDiv || !portfolioValueDiv || !annualReturnDiv || !withdrawalAmountDiv || !netChangeDiv || !inflationNoteDiv || !errorMessageDiv || !wikiLink || !wikiExplanationDiv || !wikiCloseButton) {
+                 displayCriticalError("One or more essential HTML elements were not found after DOM load. Cannot proceed with setup. Check console.");
+                 return; // Stop execution if essential elements is missing
+            }
+
+            try {
+                // Populate the start year dropdown on load
+                populateStartYearDropdown();
+
+                // Add event listeners only after the DOM is ready and elements are found
+                startButton.addEventListener('click', startSimulation);
+                console.log("Start button event listener added.");
+
+                resetButton.addEventListener('click', resetSimulation);
+                console.log("Reset button event listener added.");
+
+                startYearSelect.addEventListener('change', resetSimulation);
+                console.log("Start year select event listener added.");
+
+                // Also reset when input values change
+                initialInvestmentInput.addEventListener('change', resetSimulation);
+                console.log("Initial investment input event listener added.");
+
+                withdrawalRateInput.addEventListener('change', resetSimulation);
+                console.log("Withdrawal rate input event listener added.");
+
+                // Add event listeners for the wiki toggle
+                wikiLink.addEventListener('click', (e) => {
+                    e.preventDefault(); // Prevent default link behavior
+                    wikiExplanationDiv.style.display = 'block'; // Show the explanation div
+                });
+
+                wikiCloseButton.addEventListener('click', () => {
+                    wikiExplanationDiv.style.display = 'none'; // Hide the explanation div
+                });
+
+
+                // Initial drawing and setup
+                console.log("Calling resetSimulation on DOMContentLoaded...");
+                resetSimulation(); // Draw the initial state when the page loads
+                console.log("resetSimulation called.");
+
+            } catch (error) {
+                displayCriticalError("Error during DOMContentLoaded setup: " + error.message);
+                console.error("Error during DOMContentLoaded setup:", error);
+            }
+        });
+
+
+    </script>
+</body>
+</html>
