@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Git Poetry Studio</title>
+
+    <style>
+        /* Custom CSS for specific elements not easily handled by Tailwind or for fine-tuning */
+
+        /* Using Inter font loaded in HTML head */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Style for the editable branch editor area */
+        .branch-editor {
+            min-height: 200px; /* Increased minimum height */
+            white-space: pre-wrap; /* Preserve whitespace and wrap text */
+            word-wrap: break-word; /* Break long words if necessary */
+            outline: none; /* Remove default focus outline */
+            cursor: text; /* Indicate it's editable */
+            /* Overflow and resize handled by Tailwind classes in HTML */
+        }
+
+        /* Distinct style for the main branch editor */
+        .main-branch {
+            border-color: #20c997; /* Tailwind teal-400 */
+            background-color: #e6fcf5; /* Lighter teal background */
+        }
+
+        /* Style for individual branch items in the list */
+        .branch-item {
+            margin-bottom: 15px; /* More space between items */
+            padding: 10px;
+            border: 1px solid #d1d5db; /* Tailwind gray-300 */
+            border-radius: 6px; /* Slightly more rounded corners */
+            background-color: #f9fafb; /* Tailwind gray-50 */
+            display: flex;
+            flex-direction: column; /* Stack name, preview, button vertically */
+            gap: 8px; /* Space between stacked elements */
+        }
+
+        .branch-item.current {
+             border-color: #20c997; /* Tailwind teal-400 */
+             background-color: #99e9d2; /* Tailwind teal-300 */
+             font-weight: 600; /* Tailwind font-semibold */
+        }
+
+
+        .branch-name {
+            font-weight: bold;
+            color: #065f46; /* Tailwind green-800 */
+        }
+
+        .branch-sequence-preview {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; /* Tailwind font-mono */
+            font-size: 0.85rem; /* Slightly larger preview text */
+            color: #4b5563; /* Tailwind gray-600 */
+            max-height: 60px; /* Limit preview height */
+            overflow: hidden; /* Hide overflowing text */
+            /* Removed text-overflow: ellipsis; */
+            white-space: pre-wrap; /* Preserve line breaks in preview */
+            word-wrap: break-word; /* Break long words in preview */
+        }
+
+        /* Style for the checkout button within the branch list */
+        .checkout-button {
+            align-self: flex-start; /* Align button to the start */
+            padding: 6px 12px; /* Slightly larger button */
+            background-color: #0891b2; /* Tailwind cyan-600 */
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .checkout-button:hover {
+            background-color: #0e7490; /* Tailwind cyan-700 */
+        }
+
+        .checkout-button:active {
+            background-color: #155e75; /* Tailwind cyan-800 */
+        }
+
+
+        /* Style for the history display to maintain formatting */
+        .history-display {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; /* Tailwind font-mono */
+            font-size: 0.875rem; /* Tailwind text-sm */
+            white-space: pre-wrap; /* Preserve whitespace and wrap text */
+        }
+    </style>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-800 font-inter p-4">
+    <div class="container mx-auto max-w-6xl bg-white rounded-lg shadow-lg p-6">
+        <h1 class="text-3xl font-bold text-teal-700 mb-4">Git Poetry Studio: Drafts & Branches!</h1>
+        <p class="mb-6">Write and manage different versions of your poem using Git concepts.</p>
+        <p class="mb-6">Type your poem in the editor. Use the <span class="font-mono font-bold text-gray-600">/</span> character to represent conceptual line breaks in your sequence.</p>
+        <p class="mb-6">Saving a version is a "Commit". Trying different drafts separately is creating "Branches". Switching drafts is "Checking Out". Combining ideas is "Merging".</p>
+
+        <div class="flex flex-col md:flex-row gap-6 mb-6">
+            <div class="w-full md:w-1/3 lg:w-1/4 p-4 border border-gray-200 rounded-md bg-gray-50 overflow-y-auto max-h-[500px]">
+                <h2 class="text-xl font-semibold text-teal-600 mb-3">Branches:</h2>
+                <div id="branch-list" class="text-sm">
+                    <p class="text-gray-500">Loading branches...</p>
+                </div>
+            </div>
+
+            <div class="flex-1 p-4 border border-gray-200 rounded-md bg-white flex flex-col">
+                <h2 class="text-xl font-semibold text-teal-600 mb-3">Current Branch: <span id="current-branch-name" class="font-bold">main</span></h2>
+                <div id="current-branch-editor" class="branch-editor main-branch border border-gray-300 rounded-md p-3 flex-grow font-mono text-sm bg-white resize-y overflow-auto" contenteditable="true" spellcheck="false">
+                    </div>
+            </div>
+        </div>
+
+        <div class="git-actions p-4 border border-gray-200 rounded-md mb-6">
+            <h2 class="text-xl font-semibold text-teal-600 mb-3">Git Actions:</h2>
+            <div class="flex flex-wrap items-center gap-4">
+                <button id="commit-btn" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 transition ease-in-out duration-150">Commit (Save Version)</button>
+
+                <div class="flex items-center">
+                    <label for="new-branch-name" class="mr-2">New Branch Name:</label>
+                    <input type="text" id="new-branch-name" class="p-2 border border-gray-300 rounded-md w-32" placeholder="e.g. experiment">
+                    <button id="create-branch-btn" class="ml-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition ease-in-out duration-150">Create Branch</button>
+                </div>
+
+                <div class="flex items-center">
+                    <label for="merge-select" class="mr-2">Merge Branch into Current:</label>
+                     <select id="merge-select" class="p-2 border border-gray-300 rounded-md">
+                        <option value="">-- Select Branch --</option>
+                    </select>
+                    <button id="merge-btn" class="ml-2 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition ease-in-out duration-150">Merge</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="history-area p-4 border border-gray-200 rounded-md">
+            <h2 class="text-xl font-semibold text-teal-600 mb-3">History (Commits & Branches):</h2>
+            <div id="history" class="history-display font-mono text-sm whitespace-pre-wrap border border-gray-300 rounded-md p-3 bg-gray-50">
+                <p>Start typing your poem and commit to see history.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Git Simulation Data Structure ---
+        // 'commits' stores snapshots of poem text strings, keyed by a simple commit ID.
+        // { commitId: 'Poem text content...', ... }
+        let commits = {};
+        // 'branches' maps branch names to the commitId they currently point to.
+        // 'main' is the default branch. null means no commits on this branch yet.
+        let branches = {
+            'main': null
+        };
+        // 'currentBranch' tracks which branch the user is currently working on.
+        let currentBranch = 'main';
+        // 'currentPoemText' holds the poem text string being actively edited.
+        let currentPoemText = '';
+        // Simple counter to generate unique commit IDs.
+        let commitCounter = 0;
+
+        // --- UI Elements ---
+        // Get references to the HTML elements we'll interact with
+        const currentBranchNameDisplay = document.getElementById('current-branch-name');
+        const currentBranchEditor = document.getElementById('current-branch-editor');
+        const branchListDisplay = document.getElementById('branch-list');
+        const historyDisplay = document.getElementById('history');
+        const commitButton = document.getElementById('commit-btn');
+        // Updated to get the new input field and button
+        const newBranchNameInput = document.getElementById('new-branch-name');
+        const createBranchButton = document.getElementById('create-branch-btn');
+        const mergeSelect = document.getElementById('merge-select');
+        const mergeButton = document.getElementById('merge-btn');
+
+        // --- Functions ---
+
+        // Updates the visual display of the current poem text in the editor
+        function renderEditor() {
+            currentBranchEditor.textContent = currentPoemText; // Set the text content of the editable div
+             currentBranchNameDisplay.textContent = currentBranch; // Update the current branch name display
+        }
+
+        // Updates the list of branches in the sidebar
+        function renderBranchList() {
+            branchListDisplay.innerHTML = ''; // Clear current list
+
+            // Sort branches alphabetically
+            const sortedBranchNames = Object.keys(branches).sort();
+
+            sortedBranchNames.forEach(branchName => {
+                const branchItem = document.createElement('div');
+                branchItem.classList.add('branch-item');
+                if (branchName === currentBranch) {
+                    branchItem.classList.add('current'); // Highlight the current branch
+                }
+
+                const branchNameSpan = document.createElement('div'); // Use div for better stacking
+                branchNameSpan.classList.add('branch-name');
+                branchNameSpan.textContent = branchName + (branches[branchName] === branches[currentBranch] && branchName !== currentBranch ? ' (synced)' : ''); // Indicate if pointing to same commit as current
+
+                branchItem.appendChild(branchNameSpan);
+
+                const sequencePreviewSpan = document.createElement('div'); // Use div for better stacking
+                sequencePreviewSpan.classList.add('branch-sequence-preview');
+                // Show the sequence of the commit this branch points to, or a default message
+                const commitId = branches[branchName];
+                // Display first 100 characters or less for preview
+                const previewText = commitId ? commits[commitId].substring(0, 100) + (commits[commitId].length > 100 ? '...' : '') : 'No commits yet';
+                sequencePreviewSpan.textContent = previewText;
+                branchItem.appendChild(sequencePreviewSpan);
+
+
+                // Add a Checkout button if it's not the current branch
+                if (branchName !== currentBranch) {
+                    const checkoutButton = document.createElement('button');
+                    checkoutButton.classList.add('checkout-button');
+                    checkoutButton.textContent = 'Checkout';
+                    // Use a data attribute to store the branch name for the event listener
+                    checkoutButton.dataset.branchName = branchName;
+                    branchItem.appendChild(checkoutButton);
+                }
+
+                branchListDisplay.appendChild(branchItem);
+            });
+
+             // Add event listeners to the new checkout buttons
+             branchListDisplay.querySelectorAll('.checkout-button').forEach(button => {
+                 button.addEventListener('click', (event) => {
+                     const branchToCheckout = event.target.dataset.branchName;
+                     switchBranch(branchToCheckout); // Call the switchBranch function
+                 });
+             });
+        }
+
+
+        // Updates the history display area
+        function renderHistory() {
+            historyDisplay.innerHTML = ''; // Clear current history display
+            let historyText = 'History:\n';
+
+            // Sort branches alphabetically for consistent display order
+            const sortedBranchNames = Object.keys(branches).sort();
+
+            // Sort commits chronologically based on our simple counter
+            const sortedCommitIds = Object.keys(commits).sort((a, b) => parseInt(a.replace('c', '')) - parseInt(b.replace('c', '')));
+
+            // Iterate through sorted commits to build the history text
+            sortedCommitIds.forEach(commitId => {
+                // Find which branches are currently pointing to this commit
+                const pointingBranches = sortedBranchNames.filter(branchName => branches[branchName] === commitId);
+                const branchPointers = pointingBranches.length > 0 ? ` (${pointingBranches.join(', ')})` : '';
+                 // Check if the current branch's HEAD is pointing to this commit
+                 const isHead = (branches[currentBranch] === commitId);
+                 const headPointer = isHead ? ' (HEAD)' : ''; // Indicate the commit the current branch points to (HEAD)
+
+                // Add a line to the history text for this commit
+                // Show a truncated preview of the commit message/content
+                const commitContentPreview = commits[commitId].substring(0, 50).replace(/\n/g, ' ') + (commits[commitId].length > 50 ? '...' : '');
+                historyText += `- Commit ${commitId}${branchPointers}${headPointer}: "${commitContentPreview}"\n`;
+            });
+
+            // If there are no commits yet, display an initial state message
+            if (sortedCommitIds.length === 0) {
+                 historyText += `- Initial state (no commits yet on branch '${currentBranch}')\n`;
+            }
+
+            // Set the history display text
+            historyDisplay.textContent = historyText;
+        }
+
+
+        // Updates the options in the merge selection dropdown
+        function renderMergeSelect() {
+            mergeSelect.innerHTML = '<option value="">-- Select Branch --</option>'; // Clear current options for merging
+
+            // Add each branch as an option, but exclude the current branch
+            Object.keys(branches).forEach(branchName => {
+                if (branchName !== currentBranch) {
+                     const mergeOption = document.createElement('option');
+                     mergeOption.value = branchName;
+                     mergeOption.textContent = branchName;
+                     mergeSelect.appendChild(mergeOption);
+                }
+            });
+        }
+
+
+        // Saves the current poem text as a new commit
+        function commit() {
+            console.log("Attempting to commit..."); // Log for debugging
+
+            // Get the current text from the editor
+            const poemToCommit = currentBranchEditor.textContent;
+
+            // Prevent committing if the sequence is empty and there are no previous commits on this branch
+            if (poemToCommit.length === 0 && branches[currentBranch] === null) {
+                alert("Nothing to commit. Type some poetry in the editor first.");
+                console.log("Commit failed: Nothing to commit."); // Log for debugging
+                return;
+            }
+
+            // Generate a unique commit ID
+            const commitId = 'c' + commitCounter++;
+            // Store the current poem text in the commits object
+            commits[commitId] = poemToCommit;
+            // Update the current branch to point to this new commit (its HEAD moves)
+            branches[currentBranch] = commitId;
+
+            // Notify the user
+            alert(`Committed current poem to branch '${currentBranch}' as commit ${commitId}!`);
+            console.log(`Commit successful: ${commitId} on branch '${currentBranch}'.`); // Log for debugging
+
+            // Update the UI displays
+            renderHistory();
+            renderBranchList(); // Update branch list to show updated commit pointer
+            renderMergeSelect(); // Update merge options
+        }
+
+        // Creates a new branch using the name from the input field
+        function createBranch() {
+            console.log("Attempting to create branch from input..."); // Log for debugging
+            const newBranchName = newBranchNameInput.value.trim(); // Get value from input and trim whitespace
+            console.log(`Input branch name: ${newBranchName}`); // Added log
+
+            if (!newBranchName) {
+                alert("Please enter a name for the new branch.");
+                console.log("Create branch failed: No name entered."); // Log for debugging
+                return; // Input is empty
+            }
+            // Basic validation for branch name (can be improved)
+            if (branches[newBranchName]) {
+                alert(`Branch '${newBranchName}' already exists.`);
+                console.log(`Create branch failed: Branch '${newBranchName}' already exists.`); // Log for debugging
+                return;
+            }
+             // Cannot create a branch if the current branch has no commits yet
+             if (branches[currentBranch] === null) {
+                 alert("Cannot create a branch from an empty history. Make a commit first on the current branch.");
+                 console.log("Create branch failed: No commits on current branch."); // Log for debugging
+                 return;
+             }
+
+            console.log(`Passed initial checks. Creating branch '${newBranchName}' from commit ${branches[currentBranch]}.`); // Added log
+            // The new branch starts by pointing to the same commit as the current branch
+            branches[newBranchName] = branches[currentBranch];
+            alert(`Created new branch '${newBranchName}' pointing to commit ${branches[currentBranch]}.`);
+            console.log(`Branch created: '${newBranchName}' pointing to ${branches[currentBranch]}.`); // Log for debugging
+
+            // Clear the input field after successful creation
+            newBranchNameInput.value = '';
+
+            // Update the UI displays
+            renderBranchList(); // Add the new branch to the list
+            renderMergeSelect(); // Add the new branch to merge options
+            renderHistory(); // History display might show the new branch pointer
+        }
+
+        // Switches the working directory and HEAD to a different branch
+        // This function is now called by the checkout buttons in the branch list
+        function switchBranch(targetBranch) {
+            console.log(`Attempting to switch to branch: ${targetBranch}`); // Log for debugging
+            if (targetBranch === currentBranch) {
+                alert(`You are already on branch '${targetBranch}'.`);
+                console.log(`Switch branch failed: Already on branch '${targetBranch}'.`); // Log for debugging
+                return;
+            }
+             // Check if the target branch exists
+             if (!branches[targetBranch]) {
+                 alert(`Branch '${targetBranch}' not found.`);
+                 console.log(`Switch branch failed: Branch '${targetBranch}' not found.`); // Log for debugging
+                 return;
+             }
+
+             // Load the sequence corresponding to the commit the target branch points to
+             if (branches[targetBranch] === null) {
+                 // Switching to a branch with no commits means an empty sequence
+                 currentPoemText = '';
+                 console.log(`Switched to branch '${targetBranch}'. Branch has no commits, editor is empty.`); // Log for debugging
+             } else {
+                const targetCommitId = branches[targetBranch];
+                currentPoemText = commits[targetCommitId]; // Load the poem text from the commit
+                console.log(`Switched to branch '${targetBranch}'. Loaded poem from commit ${targetCommitId}.`); // Log for debugging
+             }
+
+            // Update the current branch tracker
+            currentBranch = targetBranch;
+            alert(`Switched to branch '${currentBranch}'.`);
+
+            // Update the UI displays
+            renderEditor(); // Show the poem of the new branch in the editor
+            renderBranchList(); // Update branch list to highlight the current branch and update previews
+            renderMergeSelect(); // Update merge options (current branch can't be merged into itself)
+            renderHistory(); // History display might highlight the new HEAD
+        }
+
+        // Merges a selected branch's changes into the current branch
+        function mergeBranch() {
+            console.log("Attempting to merge branch..."); // Log for debugging
+            const sourceBranch = mergeSelect.value; // Get the branch to merge from
+            if (!sourceBranch) {
+                alert("Please select a branch to merge.");
+                console.log("Merge failed: No source branch selected."); // Log for debugging
+                return;
+            }
+            if (sourceBranch === currentBranch) {
+                alert("Cannot merge a branch into itself.");
+                console.log("Merge failed: Cannot merge into self."); // Log for debugging
+                return;
+            }
+             // Check if the source branch exists
+             if (!branches[sourceBranch]) {
+                 alert(`Source branch '${sourceBranch}' not found.`);
+                 console.log(`Merge failed: Source branch '${sourceBranch}' not found.`); // Log for debugging
+                 return;
+             }
+             // Check if the source branch has any commits to merge
+             if (branches[sourceBranch] === null) {
+                  alert(`Source branch '${sourceBranch}' has no commits to merge.`);
+                  console.log(`Merge failed: Source branch '${sourceBranch}' has no commits.`); // Log for debugging
+                  return;
+             }
+             // Check if the current branch has any commits to merge into
+             if (branches[currentBranch] === null) {
+                 alert(`Current branch '${currentBranch}' has no commits to merge into. Make a commit first.`);
+                 console.log(`Merge failed: Current branch '${currentBranch}' has no commits.`); // Log for debugging
+                 return;
+             }
+
+
+            // --- Simplified Text Merge Logic ---
+            // In real Git, merge is a complex process involving finding a common ancestor,
+            // calculating differences (diffs), and applying changes line by line. Conflicts can occur.
+            // Here, for simplicity, we will just append the entire text string from the
+            // source branch's latest commit to the current poem text, separated by a line break.
+            // This is NOT how Git merge truly works but serves as a basic illustration
+            // of bringing work from one line of development into another.
+
+            const sourceCommitId = branches[sourceBranch];
+            const sourcePoemText = commits[sourceCommitId];
+            const currentPoemTextContent = currentBranchEditor.textContent; // Get current text from editor
+
+            // Create a new poem by combining the current poem and the source poem
+            const mergedPoem = currentPoemTextContent + "\n\n-- Merged from " + sourceBranch + " --\n\n" + sourcePoemText;
+
+
+            // Create a new commit on the current branch with the merged poem
+            const newCommitId = 'c' + commitCounter++;
+            commits[newCommitId] = mergedPoem;
+            // The current branch's HEAD now points to this new merge commit
+            branches[currentBranch] = newCommitId;
+            // Update the poem being edited to the result of the merge
+            currentPoemText = mergedPoem;
+
+            // Notify the user
+            alert(`Merged branch '${sourceBranch}' into '${currentBranch}'. Created new commit ${newCommitId}.`);
+            console.log(`Merge successful: '${sourceBranch}' into '${currentBranch}'. New commit ${newCommitId}.`); // Log for debugging
+
+            // Update the UI displays
+            renderEditor(); // Show the new merged poem in the editor
+            renderHistory(); // History will show the new merge commit and the updated branch pointer
+            renderBranchList(); // Update branch list
+            renderMergeSelect(); // Update merge options
+            mergeSelect.value = ""; // Reset merge select dropdown
+        }
+
+
+        // --- Event Listeners ---
+        // Ensure the DOM is fully loaded before attaching listeners and initializing
+        document.addEventListener('DOMContentLoaded', (event) => {
+            console.log('DOM fully loaded and parsed'); // Confirm DOM is ready
+
+            // Add event listeners to the Git action buttons
+            if (commitButton) commitButton.addEventListener('click', commit); else console.error("Commit button not found!");
+            // Updated event listener for the new create branch button
+            if (createBranchButton) {
+                createBranchButton.addEventListener('click', createBranch);
+                console.log("Create Branch button event listener attached."); // Log listener attachment
+            } else {
+                console.error("Create Branch button not found!");
+            }
+            if (mergeButton) mergeButton.addEventListener('click', mergeBranch); else console.error("Merge button not found!");
+
+            // Listen for input on the editable editor area to keep currentPoemText updated
+            if (currentBranchEditor) {
+                currentBranchEditor.addEventListener('input', () => {
+                    currentPoemText = currentBranchEditor.textContent;
+                    // No need to re-render the editor here, as the input event handles it.
+                    // We could add a debounce here to update the branch list preview periodically while typing,
+                    // but for simplicity, previews only update on commit/switch/merge.
+                });
+            } else {
+                console.error("Current branch editor not found!");
+            }
+
+
+            // --- Initialization ---
+            // Render the initial state of the UI when the page loads
+            renderEditor(); // Display the initial empty poem in the editor
+            renderBranchList(); // Display the initial branch list ('main')
+            renderMergeSelect(); // Populate merge dropdown (empty initially)
+            renderHistory(); // Display initial history state (no commits)
+
+
+            console.log("Event listeners attached and initial render complete."); // Confirm setup is done
+        });
+
+        // Add a check to see if the script file itself is loaded
+        console.log("script.js is loading...");
+    </script>
+</body>
+</html>
