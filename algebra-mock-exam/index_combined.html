@@ -48,7 +48,7 @@
             margin-bottom: 20px;
         }
 
-        /* Container for two-column layout */
+        /* Container for two-column layout - applied by default */
         .questions-container {
             display: grid;
             grid-template-columns: 1fr 1fr; /* Two equal columns */
@@ -88,7 +88,6 @@
         .initially-hidden {
             display: none;
         }
-
 
         .explanation {
             margin-top: 15px;
@@ -199,7 +198,7 @@
              display: block; /* Make image a block element */
              margin: 0 auto; /* Center the image */
              border: 1px solid #ccc; /* Optional: Add a light border */
-             border-radius: 4px; /* Optional: Rounded corners */
+             border-radius: 44px; /* Optional: Rounded corners */
          }
 
 
@@ -252,8 +251,11 @@
                 padding: 0;
             }
             .questions-container {
-                 gap: 4mm; /* Reduced gap for printing */
+                 /* Revert to single column for print */
+                 display: block;
+                 gap: 0;
             }
+             /* Reset question styles for print */
             .question {
                 border: 1px solid #000 !important; /* Black border for questions in print */
                 border-radius: 0 !important; /* Remove rounded corners in print */
@@ -264,25 +266,27 @@
                 page-break-inside: avoid !important; /* Older property for print breaking */
                 page-break-after: auto !important; /* Allow multiple questions per page */
                 height: auto !important; /* Ensure height is auto */
-                overflow: visible !important; /* Ensure content is not hidden */
+                overflow: visible !important; /* Ensure content is hidden */
+                border-bottom: none !important; /* Remove bottom border in print */
             }
              .question:last-child {
                 margin-bottom: 0 !important; /* Remove margin after the last question */
              }
 
-            .options label {
-                display: block !important; /* Ensure options are block elements in print */
-            }
 
-            .explanation {
-                display: block !important; /* Show explanations in print */
-                background-color: #f0f0f0 !important; /* Light grey background for print */
-                border-left: 4px solid #ccc !important; /* Grey border for print */
-                color: #000 !important; /* Black text for print */
-            }
-            .show-answer-btn, .submit-btn, .score, .navigation-links, #unlockQuiz { /* Hide unlock button in print */
+            .options, .explanation, .show-answer-btn, .submit-btn, .score, .navigation-links, #unlockQuiz { /* Hide interactive elements and unlock button in print */
                 display: none !important; /* Hide buttons, score, and navigation in print */
             }
+
+             /* Add space for answers in print */
+            .question .answer-space {
+                 display: block !important; /* Show answer space in print */
+                 min-height: 20mm; /* Add space for writing answers */
+                 border-bottom: 1px dashed #ccc; /* Dashed line for answer space */
+                 margin-top: 10mm;
+            }
+
+
              /* Adjust image sizes for print if necessary */
             .question img {
                  height: auto !important; /* Ensure height is auto for proportional scaling */
@@ -302,9 +306,8 @@
 
              /* Print styles for figure and related questions group */
             .figure-and-questions-group {
-                display: grid; /* Keep grid layout for printing */
-                grid-template-columns: 1fr 1fr; /* Two columns */
-                gap: 4mm; /* Reduced gap for printing */
+                display: block; /* Stack elements in print */
+                gap: 0;
                 margin-bottom: 10mm !important; /* Add some space below the group */
                 grid-column: span 2; /* Make this group span both columns of the main grid */
                 break-inside: avoid !important; /* Avoid breaking the group across pages */
@@ -314,6 +317,7 @@
                 overflow: visible !important; /* Ensure content is not hidden */
                 border: 1px solid #000 !important; /* Black border for the group in print */
                 padding: 5mm !important; /* Padding around the group in print */
+                 border-bottom: none !important; /* No bottom border for the group in print */
             }
              /* Don't force a page break after the last group */
              .questions-container .figure-and-questions-group:last-child {
@@ -335,9 +339,8 @@
             }
 
              .questions-group {
-                 display: flex;
-                 flex-direction: column; /* Stack questions vertically */
-                 gap: 4mm; /* Reduced space between questions within the group in print */
+                 display: block; /* Stack questions vertically */
+                 gap: 0;
                  height: auto !important; /* Ensure height is auto */
                  overflow: visible !important; /* Ensure content is not hidden */
             }
@@ -348,12 +351,18 @@
                  background-color: #fff !important; /* White background for questions inside the group in print */
                  break-inside: avoid !important; /* Avoid breaking questions across pages */
                  page-break-inside: avoid !important; /* Older property for print breaking */
-                 margin-bottom: 0 !important; /* Remove margin bottom for questions within the group */
+                 margin-bottom: 10mm !important; /* Add some space between questions */
                  page-break-after: auto !important; /* Don't force page break after questions within a group */
                  height: auto !important; /* Ensure height is auto */
                  overflow: visible !important; /* Ensure content is not hidden */
                  padding: 5mm !important; /* Padding for questions within the group */
+                 border-bottom: none !important; /* Remove bottom border in print */
             }
+             /* Remove bottom border for the last question in a group */
+            .figure-and-questions-group .questions-group .question:last-child {
+                margin-bottom: 0 !important;
+            }
+
 
              .figure-and-questions-group .questions-group .question .workspace {
                  flex-grow: 1; /* Make the workspace fill the remaining vertical space */
@@ -372,12 +381,12 @@
                 background-color: #fff !important; /* White background for the group in print */
                 break-inside: avoid !important; /* Avoid breaking the group across pages */
                 page-break-inside: avoid !important; /* Older property for print breaking */
-                display: grid; /* Use grid for internal layout */
-                grid-template-columns: 1fr 1fr; /* Two columns within this group in print */
-                gap: 4mm; /* Reduced space between questions within the group in print */
+                display: block; /* Stack questions in print */
+                gap: 0;
                 page-break-after: auto !important; /* Allow multiple groups per page */
                 height: auto !important; /* Ensure height is auto */
                 overflow: visible !important; /* Ensure content is not hidden */
+                 border-bottom: none !important; /* No bottom border for the group in print */
             }
              /* Don't force a page break after the last group */
              .questions-container .questions-only-group:last-child {
@@ -389,11 +398,16 @@
                 background-color: #fff !important; /* White background for questions inside the group in print */
                 break-inside: avoid !important; /* Avoid breaking questions across pages */
                 page-break-inside: avoid !important; /* Older property for print breaking */
-                 margin-bottom: 0 !important; /* Remove margin bottom for questions within the group */
+                 margin-bottom: 10mm !important; /* Add some space between questions */
                  page-break-after: auto !important; /* Don't force page break after questions within a group */
                  height: auto !important; /* Ensure height is auto */
                  overflow: visible !important; /* Ensure content is not hidden */
                  padding: 5mm !important; /* Padding for questions within the group */
+                 border-bottom: none !important; /* Remove bottom border in print */
+            }
+             /* Remove bottom border for the last question in a group */
+            .questions-only-group .question:last-child {
+                margin-bottom: 0 !important;
             }
         }
     </style>
@@ -407,7 +421,9 @@
                 </div>
         </form>
 
-        <button type="button" id="unlockQuiz">Unlock Multiple Choice</button> <button type="button" class="submit-btn" id="submitExam">Submit Exam</button> <div class="score" id="examScore"></div>
+        <button type="button" id="unlockQuiz">Unlock Multiple Choice</button>
+        <button type="button" class="submit-btn" id="submitExam">Submit Exam</button>
+        <div class="score" id="examScore"></div>
     </div>
 
     <script>
@@ -517,8 +533,9 @@
                 content: [
                     {
                         id: 'q20', type: 'multiple-choice', question: 'State the vertex of the function shown in Figure 1.',
-                        options: { a: '(4,3)', b: '(3,4)', c: '(-4,-3)', d: '(-3,-4)' }, correctAnswer: 'a',
-                        explanation: 'The vertex is the highest or lowest point on the parabola. Identify the coordinates of this point from the graph.'
+                        // Corrected correct answer based on user feedback (3,4) is option b
+                        options: { a: '(4,3)', b: '(3,4)', c: '(-4,-3)', d: '(-3,-4)' }, correctAnswer: 'b',
+                        explanation: 'The vertex is the highest or lowest point on the parabola. For $y = -x^2 + 6x - 5$, the x-coordinate of the vertex is $x = -b/(2a) = -6/(2*-1) = 3$. The y-coordinate is $y = -(3)^2 + 6(3) - 5 = -9 + 18 - 5 = 4$. The vertex is (3,4).'
                     },
                     {
                         id: 'q21', type: 'multiple-choice', question: 'Does the graph in Figure 1 have a maximum or minimum?',
@@ -527,13 +544,15 @@
                     },
                     {
                         id: 'q22', type: 'multiple-choice', question: 'State the roots of the function shown in Figure 1.',
-                        options: { a: '(1,0) (-2,0)', b: '(-1,0) (2,0)', c: '(0,0) (-2,0)', d: '(.5,0) (-2.5,0)' }, correctAnswer: 'b',
-                        explanation: 'The roots (or x-intercepts) are the points where the graph crosses the x-axis. Identify the coordinates of these points from the graph.'
+                        // Updated options and correct answer based on user feedback (1,0) and (5,0)
+                        options: { a: '(1,0) and (5,0)', b: '(-1,0) and (2,0)', c: '(0,0) and (-2,0)', d: '(.5,0) and (-2.5,0)' }, correctAnswer: 'a',
+                        explanation: 'The roots (or x-intercepts) are the points where the graph crosses the x-axis. For $y = -x^2 + 6x - 5$, set y=0: $-x^2 + 6x - 5 = 0$. Multiply by -1: $x^2 - 6x + 5 = 0$. Factor: $(x-1)(x-5) = 0$. The roots are x=1 and x=5. The points are (1,0) and (5,0).'
                     },
                     {
                         id: 'q23', type: 'multiple-choice', question: 'State the y-intercept of the function shown in Figure 1.',
-                        options: { a: '(-1,0)', b: '(-1, -3)', c: '(-3, 5)', d: '(0,-1)' }, correctAnswer: 'd',
-                        explanation: 'The y-intercept is the point where the graph crosses the y-axis. Identify the coordinates of this point from the graph.'
+                        // Updated options and correct answer based on user feedback (0,-5)
+                        options: { a: '(0,-5)', b: '(-5,0)', c: '(0,5)', d: '(5,0)' }, correctAnswer: 'a',
+                        explanation: 'The y-intercept is the point where the graph crosses the y-axis. Set x=0: $y = -(0)^2 + 6(0) - 5 = 0 + 0 - 5 = -5$. The y-intercept is (0,-5).'
                     }
                 ]
             },
@@ -583,8 +602,8 @@
                         id: 'q31', type: 'text-only', question: 'Create a table of values for the quadratic function $$y = -x^2 + 6x - 5$$. (This question is not graded in this mockup.)',
                          // Updated image URL for Table of Values
                          image: { src: './images/table_of_values.png', alt: 'Table of values for y = -x^2 + 6x - 5' },
-                        explanation: 'To create a table of values, choose several x-values (including the vertex\'s x-value and points on either side) and substitute them into the equation $y = -x^2 + 6x - 5$ to find the corresponding y-values.\n\n| x | Substitution | y |\n|---|---|---|\n| 0 | $y = -(0)^2 + 6(0) - 5 = 0 + 0 - 5 = -5$ | -5 |\n| 1 | $y = -(1)^2 + 6(1) - 5 = -1 + 6 - 5 = 0$ | 0 |\n| 2 | $y = -(2)^2 + 6(2) - 5 = -4 + 12 - 5 = 3$ | 3 |\
-| 3 | $y = -(3)^2 + 6(3) - 5 = -9 + 18 - 5 = 4$ | 4 (Vertex) |\n| 4 | $y = -(4)^2 + 6(4) - 5 = -16 + 24 - 5 = 3$ | 3 |\n| 5 | $y = -(5)^2 + 6(5) - 5 = -25 + 30 - 5 = 0$ | 0 |\n| 6 | $y = -(6)^2 + 6(6) - 5 = -36 + 36 - 5 = -5$ | -5 |',
+                        // Updated explanation text based on user feedback
+                        explanation: 'To create a table of values, choose several x-values (including the vertex\'s x-value and points on either side) and substitute them into the equation to find the corresponding y-values.\n\n| x | Substitution | y |\n|---|---|---|\n| 1 | f(1)=-(1)^2+6(1)-5 = -1+6-5 = 0 | 0 |\n| 2 | f(2)=-(2)^2+6(2)-5 = -4+12-5 = 3 | 3 |\n| 3 | f(3)=-(3)^2+6(3)-5 = -9+18-5 = 4 | 4 |\n| 4 | f(4)=-(4)^2+6(4)-5 = -16+24-5 = 3 | 3 |\n| 5 | f(5)=-(5)^2+6(5)-5 = -25+30-5 = 0 | 0 |',
                     },
                      {
                         id: 'q32', type: 'text-only', question: 'Graph the quadratic function $$y = -x^2 + 6x - 5$$. (This question is not graded in this mockup.)',
@@ -599,7 +618,7 @@
             {
                 id: 'q33', type: 'multiple-choice', question: 'Solve the equation using the quadratic formula:\n$$3x^2 + 5x - 2 = 0$$',
                 options: { a: '$x = \\frac{1}{3}, x = -2$', b: '$x = -\\frac{1}{3}, x = 2$', c: '$x = \\frac{2}{3}, x = -1$', d: '$x = -\\frac{2}{3}, x = 1$' }, correctAnswer: 'a',
-                explanation: 'First, ensure the equation is in standard form ($ax^2 + bx + c = 0$). The equation $3x^2 + 5x - 2 = 0$ is already in standard form.\nIdentify the coefficients: $a=3$, $b=5$, $c=-2$.\n\nCalculate the discriminant ($b^2 - 4ac$):\nDiscriminant $= (5)^2 - 4(3)(-2)$\nDiscriminant $= 25 - (-24)$\nDiscriminant $= 25 + 24$\nDiscriminant $= 49$.\n\nNow, substitute the values of a, b, and the discriminant into the quadratic formula:\n$x = \\frac{-b\\pm\\sqrt{\\text{Discriminant}}}{2a}$\n$x = \\frac{-5\\pm\\sqrt{49}}{6}$\n$x = \\frac{-5\\pm7}{6}$.\n\nSolve for the two possible values of x:\n$x_1 = \\frac{-5+7}{6} = \\frac{2}{6} = \\frac{1}{3}$\n$x_2 = \\frac{-5-7}{6} = \\frac{-12}{6} = -2$.\nThe solutions are $x = \\frac{1}{3}$ and $x = -2$.',
+                explanation: 'First, ensure the equation is in standard form ($ax^2 + bx + c = 0$). The equation $3x^2 + 5x - 2 = 0$ is already in standard form.\nIdentify the coefficients: $a=3$, $b=5$, $c=-2$.\n\nCalculate the discriminant ($b^2 - 4ac$):\nDiscriminant $= (5)^2 - 4(3)(-2)$\nDiscriminant $= 25 - (-24)$\nDiscriminant $= 25 + 24$\nDiscriminant $= 49$.\n\nNow, substitute the values of a, b, and the discriminant into the quadratic formula:\n$x = \\frac{-b\\pm\\sqrt{49}}{6}$\n$x = \\frac{-5\\pm7}{6}$.\n\nSolve for the two possible values of x:\n$x_1 = \\frac{-5+7}{6} = \\frac{2}{6} = \\frac{1}{3}$\n$x_2 = \\frac{-5-7}{6} = \\frac{-12}{6} = -2$.\nThe solutions are $x = \\frac{1}{3}$ and $x = -2$.',
             },
             {
                 id: 'q34', type: 'multiple-choice', question: 'Simplify the radical expression:\n$$\\sqrt{75}$$',
@@ -630,7 +649,7 @@
                     {
                         id: 'q38', type: 'multiple-choice', question: 'Find the mode age for the data set in Figure 2.',
                         options: { a: '78', b: '60', c: '78, 60', d: '78, 58' }, correctAnswer: 'a', // 78 appears twice, other ages appear once.
-                        explanation: 'The mode is the age that appears most frequently in the data set.\nLooking at the list, the age 78 appears 2 times, which is more frequent than any other age.'
+                        explanation: 'The mode is the age that appears most frequently in the data set.\nLooking at the list, the age 78 appears 2 times, which is the highest frequency.'
                     }
                 ]
             },
@@ -707,6 +726,16 @@
 
             // After rendering, typeset the MathJax content in the container
             MathJax.typesetPromise([questionsContainer]);
+
+             // Add answer spaces for print view after initial render - NOT NEEDED FOR THIS FORMAT
+            // document.querySelectorAll('.question').forEach(question => {
+            //     // Only add if it doesn't already have options (i.e., initially hidden)
+            //     if (!question.querySelector('.options')) {
+            //         const answerSpace = document.createElement('div');
+            //         answerSpace.classList.add('answer-space');
+            //         question.appendChild(answerSpace);
+            //     }
+            // });
         }
 
         // Helper function to create a single question element
@@ -719,6 +748,7 @@
             if (q.type === 'multiple-choice') {
                 const optionsDiv = document.createElement('div');
                 optionsDiv.classList.add('options', 'mt-4', 'mathjax-process', 'initially-hidden'); // Add initially-hidden class
+
                 if (q.displayType === 'dropdown') {
                     // Render as a dropdown
                     const selectElement = document.createElement('select');
@@ -794,13 +824,12 @@
                     questionElement.appendChild(imgElement);
                 }
 
-                // Add explanation area (initially hidden)
+                 // Always add explanation and button, but initially hidden
                 const explanationElement = document.createElement('div');
                 explanationElement.classList.add('explanation', 'mathjax-process', 'initially-hidden'); // Add initially-hidden class
                 explanationElement.innerHTML = `<strong>Explanation:</strong> ${q.explanation}`;
                 questionElement.appendChild(explanationElement);
 
-                // Add show answer button
                 const showAnswerButton = document.createElement('button');
                 showAnswerButton.classList.add('show-answer-btn', 'initially-hidden'); // Add initially-hidden class
                 showAnswerButton.textContent = 'Show Explanation'; // Changed button text
@@ -826,11 +855,21 @@
         unlockQuizButton.addEventListener('click', () => {
             const enteredPassword = prompt('Enter password to unlock multiple choice options:');
             if (enteredPassword === unlockQuizPassword) {
-                // Show all multiple choice options and the submit button
+                // Show all multiple choice options
                 document.querySelectorAll('.options').forEach(el => {
                     el.classList.remove('initially-hidden');
                 });
-                submitButton.style.display = 'block'; // Show submit button
+                // Show all show answer/explanation buttons (still hidden until after submit)
+                 document.querySelectorAll('.show-answer-btn').forEach(el => {
+                    el.classList.remove('initially-hidden');
+                });
+                 // Show all explanations (still hidden until after submit)
+                 document.querySelectorAll('.explanation').forEach(el => {
+                    el.classList.remove('initially-hidden');
+                 });
+
+                // Show the submit button
+                submitButton.style.display = 'block';
 
                 // Hide the unlock quiz button
                 unlockQuizButton.style.display = 'none';
@@ -930,12 +969,12 @@
                 // Handle the 'Unlock Explanations' state
                 const enteredPassword = prompt('Enter password to unlock explanations:');
                 if (enteredPassword === unlockExplanationsPassword) { // Use the correct password variable
-                    // Show all "Show Answer/Explanation" buttons
+                    // Show all "Show Answer/Explanation" buttons and explanations
                     document.querySelectorAll('.show-answer-btn').forEach(button => {
                         button.style.display = 'inline-block';
                     });
-                     // Re-typeset MathJax for newly visible explanations
                      document.querySelectorAll('.explanation').forEach(exp => {
+                         exp.style.display = 'block';
                          MathJax.typesetPromise([exp]);
                      });
 
