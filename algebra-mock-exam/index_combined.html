@@ -342,7 +342,7 @@
                  display: block; /* Stack questions vertically */
                  gap: 0;
                  height: auto !important; /* Ensure height is auto */
-                 overflow: visible !important; /* Ensure content is not hidden */
+                 overflow: visible !important; /* Ensure content is hidden */
             }
 
             /* Print styles for questions within a figure-and-questions-group to make workspace fill space */
@@ -864,9 +864,8 @@
                     el.classList.remove('initially-hidden');
                 });
                  // Show all explanations (still hidden until after submit)
-                 document.querySelectorAll('.explanation').forEach(el => {
-                    el.classList.remove('initially-hidden');
-                 });
+                 // REMOVED: document.querySelectorAll('.explanation').forEach(el => { el.classList.remove('initially-hidden'); });
+
 
                 // Show the submit button
                 submitButton.style.display = 'block';
@@ -969,14 +968,15 @@
                 // Handle the 'Unlock Explanations' state
                 const enteredPassword = prompt('Enter password to unlock explanations:');
                 if (enteredPassword === unlockExplanationsPassword) { // Use the correct password variable
-                    // Show all "Show Answer/Explanation" buttons and explanations
+                    // Show all "Show Answer/Explanation" buttons
                     document.querySelectorAll('.show-answer-btn').forEach(button => {
                         button.style.display = 'inline-block';
                     });
-                     document.querySelectorAll('.explanation').forEach(exp => {
-                         exp.style.display = 'block';
-                         MathJax.typesetPromise([exp]);
-                     });
+                     // Explanations are now shown by clicking the individual buttons, not all at once here.
+                     // REMOVED: document.querySelectorAll('.explanation').forEach(exp => {
+                     //     exp.style.display = 'block';
+                     //     MathJax.typesetPromise([exp]);
+                     // });
 
                 } else {
                     alert('Incorrect password.');
