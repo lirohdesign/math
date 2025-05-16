@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Six Flags Trip Treasurer Simulation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for flag theme and table readability */
+        body {
+            font-family: sans-serif;
+            background-color: #f8f8f8; /* Light background */
+        }
+        .flag-theme-bg {
+            background-color: #0a3161; /* Deep Blue */
+        }
+        .flag-theme-text {
+            color: #e02c4a; /* Bright Red */
+        }
+        .flag-theme-header {
+            background-color: #e02c4a; /* Bright Red */
+            color: white;
+        }
+        .flag-theme-row-even {
+            background-color: #ffffff; /* White */
+        }
+        .flag-theme-row-odd {
+            background-color: #f0f0f0; /* Light Gray for subtle stripe */
+        }
+        .table-container {
+            overflow-x: auto; /* Make table scrollable on small screens */
+            margin-top: 1.5rem; /* Add some space above the table */
+            border: 1px solid #ccc; /* Subtle border around the table container */
+            border-radius: 0.5rem; /* Rounded corners */
+            position: relative; /* Needed for absolute positioning of the copy button */
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse; /* Remove space between borders */
+        }
+        th, td {
+            padding: 12px 15px; /* Padding inside cells */
+            text-align: left;
+            border-bottom: 1px solid #ddd; /* Border between rows */
+        }
+        th {
+            font-weight: bold;
+        }
+        tbody tr:last-child td {
+            border-bottom: none; /* No border on the last row */
+        }
+        /* Style for the 'YOU' row */
+        .you-row {
+            background-color: #ffeb3b; /* Yellow/Gold accent */
+            font-weight: bold;
+        }
+        /* Style for the copy button */
+        .copy-button {
+            position: absolute;
+            top: 0.5rem; /* Adjust position from the top */
+            right: 0.5rem; /* Adjust position from the right */
+            padding: 0.25rem 0.5rem; /* Smaller padding */
+            background-color: #0a3161; /* Blue background */
+            color: white;
+            border: none;
+            border-radius: 0.25rem; /* Slightly rounded corners */
+            cursor: pointer;
+            font-size: 0.875rem; /* Smaller font size */
+            z-index: 10; /* Ensure it's above the table */
+            transition: background-color 0.2s ease;
+        }
+        .copy-button:hover {
+            background-color: #07254a; /* Darker blue on hover */
+        }
+        .copy-button:active {
+             background-color: #e02c4a; /* Red on click */
+        }
+    </style>
+</head>
+<body class="flag-theme-bg text-gray-800">
+
+    <div class="container mx-auto p-6 lg:p-12 bg-white rounded-lg shadow-lg mt-8 mb-8">
+
+        <h1 class="text-3xl font-bold mb-6 flag-theme-text">Simulation: The Six Flags Trip Treasurer's Challenge</h1>
+
+        <p class="mb-4">
+            It's Thursday afternoon, just two days before your club's highly anticipated trip to Six Flags Great America this Saturday. As the club's treasurer, you're doing one final review of the trip finances to make sure everything is in order. You have the breakdown of costs associated with each student's participation and the amounts they raised from the recent fundraiser. A deposit has already been paid to secure the bus for Saturday morning.
+        </p>
+
+        <p class="mb-6">
+            As you meticulously look over the numbers in your file, you realize there's a major issue that needs to be addressed immediately.
+        </p>
+
+        <h2 class="text-2xl font-semibold mb-4 flag-theme-text">Trip Data</h2>
+
+        <p class="mb-4">
+            Below is the data you are reviewing. Please examine it closely.
+        </p>
+
+        <div class="table-container">
+             <button class="copy-button" onclick="copyTableToClipboard()">Copy Table</button>
+
+            <table id="tripDataTable">
+                <thead>
+                    <tr class="flag-theme-header">
+                        <th>Name</th>
+                        <th>Park Admission Cost</th>
+                        <th>Bus Ride Cost</th>
+                        <th>Panera Sandwich Cost</th>
+                        <th>Individual Trip Cost</th>
+                        <th>Amount Raised</th>
+                        <th>Self-Reported Previous Visits to SFGA</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="flag-theme-row-even">
+                        <td>Blake</td>
+                        <td>$70</td>
+                        <td>$80</td>
+                        <td>$12</td>
+                        <td>$162</td>
+                        <td>$200</td>
+                        <td>3</td>
+                        <td>Full Park Ticket</td>
+                    </tr>
+                    <tr class="flag-theme-row-odd">
+                        <td>Kai</td>
+                        <td>$35</td>
+                        <td>$80</td>
+                        <td>$12</td>
+                        <td>$127</td>
+                        <td>$5</td>
+                        <td>0</td>
+                        <td>Base Park Ticket</td>
+                    </tr>
+                    <tr class="flag-theme-row-even">
+                        <td>Jesse</td>
+                        <td>$0</td>
+                        <td>$80</td>
+                        <td>$12</td>
+                        <td>$92</td>
+                        <td>$50</td>
+                        <td>2</td>
+                        <td>Has Season Pass</td>
+                    </tr>
+                    <tr class="flag-theme-row-odd">
+                        <td>Jordan</td>
+                        <td>$70</td>
+                        <td>$80</td>
+                        <td>$12</td>
+                        <td>$162</td>
+                        <td>$250</td>
+                        <td>5+</td>
+                        <td>Full Park Ticket</td>
+                    </tr>
+                    <tr class="flag-theme-row-even">
+                        <td>Taylor</td>
+                        <td>$35</td>
+                        <td>$80</td>
+                        <td>$12</td>
+                        <td>$127</td>
+                        <td>$0</td>
+                        <td>0</td>
+                        <td>Base Park Ticket</td>
+                    </tr>
+                    <tr class="flag-theme-row-odd">
+                        <td>Cameron</td>
+                        <td>$70</td>
+                        <td>$80</td>
+                        <td>$12</td>
+                        <td>$162</td>
+                        <td>$95</td>
+                        <td>1</td>
+                        <td>Full Park Ticket</td>
+                    </tr>
+                    <tr class="flag-theme-row-even">
+                        <td>Quinn</td>
+                        <td>$0</td>
+                        <td>$80</td>
+                        <td>$12</td>
+                        <td>$92</td>
+                        <td>$5</td>
+                        <td>0</td>
+                        <td>Has Season Pass</td>
+                    </tr>
+                    <tr class="flag-theme-row-odd">
+                        <td>Alex</td>
+                        <td>$35</td>
+                        <td>$80</td>
+                        <td>$12</td>
+                        <td>$127</td>
+                        <td>$10</td>
+                        <td>0</td>
+                        <td>Base Park Ticket</td>
+                    </tr>
+                    <tr class="flag-theme-row-even">
+                        <td>Riley</td>
+                        <td>$70</td>
+                        <td>$80</td>
+                        <td>$12</td>
+                        <td>$162</td>
+                        <td>$80</td>
+                        <td>2</td>
+                        <td>Full Park Ticket</td>
+                    </tr>
+                    <tr class="flag-theme-row-odd">
+                        <td>Finley</td>
+                        <td>$0</td>
+                        <td>$80</td>
+                        <td>$12</td>
+                        <td>$92</td>
+                        <td>$10</td>
+                        <td>1</td>
+                        <td>Has Season Pass</td>
+                    </tr>
+                    <tr class="you-row">
+                        <td>YOU</td>
+                        <td>$70</td>
+                        <td>$80</td>
+                        <td>$12</td>
+                        <td>$162</td>
+                        <td>$180</td>
+                        <td>4</td>
+                        <td>Full Park Ticket</td>
+                    </tr>
+                    <tr class="flag-theme-row-even">
+                        <td>Rowan</td>
+                        <td>$70</td>
+                        <td>$80</td>
+                        <td>$12</td>
+                        <td>$162</td>
+                        <td>$15</td>
+                        <td>0</td>
+                        <td>Full Park Ticket</td>
+                    </tr>
+                    <tr class="flag-theme-row-odd">
+                        <td>Dakota</td>
+                        <td>$0</td>
+                        <td>$80</td>
+                        <td>$12</td>
+                        <td>$92</td>
+                        <td>$40</td>
+                        <td>3</td>
+                        <td>Has Season Pass</td>
+                    </tr>
+                    <tr class="flag-theme-row-even">
+                        <td>Jamie</td>
+                        <td>$70</td>
+                        <td>$80</td>
+                        <td>$12</td>
+                        <td>$162</td>
+                        <td>$40</td>
+                        <td>1</td>
+                        <td>Full Park Ticket</td>
+                    </tr>
+                    <tr class="flag-theme-row-odd">
+                        <td>Blair</td>
+                        <td>$35</td>
+                        <td>$80</td>
+                        <td>$12</td>
+                        <td>$127</td>
+                        <td>$30</td>
+                        <td>0</td>
+                        <td>Base Park Ticket</td>
+                    </tr>
+                    <tr class="flag-theme-row-even">
+                        <td>Robin</td>
+                        <td>$70</td>
+                        <td>$80</td>
+                        <td>$12</td>
+                        <td>$162</td>
+                        <td>$60</td>
+                        <td>1</td>
+                        <td>Full Park Ticket</td>
+                    </tr>
+                    <tr class="flag-theme-row-odd">
+                        <td>Casey</td>
+                        <td>$35</td>
+                        <td>$80</td>
+                        <td>$12</td>
+                        <td>$127</td>
+                        <td>$0</td>
+                        <td>0</td>
+                        <td>Base Park Ticket</td>
+                    </tr>
+                    <tr class="flag-theme-row-even">
+                        <td>Sam</td>
+                        <td>$70</td>
+                        <td>$80</td>
+                        <td>$12</td>
+                        <td>$162</td>
+                        <td>$130</td>
+                        <td>2</td>
+                        <td>Full Park Ticket</td>
+                    </tr>
+                    <tr class="flag-theme-row-odd">
+                        <td>Reese</td>
+                        <td>$70</td>
+                        <td>$80</td>
+                        <td>$12</td>
+                        <td>$162</td>
+                        <td>$70</td>
+                        <td>1</td>
+                        <td>Full Park Ticket</td>
+                    </tr>
+                    <tr class="flag-theme-row-even">
+                        <td>Drew</td>
+                        <td>$70</td>
+                        <td>$80</td>
+                        <td>$12</td>
+                        <td>$162</td>
+                        <td>$110</td>
+                        <td>3</td>
+                        <td>Full Park Ticket</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2 class="text-2xl font-semibold mt-8 mb-4 flag-theme-text">Your Task as Treasurer</h2>
+
+        <p class="mb-4">
+            With the trip happening in less than 48 hours, and knowing the bus deposit is already paid, what do you do next as the club treasurer to understand and resolve this financial issue and ensure the trip can still happen? Think about the immediate steps you would take and who you would need to involve.
+        </p>
+
+    </div>
+
+    <script>
+        function copyTableToClipboard() {
+            const table = document.getElementById('tripDataTable');
+            let csv = [];
+            const rows = table.querySelectorAll('tr');
+
+            for (let i = 0; i < rows.length; i++) {
+                const row = [];
+                const cells = rows[i].querySelectorAll('th, td');
+
+                for (let j = 0; j < cells.length; j++) {
+                    // Get text content and trim whitespace
+                    let text = cells[j].innerText.trim();
+                    // Handle commas within cell data by enclosing in quotes (basic CSV handling)
+                    if (text.includes(',')) {
+                        text = `"${text}"`;
+                    }
+                    row.push(text);
+                }
+                csv.push(row.join('\t')); // Use tab as delimiter for easy pasting into spreadsheets
+            }
+
+            // Join rows with newline character
+            const csvString = csv.join('\n');
+
+            // Copy to clipboard using the modern API
+            navigator.clipboard.writeText(csvString)
+                .then(() => {
+                    // Provide feedback to the user
+                    const button = document.querySelector('.copy-button');
+                    const originalText = button.innerText;
+                    button.innerText = 'Copied!';
+                    setTimeout(() => {
+                        button.innerText = originalText;
+                    }, 2000); // Revert text after 2 seconds
+                })
+                .catch(err => {
+                    // Handle errors (e.g., permission denied)
+                    console.error('Failed to copy table: ', err);
+                    alert('Failed to copy table. Please try manually selecting and copying the data.');
+                });
+        }
+    </script>
+
+</body>
+</html>

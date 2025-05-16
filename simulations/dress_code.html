@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Discipline Data Simulation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for a school/discipline theme */
+        body {
+            font-family: sans-serif;
+            background-color: #f0f4f8; /* Light blue-gray background */
+            color: #333;
+        }
+        .school-theme-bg {
+            background-color: #1a202c; /* Dark gray/blue */
+        }
+        .school-theme-text {
+            color: #2b6cb0; /* Steel blue */
+        }
+        .school-theme-header {
+            background-color: #4299e1; /* Lighter blue */
+            color: white;
+        }
+         .school-theme-row-even {
+            background-color: #ffffff; /* White */
+        }
+        .school-theme-row-odd {
+            background-color: #edf2f7; /* Very light gray */
+        }
+
+        .table-container {
+            overflow-x: auto; /* Make table scrollable on small screens */
+            margin-top: 1.5rem; /* Add some space above the table */
+            border: 1px solid #ccc; /* Subtle border around the table container */
+            border-radius: 0.5rem; /* Rounded corners */
+            position: relative; /* Needed for absolute positioning of the copy button */
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse; /* Remove space between borders */
+        }
+        th, td {
+            padding: 12px 15px; /* Padding inside cells */
+            text-align: left;
+            border-bottom: 1px solid #ddd; /* Border between rows */
+        }
+        th {
+            font-weight: bold;
+        }
+        tbody tr:last-child td {
+            border-bottom: none; /* No border on the last row */
+        }
+
+        /* Style for the copy button */
+        .copy-button {
+            position: absolute;
+            top: 0.5rem; /* Adjust position from the top */
+            right: 0.5rem; /* Adjust position from the right */
+            padding: 0.25rem 0.5rem; /* Smaller padding */
+            background-color: #2b6cb0; /* Steel blue */
+            color: white;
+            border: none;
+            border-radius: 0.25rem; /* Slightly rounded corners */
+            cursor: pointer;
+            font-size: 0.875rem; /* Smaller font size */
+            z-index: 10; /* Ensure it's above the table */
+            transition: background-color 0.2s ease;
+        }
+        .copy-button:hover {
+            background-color: #1a4e85; /* Darker blue on hover */
+        }
+        .copy-button:active {
+             background-color: #c53030; /* Red on click */
+        }
+        .language-switcher {
+            text-align: right;
+            margin-bottom: 1rem;
+        }
+        .language-switcher a {
+            color: #2b6cb0;
+            text-decoration: none;
+            font-weight: bold;
+            margin-left: 10px; /* Space between links */
+        }
+         .language-switcher a:hover {
+            text-decoration: underline;
+        }
+         /* Hide Spanish content by default */
+        #spanish-content {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <div class="container mx-auto p-6 lg:p-12 bg-white rounded-lg shadow-lg mt-8 mb-8">
+
+        <div class="language-switcher">
+            <a href="#" onclick="showLanguage('en'); return false;">English</a> |
+            <a href="#" onclick="showLanguage('es'); return false;">Español</a>
+        </div>
+
+        <div id="english-content">
+            <h1 class="text-3xl font-bold mb-6 school-theme-text">Simulation: Preparing Discipline Data for the School Board</h1>
+
+            <p class="mb-4">
+                Imagine you are the Head of Student Engagement at the high school. You are a teacher who has been tasked with organizing student discipline data from the past academic year into a presentation for the upcoming school board meeting. There has been much discussion related to dress code enforcement recently, and some members of the school board are interested in forming a committee to explore implementing school uniforms. This interest was heightened after one member commented they were "shocked at the lack of professionalism" they observed while attending a volleyball match last week. The superintendent has asked you to prepare two graphics based on the discipline data to present at the meeting.
+            </p>
+
+            <p class="mb-6">
+                Your task is to examine this data closely to identify significant patterns or points of interest and prepare the information needed for your presentation graphics.
+            </p>
+
+            <h2 class="text-2xl font-semibold mb-4 school-theme-text">Student Referral Data</h2>
+
+            <p class="mb-4">
+                Below is the data for 100 students.
+            </p>
+
+            <div class="table-container">
+                 <button class="copy-button" onclick="copyTableToClipboard('disciplineDataTable_en')">Copy Table</button>
+
+                <table id="disciplineDataTable_en">
+                    <thead>
+                        <tr class="school-theme-header">
+                            <th>Name</th>
+                            <th>Gender</th>
+                            <th>Total Referrals</th>
+                            <th>Tardies</th>
+                            <th>Inappropriate Language</th>
+                            <th>Insubordination</th>
+                            <th>Dress Code Violation</th>
+                            <th>Calls to Parent</th>
+                            <th>Successful Parent Contact</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="school-theme-row-even"><td>Benjamin</td><td>M</td><td>11</td><td>3</td><td>5</td><td>3</td><td>0</td><td>8</td><td>6</td></tr>
+                        <tr class="school-theme-row-odd"><td>Maya</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Riley</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-odd"><td>Elijah</td><td>M</td><td>7</td><td>1</td><td>3</td><td>3</td><td>0</td><td>5</td><td>3</td></tr>
+                        <tr class="school-theme-row-even"><td>Grace</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Rowan</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-even"><td>Liam</td><td>M</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Aurora</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Taylor</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-odd"><td>Sophia</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>James</td><td>M</td><td>12</td><td>4</td><td>5</td><td>3</td><td>0</td><td>9</td><td>7</td></tr>
+                        <tr class="school-theme-row-odd"><td>Penelope</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Dakota</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-odd"><td>Chloe</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Liam</td><td>M</td><td>8</td><td>2</td><td>3</td><td>3</td><td>0</td><td>6</td><td>4</td></tr>
+                        <tr class="school-theme-row-odd"><td>Nora</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Charlie</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-odd"><td>Everly</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Oliver</td><td>M</td><td>7</td><td>2</td><td>3</td><td>2</td><td>0</td><td>5</td><td>4</td></tr>
+                        <tr class="school-theme-row-odd"><td>Layla</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Blair</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-odd"><td>Violet</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Samuel</td><td>M</td><td>9</td><td>2</td><td>4</td><td>3</td><td>0</td><td>7</td><td>5</td></tr>
+                        <tr class="school-theme-row-odd"><td>Lily</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Cameron</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-odd"><td>Eleanor</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Lucas</td><td>M</td><td>8</td><td>1</td><td>4</td><td>3</td><td>0</td><td>6</td><td>4</td></tr>
+                        <tr class="school-theme-row-odd"><td>Hannah</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Jesse</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-odd"><td>Autumn</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Daniel</td><td>M</td><td>11</td><td>3</td><td>5</td><td>3</td><td>0</td><td>8</td><td>6</td></tr>
+                        <tr class="school-theme-row-odd"><td>Summer</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Reese</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-odd"><td>Willow</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Joseph</td><td>M</td><td>8</td><td>1</td><td>4</td><td>3</td><td>0</td><td>6</td><td>4</td></tr>
+                        <tr class="school-theme-row-odd"><td>Claire</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Drew</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-odd"><td>Anna</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>David</td><td>M</td><td>10</td><td>2</td><td>5</td><td>3</td><td>0</td><td>8</td><td>5</td></tr>
+                        <tr class="school-theme-row-odd"><td>Samantha</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Olivia</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Allison</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Liam</td><td>M</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Natalie</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Taylor</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-odd"><td>Serenity</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Noah</td><td>M</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Skylar</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Ava</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Kinsley</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Morgan</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-odd"><td>Naomi</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Oliver</td><td>M</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Elena</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Sophia</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Caroline</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Casey</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-odd"><td>Genesis</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Elijah</td><td>M</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Kennedy</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Isabella</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Valentina</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Jamie</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-odd"><td>Ruby</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>James</td><td>M</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Piper</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Charlotte</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Nevaeh</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Drew</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-odd"><td>Jade</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>William</td><td>M</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Georgia</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Amelia</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Delilah</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Cameron</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-odd"><td>Bailey</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Benjamin</td><td>M</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Mia</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Alex</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-odd"><td>Lucas</td><td>M</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Harper</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Blake</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-even"><td>Henry</td><td>M</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Evelyn</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Quinn</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-odd"><td>Theodore</td><td>M</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Abigail</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Rowan</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-even"><td>Matthew</td><td>M</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Emily</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Sam</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-odd"><td>Samuel</td><td>M</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Elizabeth</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Dakota</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-even"><td>Daniel</td><td>M</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Mila</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Charlie</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-odd"><td>Joseph</td><td>M</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Ella</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Finley</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-even"><td>David</td><td>M</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Avery</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Jesse</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-odd"><td>Sofia</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Blair</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-odd"><td>Camila</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Robin</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-odd"><td>Aria</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Reese</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-odd"><td>Scarlett</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Victoria</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Madison</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Luna</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Grace</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Chloe</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Penelope</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Layla</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Riley</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-even"><td>Nora</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Lily</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Eleanor</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Hannah</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Violet</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Aurora</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Brooklyn</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Zoey</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Stella</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Autumn</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Summer</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Willow</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Everly</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Claire</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Anna</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Samantha</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Allison</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Maya</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Savannah</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Natalie</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Serenity</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Skylar</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Kinsley</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Naomi</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Elena</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Caroline</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Genesis</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Kennedy</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Valentina</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Ruby</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Piper</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Nevaeh</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Jade</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Georgia</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Delilah</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Bailey</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="spanish-content">
+            <h1 class="text-3xl font-bold mb-6 school-theme-text">Simulación: Preparación de Datos de Disciplina para la Junta Escolar</h1>
+
+            <p class="mb-4">
+                Imagina que eres el Jefe de Participación Estudiantil en la escuela secundaria. Eres un maestro al que se le ha encomendado la tarea de organizar los datos de disciplina estudiantil del último año académico en una presentación para la próxima reunión de la junta escolar. Ha habido mucha discusión recientemente relacionada con la aplicación del código de vestimenta, y algunos miembros de la junta escolar están interesados en formar un comité para explorar la implementación de uniformes escolares. Este interés aumentó después de que un miembro comentara que estaba "sorprendido por la falta de profesionalismo" que observó mientras asistía a un partido de voleibol la semana pasada. El superintendente te ha pedido que prepares dos gráficos basados en los datos de disciplina para presentar en la reunión.
+            </p>
+
+            <p class="mb-6">
+                Tu tarea es examinar estos datos detenidamente para identificar patrones o puntos de interés significativos que puedan ser relevantes para la discusión de la junta escolar sobre la aplicación del código de vestimenta y los posibles uniformes. Considera observar los diferentes tipos de remisiones, el número total de remisiones por estudiante y las acciones de seguimiento tomadas (llamadas a los padres). ¿Hay alguna correlación o diferencia notable entre los grupos de estudiantes que la junta escolar deba conocer?
+            </p>
+
+             <h2 class="text-2xl font-semibold mb-4 school-theme-text">Datos de Remisiones Estudiantiles</h2>
+
+            <p class="mb-4">
+                A continuación se presentan los datos de 100 estudiantes.
+            </p>
+
+            <div class="table-container">
+                 <button class="copy-button" onclick="copyTableToClipboard('disciplineDataTable_es')">Copiar Tabla</button>
+
+                <table id="disciplineDataTable_es">
+                    <thead>
+                        <tr class="school-theme-header">
+                            <th>Nombre</th>
+                            <th>Género</th>
+                            <th>Remisiones Totales</th>
+                            <th>Tardanzas</th>
+                            <th>Lenguaje Inapropiado</th>
+                            <th>Insubordinación</th>
+                            <th>Violación Código Vestimenta</th>
+                            <th>Llamadas a Padres</th>
+                            <th>Contacto Exitoso con Padres</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                         <tr class="school-theme-row-even"><td>Benjamin</td><td>M</td><td>11</td><td>3</td><td>5</td><td>3</td><td>0</td><td>8</td><td>6</td></tr>
+                        <tr class="school-theme-row-odd"><td>Maya</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Riley</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-odd"><td>Elijah</td><td>M</td><td>7</td><td>1</td><td>3</td><td>3</td><td>0</td><td>5</td><td>3</td></tr>
+                        <tr class="school-theme-row-even"><td>Grace</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Rowan</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-even"><td>Liam</td><td>M</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Aurora</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Taylor</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-odd"><td>Sophia</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>James</td><td>M</td><td>12</td><td>4</td><td>5</td><td>3</td><td>0</td><td>9</td><td>7</td></tr>
+                        <tr class="school-theme-row-odd"><td>Penelope</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Dakota</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-odd"><td>Chloe</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Liam</td><td>M</td><td>8</td><td>2</td><td>3</td><td>3</td><td>0</td><td>6</td><td>4</td></tr>
+                        <tr class="school-theme-row-odd"><td>Nora</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Charlie</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-odd"><td>Everly</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Oliver</td><td>M</td><td>7</td><td>2</td><td>3</td><td>2</td><td>0</td><td>5</td><td>4</td></tr>
+                        <tr class="school-theme-row-odd"><td>Layla</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Blair</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-odd"><td>Violet</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Samuel</td><td>M</td><td>9</td><td>2</td><td>4</td><td>3</td><td>0</td><td>7</td><td>5</td></tr>
+                        <tr class="school-theme-row-odd"><td>Lily</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Cameron</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-odd"><td>Eleanor</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Lucas</td><td>M</td><td>8</td><td>1</td><td>4</td><td>3</td><td>0</td><td>6</td><td>4</td></tr>
+                        <tr class="school-theme-row-odd"><td>Hannah</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Jesse</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-odd"><td>Autumn</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Daniel</td><td>M</td><td>11</td><td>3</td><td>5</td><td>3</td><td>0</td><td>8</td><td>6</td></tr>
+                        <tr class="school-theme-row-odd"><td>Summer</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Reese</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-odd"><td>Willow</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Joseph</td><td>M</td><td>8</td><td>1</td><td>4</td><td>3</td><td>0</td><td>6</td><td>4</td></tr>
+                        <tr class="school-theme-row-odd"><td>Claire</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Drew</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-odd"><td>Anna</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>David</td><td>M</td><td>10</td><td>2</td><td>5</td><td>3</td><td>0</td><td>8</td><td>5</td></tr>
+                        <tr class="school-theme-row-odd"><td>Samantha</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Olivia</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Allison</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Liam</td><td>M</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Natalie</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Taylor</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-odd"><td>Serenity</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Noah</td><td>M</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Skylar</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Ava</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Kinsley</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Morgan</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-odd"><td>Naomi</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Oliver</td><td>M</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Elena</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Sophia</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Caroline</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Casey</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-odd"><td>Genesis</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Elijah</td><td>M</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Kennedy</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Isabella</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Valentina</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Jamie</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-odd"><td>Ruby</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>James</td><td>M</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Piper</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Charlotte</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Nevaeh</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Drew</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-odd"><td>Jade</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>William</td><td>M</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Georgia</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Amelia</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Delilah</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Cameron</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-odd"><td>Bailey</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Benjamin</td><td>M</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Mia</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Alex</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-odd"><td>Lucas</td><td>M</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Harper</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Blake</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-even"><td>Henry</td><td>M</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Evelyn</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Quinn</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-odd"><td>Theodore</td><td>M</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Abigail</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Rowan</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-even"><td>Matthew</td><td>M</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Emily</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Sam</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-odd"><td>Samuel</td><td>M</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Elizabeth</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Dakota</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-even"><td>Daniel</td><td>M</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Mila</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Charlie</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-odd"><td>Joseph</td><td>M</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Ella</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Finley</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-even"><td>David</td><td>M</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Avery</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Jesse</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-odd"><td>Sofia</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Blair</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-odd"><td>Camila</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Robin</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-odd"><td>Aria</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Reese</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-odd"><td>Scarlett</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Victoria</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Madison</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Luna</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Grace</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Chloe</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Penelope</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Layla</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Riley</td><td>F</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr class="school-theme-row-even"><td>Nora</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Lily</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Eleanor</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Hannah</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Violet</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Aurora</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Brooklyn</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Zoey</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Stella</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Autumn</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Summer</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Willow</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Everly</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Claire</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Anna</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Samantha</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Allison</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Maya</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Savannah</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Natalie</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Serenity</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Skylar</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Kinsley</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Naomi</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Elena</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Caroline</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Genesis</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Kennedy</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Valentina</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Ruby</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Piper</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Nevaeh</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Jade</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Georgia</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-even"><td>Delilah</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                        <tr class="school-theme-row-odd"><td>Bailey</td><td>F</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Function to show the selected language content and hide the other
+        function showLanguage(lang) {
+            const englishContent = document.getElementById('english-content');
+            const spanishContent = document.getElementById('spanish-content');
+
+            if (lang === 'en') {
+                englishContent.style.display = 'block';
+                spanishContent.style.display = 'none';
+                // Ensure correct table ID is used for copying
+                document.querySelector('#english-content .copy-button').onclick = function() { copyTableToClipboard('disciplineDataTable_en'); return false; };
+                 // Update copy button text for English table
+                document.querySelector('#english-content .copy-button').innerText = 'Copy Table';
+            } else if (lang === 'es') {
+                englishContent.style.display = 'none';
+                spanishContent.style.display = 'block';
+                 // Ensure correct table ID is used for copying
+                document.querySelector('#spanish-content .copy-button').onclick = function() { copyTableToClipboard('disciplineDataTable_es'); return false; };
+                 // Update copy button text for Spanish table
+                document.querySelector('#spanish-content .copy-button').innerText = 'Copiar Tabla';
+            }
+        }
+
+        // Function to copy table data to clipboard
+        function copyTableToClipboard(tableId) {
+            const table = document.getElementById(tableId);
+            let csv = [];
+            const rows = table.querySelectorAll('tr');
+
+            for (let i = 0; i < rows.length; i++) {
+                const row = [];
+                const cells = rows[i].querySelectorAll('th, td');
+
+                for (let j = 0; j < cells.length; j++) {
+                    let text = cells[j].innerText.trim();
+                    if (text.includes(',')) {
+                        text = `"${text}"`;
+                    }
+                    row.push(text);
+                }
+                csv.push(row.join('\t')); // Use tab as delimiter
+            }
+
+            const csvString = csv.join('\n');
+
+            navigator.clipboard.writeText(csvString)
+                .then(() => {
+                    // Find the correct copy button based on the tableId
+                    const button = document.querySelector(`#${tableId.replace('_en', '').replace('_es', '')}-content .copy-button`);
+                    const originalText = (tableId.includes('_en')) ? 'Copy Table' : 'Copiar Tabla'; // Get original text based on table ID
+                    button.innerText = (tableId.includes('_en')) ? 'Copied!' : '¡Copiado!'; // Set copied text based on language
+                    setTimeout(() => {
+                        button.innerText = originalText;
+                    }, 2000);
+                })
+                .catch(err => {
+                    console.error('Failed to copy table: ', err);
+                    alert('Failed to copy table. Please try manually selecting and copying the data.');
+                });
+        }
+
+        // Show English content by default on page load
+        window.onload = function() {
+            showLanguage('en');
+        };
+
+    </script>
+
+</body>
+</html>
