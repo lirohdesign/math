@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Improv Game</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start; /* Align items to the start (top) */
+            min-height: 100vh; /* Ensure full viewport height */
+            margin: 0; /* Remove default body margin */
+            padding-top: 20px; /* Add padding at the top */
+            background-color: #f0f0f0;
+        }
+        #instructions {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: #e9e9e9;
+            max-width: 80%;
+        }
+        #card-container {
+            display: flex;
+            justify-content: center; /* Center the cards horizontally */
+            gap: 20px;
+            margin-bottom: 20px;
+            width: 100%; /* Allow container to take full width */
+        }
+        .card {
+            border: 1px solid #ccc;
+            padding: 15px;
+            width: 300px;
+            box-shadow: 2px 2px 5px #888888;
+            background-color: white;
+            border-radius: 8px; /* Add rounded corners to cards */
+        }
+        .card h3 {
+            margin-top: 0;
+            font-size: 1.2em; /* Slightly smaller heading */
+            margin-bottom: 10px;
+        }
+        .card p {
+            margin-bottom: 5px;
+            line-height: 1.4; /* Improve readability */
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #4CAF50; /* Green button */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease; /* Smooth transition */
+        }
+        button:hover {
+            background-color: #367c39; /* Darker green on hover */
+        }
+        #card1, #card2 {
+            display: none; /* Initially hide the cards */
+        }
+
+        @media (max-width: 768px) {
+            #card-container {
+                flex-direction: column; /* Stack cards vertically on smaller screens */
+                align-items: center;
+            }
+            .card {
+                width: 90%; /* Make cards wider on small screens */
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Improv Game: Character Cards</h1>
+    <div id="instructions">
+        <p>Two players draw a character card each. Embody the character, use the provided lines and actions, and create a hilarious scene!</p>
+    </div>
+    <div id="card-container">
+        <div id="card1" class="card"></div>
+        <div id="card2" class="card"></div>
+    </div>
+    <button onclick="shuffleCards()">Shuffle Cards</button>
+    <script>
+        const characters = [
+            {
+                "heading": "Pirate with a Rolling Peg Leg",
+                "line1": "Avast ye, matey! That's me leg!",
+                "line2": "I'll have ye walk the plank for this!",
+                "action1": "Stumble around dramatically, chasing the rolling peg leg.",
+                "action2": "Yell at another player, pointing an imaginary sword at the rolling peg leg."
+            },
+            {
+                "heading": "Frantic Grocery Shopper",
+                "line1": "Honey, please stop running!",
+                "line2": "We need to get home before your nap time.",
+                "action1": "Chase after a child (another player).",
+                "action2": "Read a cereal box label dramatically, while trying to keep track of the child."
+            },
+            {
+                "heading": "Territorial Alley Cat",
+                "line1": "Hisses and arches its back.",
+                "line2": "This is *my* corner. Scram!",
+                "action1": "Swipes at another player.",
+                "action2": "Sprints towards a corner and guards it fiercely, swatting at imaginary intruders."
+            },
+            {
+                "heading": "Founding Father in Vegas",
+                "line1": "I cannot believe this! A slot machine?!",
+                "line2": "I shall have order in this establishment!",
+                "action1": "Pull the lever of a slot machine repeatedly, muttering about liberty and justice.",
+                "action2": "Yell at a casino employee (another player), demanding to know where the nearest tavern is."
+            },
+            {
+                "heading": "Abraham Lincoln, the Honest Gambler",
+                "line1": "You can fool some of the people all of the time, and all of the people some of the time, but you can’t fool all of the people all of the time.",
+                "line2": "A poker game without any bluffing is no fun at all.",
+                "action1": "Pull the lever of a slot machine repeatedly, while muttering about honesty and integrity.",
+                "action2": "Yell at a casino employee (another player), demanding to know where the nearest tavern is."
+            },
+            {
+                "heading": "The Time-Traveling Teacher",
+                "line1": "Class, today we'll be discussing the quadratic formula.",
+                "line2": "Now, if you can just imagine a world without Wi-Fi...",
+                "action1": "Writes equations on an imaginary chalkboard.",
+                "action2": "Tries to use a smartphone to check email, but it doesn't work."
+            },
+            {
+                "heading": "The Superhero Sidekick",
+                "line1": "Wow, the hero really saved the day!",
+                "line2": "I should probably get that cape dry cleaned.",
+                "action1": "Flies around the stage, pretending to fight crime.",
+                "action2": "Lands dramatically and strikes a pose."
+            },
+            {
+                "heading": "The Alien Tourist",
+                "line1": "Fascinating planet! So many strange creatures.",
+                "line2": "I wonder if they have any good alien cuisine.",
+                "action1": "Points at a human (another player) and examines them curiously.",
+                "action2": "Tries to communicate with a human using strange alien sounds."
+            },
+            {
+                "heading": "The Reality TV Star",
+                "line1": "Oh my gosh, this is so dramatic!",
+                "line2": "Can you believe the drama? It's insane!",
+                "action1": "Strikes a pose for an imaginary camera.",
+                "action2": "Whispers to another player about a secret alliance."
+            },
+            {
+                "heading": "The Professional Procrastinator",
+                "line1": "I really should start that project.",
+                "line2": "But first, I need to check my social media.",
+                "action1": "Stares blankly at a computer screen.",
+                "action2": "Gets up to make a cup of coffee, then sits back down and starts scrolling through their phone."
+            },
+            {
+                "heading": "The Caffeine-Fueled Capitalist",
+                "line1": "Another deal closed, another cup of coffee brewed.",
+                "line2": "I'll buy that building, that land, and that whole city block!",
+                "action1": "Sips from a giant mug of coffee while scrolling through a tablet.",
+                "action2": "Makes exaggerated gestures, pointing at imaginary properties and signing imaginary contracts."
+            },
+            {
+                "heading": "The Pushy Property Mogul",
+                "line1": "Now, now, old timer, let's talk business.",
+                "line2": "I'm offering you a fortune for that little shack!",
+                "action1": "Leans in aggressively, waving a contract in the elderly person's face.",
+                "action2": "Sips from a giant mug of coffee and sighs impatiently."
+            },
+            {
+                "heading": "Dracula's Tech Troubles",
+                "line1": "Mother, can you hear me? The signal is terrible!",
+                "line2": "I'm trying to discuss our family's bloodline, but this static is unbearable!",
+                "action1": "Tilts head, straining to hear the phone.",
+                "action2": "Paces back and forth, muttering about ancient curses and technological difficulties."
+            },
+             {
+                "heading": "The Inebriated Equestrian",
+                "line1": "Whoa there, boy! Steady as she goes! The British are coming!",
+                "line2": "We've got a long ride ahead, so let's keep it together. The fate of a nation depends on it!",
+                "action1": "Struggles to keep the horse upright, holding onto the reins tightly.",
+                "action2": "Yells at the horse, urging it to focus on the task at hand, while also shouting warnings about the approaching British."
+            },
+            {
+                "heading": "The Dark Knight's Pursuit",
+                "line1": "You'll never escape me, Joker!",
+                "line2": "Prepare to face justice!",
+                "action1": "Chases the Joker through the city, leaping over obstacles.",
+                "action2": "Throws Batarangs at the Joker, narrowly missing."
+            },
+            {
+                "heading": "The Desperate Plea",
+                "line1": "Spare some change, sir? I haven't eaten in days.",
+                "line2": "Please, anything helps. I just need a little bit of luck.",
+                "action1": "Extends a hand, palm up, pleading for money.",
+                "action2": "Shivers, as if cold and hungry."
+            },
+            {
+                "heading": "Victorian Homeless Man",
+                "line1": "A shilling, please, kind sir. A man of my station has fallen on hard times.",
+                "line2": "The world has turned its back on me, a true tragedy.",
+                "action1": "Tips his non-existent hat, a gesture of polite desperation.",
+                "action2": "Mumbles to himself about lost fortunes and faded glory."
+            }
+        ];
+        function shuffleCards() {
+            const card1Div = document.getElementById('card1');
+            const card2Div = document.getElementById('card2');
+            // Get two random characters
+            const randomIndex1 = Math.floor(Math.random() * characters.length);
+            let randomIndex2 = Math.floor(Math.random() * characters.length);
+            // Ensure the two cards are different
+            while (randomIndex2 === randomIndex1) {
+                randomIndex2 = Math.floor(Math.random() * characters.length);
+            }
+            const character1 = characters[randomIndex1];
+            const character2 = characters[randomIndex2];
+            // Display the first card
+            card1Div.innerHTML = `
+                <h3>${character1.heading}</h3>
+                <p><strong>Line 1:</strong> ${character1.line1}</p>
+                <p><strong>Line 2:</strong> ${character1.line2}</p>
+                <p><strong>Action 1:</strong> ${character1.action1}</p>
+                <p><strong>Action 2:</strong> ${character1.action2}</p>
+            `;
+            card1Div.style.display = 'block';
+            // Display the second card
+            card2Div.innerHTML = `
+                <h3>${character2.heading}</h3>
+                <p><strong>Line 1:</strong> ${character2.line1}</p>
+                <p><strong>Line 2:</strong> ${character2.line2}</p>
+                <p><strong>Action 1:</strong> ${character2.action1}</p>
+                <p><strong>Action 2:</strong> ${character2.action2}</p>
+            `;
+            card2Div.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

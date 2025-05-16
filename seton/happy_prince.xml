@@ -1,0 +1,124 @@
+<speak>
+  <voice name="en-US-Standard-B">
+    <prosody rate="medium">
+      Behold! The magnificent statue of the Happy Prince! A true testament to… well, to me! I mean, to civic pride! He’s certainly… golden.
+    </prosody>
+  </voice>
+  <break time="1s"/>
+
+  <voice name="en-US-Wavenet-F">
+    <prosody rate="medium">
+      This weather’s a drag. Makes a fox just want to disappear for a few months. Find a nice, quiet hideaway and… you know… catch some Z's.
+    </prosody>
+  </voice>
+  <break time="1s"/>
+
+  <voice name="en-US-Wavenet-D">
+    <prosody rate="slow" pitch="low">He looks… sad.</prosody>
+  </voice>
+  <break time="1s"/>
+
+  <voice name="en-US-Wavenet-D">
+    <prosody rate="slow" pitch="low">I am the Happy Prince. But I am not happy now. From up here, I see so much sadness in the city.</prosody>
+  </voice>
+  <break time="1s"/>
+
+  <voice name="en-US-Wavenet-F">
+    <prosody rate="medium">Why are you sad? You’re covered in gold!</prosody>
+  </voice>
+  <break time="1s"/>
+
+  <voice name="en-US-Wavenet-D">
+    <prosody rate="slow" pitch="low">That gold cannot help those who are suffering. Far away, I see a poor woman whose son is ill. She has nothing to give him.</prosody>
+  </voice>
+  <break time="1s"/>
+
+  <voice name="en-US-Wavenet-F">
+    <prosody rate="medium">That’s rough.</prosody>
+  </voice>
+  <break time="1s"/>
+
+  <voice name="en-US-Wavenet-D">
+    <prosody rate="slow" pitch="low">Little Fox, will you help me? Take the ruby from my sword and give it to her.</prosody>
+  </voice>
+  <break time="1s"/>
+
+  <voice name="en-US-Wavenet-F">
+    <prosody rate="medium">But… I need to find shelter! The winter’s coming! And… well, people don’t exactly trust foxes. They’ll think I stole it.</prosody>
+  </voice>
+  <break time="1s"/>
+
+  <voice name="en-US-Wavenet-D">
+    <prosody rate="slow" pitch="low">I will tell them you are helping me. Please. Just this once.</prosody>
+  </voice>
+  <break time="1s"/>
+
+  <voice name="en-US-Wavenet-F">
+    <prosody rate="medium">I gave her the ruby. It… it actually felt pretty good. Even if I got some nasty looks.</prosody>
+  </voice>
+  <break time="1s"/>
+
+  <voice name="en-US-Wavenet-D">
+    <prosody rate="slow" pitch="low">Thank you, little Fox. Now, I see a young writer who is cold and hungry. Take one of my sapphire eyes and give it to him.</prosody>
+  </voice>
+  <break time="1s"/>
+
+  <voice name="en-US-Wavenet-F">
+    <prosody rate="medium">But… your eyes! You’ll be blind! And if I take another jewel, they’ll definitely think I’m robbing you!</prosody>
+  </voice>
+  <break time="1s"/>
+
+  <voice name="en-US-Wavenet-D">
+    <prosody rate="slow" pitch="low">It is more important that he can write his stories. I will explain everything.</prosody>
+  </voice>
+  <break time="1s"/>
+
+  <voice name="en-US-Wavenet-F">
+    <prosody rate="medium">He was so grateful! He said he could finish his play now. But the whispers… they’re getting louder.</prosody>
+  </voice>
+  <break time="1s"/>
+
+  <voice name="en-US-Wavenet-D">
+    <prosody rate="slow" pitch="low">Thank you, little Fox. Now, I see a little match girl…</prosody>
+  </voice>
+  <break time="1s"/>
+
+  <voice name="en-US-Wavenet-F">
+    <prosody rate="medium">(Continues delivering the sapphires and gold leaf with increasing distress with each delivery.)</prosody>
+  </voice>
+  <break time="1s"/>
+
+  <voice name="en-US-Standard-B">
+    <prosody rate="medium">Stop right there, you thieving fox! I saw what you did! You’re robbing this statue blind!</prosody>
+  </voice>
+  <break time="1s"/>
+
+  <voice name="en-US-Wavenet-F">
+    <prosody rate="medium">No! The Prince asked me to! He’s helping people!</prosody>
+  </voice>
+  <break time="1s"/>
+
+  <voice name="en-US-Standard-B">
+    <prosody rate="medium">As if! You’re just a common criminal! Guards!</prosody>
+  </voice>
+  <break time="1s"/>
+
+  <voice name="en-US-Wavenet-F">
+    <prosody rate="medium">(To the Lion) I tried…</prosody>
+  </voice>
+  <break time="1s"/>
+
+  <voice name="en-US-Wavenet-D">
+    <prosody rate="slow" pitch="low">You have done well, little Fox. You have a true heart.</prosody>
+  </voice>
+  <break time="1s"/>
+
+  <voice name="en-US-Standard-H">
+    <prosody rate="medium">God has sent me for the two most precious things in this city.</prosody>
+  </voice>
+  <break time="1s"/>
+
+  <voice name="en-US-Standard-H">
+    <prosody rate="medium">The Happy Prince gave everything he had, and the Fox, though wrongly accused, remained loyal to his wishes. These are truly precious.</prosody>
+  </voice>
+</speak>
