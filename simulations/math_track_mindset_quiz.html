@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mindset Quiz</title>
+    <style>
+        /* Basic styling for the quiz */
+        body {
+            font-family: sans-serif;
+            margin: 0; /* Remove default body margin */
+            line-height: 1.6;
+            color: #333; /* Dark grey text */
+            /* Leger-inspired background using multiple gradients */
+            background-color: #E0E0E0; /* Base background color */
+            background-image:
+                /* Large blue shape */
+                radial-gradient(circle at 10% 80%, #0077B6 0%, transparent 30%),
+                /* Green sweeping shape */
+                linear-gradient(150deg, #06A77D 0%, transparent 40%),
+                /* Red diagonal band */
+                linear-gradient(-45deg, #D62828 0%, transparent 50%),
+                /* Yellow blob */
+                radial-gradient(circle at 90% 20%, #FFC300 0%, transparent 25%),
+                 /* Orange accent */
+                linear-gradient(90deg, #F77F00 0%, transparent 30%);
+            background-size: 800px 800px, 600px 600px, 700px 700px, 500px 500px, 400px 400px; /* Size of each gradient layer */
+            background-position: left bottom, right top, left top, right bottom, center center; /* Position of each gradient layer */
+            background-repeat: no-repeat; /* Prevent repeating */
+            background-attachment: fixed; /* Fix background position */
+        }
+        .container {
+            max-width: 800px; /* Limit content width */
+            margin: 20px auto; /* Center the container with margin */
+            padding: 20px;
+            background-color: #FFFFFF; /* White background for content */
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2); /* More prominent shadow */
+            border-radius: 10px; /* Slightly more rounded corners */
+            position: relative; /* Needed for z-index */
+            z-index: 1; /* Ensure container is above background */
+        }
+        h1 {
+            text-align: center;
+            color: #03045E; /* Using a dark blue for the main heading for contrast */
+            margin-bottom: 25px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        .question {
+            margin-bottom: 30px;
+            padding: 18px;
+            border: 2px solid #06A77D; /* A green border */
+            border-radius: 8px;
+            background-color: #A7D4AE; /* A lighter green background */
+        }
+        .question p {
+            font-weight: bold;
+            margin-bottom: 12px;
+            color: #004E64; /* A deep teal/blue for question text */
+            font-size: 1.1em;
+        }
+        .options label {
+            display: block; /* Each option on a new line */
+            margin-bottom: 10px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease, transform 0.1s ease; /* Smooth hover and slight press effect */
+            border: 1px solid #FFC300; /* A yellow border for options */
+            background-color: #FFFACD; /* A light yellow background for options */
+        }
+        .options label:hover {
+            background-color: #F77F00; /* Orange on hover */
+            color: #fff; /* White text on hover */
+        }
+         .options input[type="radio"]:checked + label {
+            background-color: #0077B6; /* Blue for selected option background */
+            color: #fff; /* White text on selected option */
+            border-color: #023E8A; /* Darker blue border for selected */
+        }
+        .options input[type="radio"] {
+            margin-right: 10px;
+            accent-color: #D62828; /* Red for the radio button itself */
+        }
+        button {
+            display: block;
+            width: 100%; /* Full width button */
+            margin-top: 30px;
+            padding: 15px 20px;
+            font-size: 1.2em;
+            color: #fff; /* White text */
+            background-color: #0077B6; /* Blue button */
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease; /* Smooth hover and slight press effect */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Button shadow */
+        }
+        button:hover {
+            background-color: #06A77D; /* Green on hover */
+            transform: translateY(-2px); /* Slight lift effect */
+        }
+         button:active {
+            background-color: #004E64; /* Darker teal/blue when pressed */
+            transform: translateY(0); /* Reset lift effect */
+        }
+        #results {
+            margin-top: 30px;
+            padding: 25px;
+            border: 2px solid #D62828; /* Red border for results */
+            border-radius: 8px;
+            background-color: #FFFACD; /* Light yellow background for results */
+            display: none; /* Hidden by default */
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        #results h2 {
+            color: #03045E; /* Dark blue heading */
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        #results p {
+            font-size: 1.2em;
+            margin-bottom: 8px;
+            color: #023E8A; /* Deep blue text */
+        }
+        #results p span {
+            font-weight: bold;
+            color: #F77F00; /* Orange for the actual score/category */
+        }
+        .error-message {
+            color: #C1121F; /* A strong red for error messages */
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Mindset Quiz - Evaluation</h1>
+        <p>Select the option that best matches your perspective for each statement.</p>
+
+        <form id="mindsetQuizForm">
+
+            <div class="question">
+                <p>Your intelligence is something very basic about you that you can't change very much.</p>
+                <div class="options">
+                    <label><input type="radio" name="q1" value="0" required> Strongly Agree</label>
+                    <label><input type="radio" name="q1" value="1"> Agree</label>
+                    <label><input type="radio" name="q1" value="2"> Disagree</label>
+                    <label><input type="radio" name="q1" value="3"> Strongly Disagree</label>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>No matter how much intelligence you have, you can always change it quite a bit.</p>
+                <div class="options">
+                    <label><input type="radio" name="q2" value="3" required> Strongly Agree</label>
+                    <label><input type="radio" name="q2" value="2"> Agree</label>
+                    <label><input type="radio" name="q2" value="1"> Disagree</label>
+                    <label><input type="radio" name="q2" value="0"> Strongly Disagree</label>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>You can always substantially change how intelligent you are.</p>
+                <div class="options">
+                    <label><input type="radio" name="q3" value="3" required> Strongly Agree</label>
+                    <label><input type="radio" name="q3" value="2"> Agree</label>
+                    <label><input type="radio" name="q3" value="1"> Disagree</label>
+                    <label><input type="radio" name="q3" value="0"> Strongly Disagree</label>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>You are a certain kind of person, and there is not much that can be done to really change that.</p>
+                <div class="options">
+                    <label><input type="radio" name="q4" value="0" required> Strongly Agree</label>
+                    <label><input type="radio" name="q4" value="1"> Agree</label>
+                    <label><input type="radio" name="q4" value="2"> Disagree</label>
+                    <label><input type="radio" name="q4" value="3"> Strongly Disagree</label>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>You can always change basic things about the kind of person you are.</p>
+                <div class="options">
+                    <label><input type="radio" name="q5" value="3" required> Strongly Agree</label>
+                    <label><input type="radio" name="q5" value="2"> Agree</label>
+                    <label><input type="radio" name="q5" value="1"> Disagree</label>
+                    <label><input type="radio" name="q5" value="0"> Strongly Disagree</label>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>Music talent can be learned by anyone.</p>
+                <div class="options">
+                    <label><input type="radio" name="q6" value="3" required> Strongly Agree</label>
+                    <label><input type="radio" name="q6" value="2"> Agree</label>
+                    <label><input type="radio" name="q6" value="1"> Disagree</label>
+                    <label><input type="radio" name="q6" value="0"> Strongly Disagree</label>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>Only a few people will be truly good at sports you have to be "born with it".</p>
+                <div class="options">
+                    <label><input type="radio" name="q7" value="0" required> Strongly Agree</label>
+                    <label><input type="radio" name="q7" value="1"> Agree</label>
+                    <label><input type="radio" name="q7" value="2"> Disagree</label>
+                    <label><input type="radio" name="q7" value="3"> Strongly Disagree</label>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>Math is much easier to learn if you are male or maybe come from a culture that values math.</p>
+                <div class="options">
+                    <label><input type="radio" name="q8" value="0" required> Strongly Agree</label>
+                    <label><input type="radio" name="q8" value="1"> Agree</label>
+                    <label><input type="radio" name="q8" value="2"> Disagree</label>
+                    <label><input type="radio" name="q8" value="3"> Strongly Disagree</label>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>The harder you work at something the better you will be at it.</p>
+                <div class="options">
+                    <label><input type="radio" name="q9" value="3" required> Strongly Agree</label>
+                    <label><input type="radio" name="q9" value="2"> Agree</label>
+                    <label><input type="radio" name="q9" value="1"> Disagree</label>
+                    <label><input type="radio" name="q9" value="0"> Strongly Disagree</label>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>No matter what kind of person you are, you can always change substantially.</p>
+                <div class="options">
+                    <label><input type="radio" name="q10" value="3" required> Strongly Agree</label>
+                    <label><input type="radio" name="q10" value="2"> Agree</label>
+                    <label><input type="radio" name="q10" value="1"> Disagree</label>
+                    <label><input type="radio" name="q10" value="0"> Strongly Disagree</label>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>Trying new things is stressful for me and I avoid it.</p>
+                <div class="options">
+                    <label><input type="radio" name="q11" value="0" required> Strongly Agree</label>
+                    <label><input type="radio" name="q11" value="1"> Agree</label>
+                    <label><input type="radio" name="q11" value="2"> Disagree</label>
+                    <label><input type="radio" name="q11" value="3"> Strongly Disagree</label>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>Some people are good and kind, and some are not - it's not often that people change.</p>
+                <div class="options">
+                    <label><input type="radio" name="q12" value="0" required> Strongly Agree</label>
+                    <label><input type="radio" name="q12" value="1"> Agree</label>
+                    <label><input type="radio" name="q12" value="2"> Disagree</label>
+                    <label><input type="radio" name="q12" value="3"> Strongly Disagree</label>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>I appreciate when parents, coaches, teachers give me feedback about my performance.</p>
+                <div class="options">
+                    <label><input type="radio" name="q13" value="3" required> Strongly Agree</label>
+                    <label><input type="radio" name="q13" value="2"> Agree</label>
+                    <label><input type="radio" name="q13" value="1"> Disagree</label>
+                    <label><input type="radio" name="q13" value="0"> Strongly Disagree</label>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>I often get angry when I get feedback about my performance.</p>
+                <div class="options">
+                    <label><input type="radio" name="q14" value="0" required> Strongly Agree</label>
+                    <label><input type="radio" name="q14" value="1"> Agree</label>
+                    <label><input type="radio" name="q14" value="2"> Disagree</label>
+                    <label><input type="radio" name="q14" value="3"> Strongly Disagree</label>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>All human beings without a brain injury or a birth defect are capable of the same amount of learning.</p>
+                <div class="options">
+                    <label><input type="radio" name="q15" value="3" required> Strongly Agree</label>
+                    <label><input type="radio" name="q15" value="2"> Agree</label>
+                    <label><input type="radio" name="q15" value="1"> Disagree</label>
+                    <label><input type="radio" name="q15" value="0"> Strongly Disagree</label>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>You can learn new things, but you can't really change how intelligent you are.</p>
+                <div class="options">
+                    <label><input type="radio" name="q16" value="0" required> Strongly Agree</label>
+                    <label><input type="radio" name="q16" value="1"> Agree</label>
+                    <label><input type="radio" name="q16" value="2"> Disagree</label>
+                    <label><input type="radio" name="q16" value="3"> Strongly Disagree</label>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>You can do things differently, but the important parts of who you are can't really be changed.</p>
+                <div class="options">
+                    <label><input type="radio" name="q17" value="0" required> Strongly Agree</label>
+                    <label><input type="radio" name="q17" value="1"> Agree</label>
+                    <label><input type="radio" name="q17" value="2"> Disagree</label>
+                    <label><input type="radio" name="q17" value="3"> Strongly Disagree</label>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>Human beings are basically good, but sometimes make terrible decisions.</p>
+                <div class="options">
+                    <label><input type="radio" name="q18" value="3" required> Strongly Agree</label>
+                    <label><input type="radio" name="q18" value="2"> Agree</label>
+                    <label><input type="radio" name="q18" value="1"> Disagree</label>
+                    <label><input type="radio" name="q18" value="0"> Strongly Disagree</label>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>An important reason why I do my school work is that I like to learn new things.</p>
+                <div class="options">
+                    <label><input type="radio" name="q19" value="3" required> Strongly Agree</label>
+                    <label><input type="radio" name="q19" value="2"> Agree</label>
+                    <label><input type="radio" name="q19" value="1"> Disagree</label>
+                    <label><input type="radio" name="q19" value="0"> Strongly Disagree</label>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>Truly smart people do not need to try hard.</p>
+                <div class="options">
+                    <label><input type="radio" name="q20" value="0" required> Strongly Agree</label>
+                    <label><input type="radio" name="q20" value="1"> Agree</label>
+                    <label><input type="radio" name="q20" value="2"> Disagree</label>
+                    <label><input type="radio" name="q20" value="3"> Strongly Disagree</label>
+                </div>
+            </div>
+
+            <button type="button" onclick="calculateScore()">Get My Mindset Score</button>
+
+        </form>
+
+        <div id="results">
+            <h2>Your Results</h2>
+            <p>Total Score: <span id="totalScore"></span></p>
+            <p>Mindset Category: <span id="mindsetCategory"></span></p>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * Calculates the total score from the quiz form and displays the results.
+         */
+        function calculateScore() {
+            const form = document.getElementById('mindsetQuizForm');
+            let totalScore = 0;
+            let allAnswered = true; // Flag to check if all questions are answered
+
+            // Iterate through all question groups (named q1, q2, ...)
+            for (let i = 1; i <= 20; i++) {
+                const questionName = 'q' + i;
+                const selectedOption = form.elements[questionName];
+
+                let questionAnswered = false;
+                // Check each radio button within the question group
+                for (let j = 0; j < selectedOption.length; j++) {
+                    if (selectedOption[j].checked) {
+                        // Add the value of the selected radio button to the total score
+                        totalScore += parseInt(selectedOption[j].value);
+                        questionAnswered = true;
+                        break; // Move to the next question group once an answer is found
+                    }
+                }
+                // If no option was selected for a question, set the flag to false
+                if (!questionAnswered) {
+                    allAnswered = false;
+                }
+            }
+
+            const resultsDiv = document.getElementById('results');
+            const totalScoreSpan = document.getElementById('totalScore');
+            const mindsetCategorySpan = document.getElementById('mindsetCategory');
+
+            // Display results or an error message if not all questions are answered
+            if (!allAnswered) {
+                resultsDiv.style.display = 'block'; // Show the results div
+                totalScoreSpan.textContent = 'N/A'; // Indicate no score
+                mindsetCategorySpan.innerHTML = '<span class="error-message">Please answer all questions.</span>'; // Display error message
+                resultsDiv.style.borderColor = '#C1121F'; // Highlight results box with red border
+                resultsDiv.style.backgroundColor = '#ffe9e9'; // Light red background
+            } else {
+                resultsDiv.style.display = 'block'; // Show the results div
+                resultsDiv.style.borderColor = '#D62828'; // Red border for results
+                resultsDiv.style.backgroundColor = '#FFFACD'; // Light yellow background for results
+                totalScoreSpan.textContent = totalScore; // Display the calculated total score
+
+                // Determine the mindset category based on the total score
+                let mindsetCategory = '';
+                if (totalScore >= 45) {
+                    mindsetCategory = 'Strong Growth Mindset';
+                } else if (totalScore >= 34) {
+                    mindsetCategory = 'Growth Mindset with Some Fixed Ideas';
+                } else if (totalScore >= 21) {
+                    mindsetCategory = 'Fixed Mindset with Some Growth Ideas';
+                } else { // 0-20 points
+                     mindsetCategory = 'Strong Fixed Mindset';
+                }
+                mindsetCategorySpan.textContent = mindsetCategory; // Display the mindset category
+            }
+        }
+    </script>
+
+</body>
+</html>
