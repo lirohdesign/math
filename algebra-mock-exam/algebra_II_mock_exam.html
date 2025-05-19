@@ -729,7 +729,7 @@
                 mainActionButton.classList.remove('unlock-btn'); // Remove orange
                 mainActionButton.classList.add('submit-btn'); // Add green
                 quizState = 'mc_unlocked';
-                alert('Multiple choice options are now unlocked. Complete the exam and click "Submit".');
+                // alert('Multiple choice options are now unlocked. Complete the exam and click "Submit".'); // Removed alert
 
             } else if (quizState === 'mc_unlocked') {
                 // State 2 -> State 3: Submit and Grade
@@ -798,7 +798,7 @@
                 mainActionButton.classList.remove('unlock-btn'); // Ensure unlock-btn is removed if present
 
                 quizState = 'graded';
-                alert('Exam submitted. Click "Unlock Explanations" to view solutions.');
+                // alert('Exam submitted. Click "Unlock Explanations" to view solutions.'); // Removed alert
 
             } else if (quizState === 'graded') {
                 // State 3 -> State 4: Unlock Explanations (now green)
@@ -817,7 +817,7 @@
                 mainActionButton.classList.remove('unlock-btn'); // Ensure unlock-btn is removed if present
 
                 quizState = 'explanations_visible';
-                alert('Explanations are now visible. Click "Submit" to re-calculate/confirm score.');
+                // alert('Explanations are now visible. Click "Submit" to re-calculate/confirm score.'); // Removed alert
 
             } else if (quizState === 'explanations_visible') {
                  // State 4: Re-submit/Confirm score (stays in this state)
@@ -893,7 +893,7 @@
                  mainActionButton.classList.remove('unlock-btn'); // Ensure unlock-btn is removed if present
 
                  quizState = 'explanations_visible'; // Stay in this state
-                 alert('Score re-calculated/confirmed. Explanations remain visible.');
+                 // alert('Score re-calculated/confirmed. Explanations remain visible.'); // Removed alert
             }
         }
 
