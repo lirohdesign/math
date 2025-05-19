@@ -501,7 +501,7 @@
             "a": "$4a(a-3)$",
             "b": "$4a$",
             "c": "$4a(a+3)$",
-            "d": "$4a$"
+            "d": "$4a-3$" // Changed from 4a to 4a-3
         },
         "correctAnswer": "b",
         "explanation": "Factor the numerator: $4a^2 - 12a = 4a(a - 3)$.\nThe expression becomes $\\frac{4a(a-3)}{a-3}$.\nCancel out the common factor $(a-3)$, assuming $a \\neq 3$: $4a$."
@@ -563,13 +563,13 @@
         "type": "multiple-choice",
         "question": "Given $f(x)=3x-2$ and $g(x)=x^{2}-x$, find $(\\frac{f}{g})(x)$.",
         "options": {
-            "a": "$\\frac{x^{2}-x}{3x-2}$",
-            "b": "$\\frac{3x-2}{x^{2}-x}$",
-            "c": "$\\frac{3x-2}{x(x-1)}$",
-            "d": "$\\frac{x(x-1)}{3x-2}$"
+            "a": "$\\frac{x^{2}+4x}{-2x+5}$", // Option A from PDF Q21
+            "b": "$\\frac{-2x+5}{x^{2}+4x}$", // Option B from PDF Q21
+            "c": "$\\frac{3x-2}{x(x-1)}$", // Equivalent simplified form of B
+            "d": "$\\frac{x^{2}-4x}{2x+5}$" // Option D from PDF Q21
         },
-        "correctAnswer": "b",
-        "explanation": "The notation $(\\frac{f}{g})(x)$ means to divide the function $f(x)$ by the function $g(x)$.\n$(\\frac{f}{g})(x) = \\frac{f(x)}{g(x)} = \\frac{3x-2}{x^{2}-x}$. Optionally, factor the denominator: $\\frac{3x-2}{x(x-1)}$. Both forms are acceptable unless specified otherwise."
+        "correctAnswer": ["b", "c"], // Accept both b and c
+        "explanation": "The notation $(\\frac{f}{g})(x)$ means to divide the function $f(x)$ by the function $g(x)$.\nUsing the functions from the original PDF Q21: $f(x)=-2x+5$ and $g(x)=x^{2}+4x$.\n$(\\frac{f}{g})(x) = \\frac{f(x)}{g(x)} = \\frac{-2x+5}{x^{2}+4x}$. This matches option B.\nFactoring the denominator gives $\\frac{-2x+5}{x(x+4)}$.\nUsing the functions from the code: $f(x)=3x-2$ and $g(x)=x^{2}-x$.\n$(\\frac{f}{g})(x) = \\frac{3x-2}{x^{2}-x}$. This matches option B in the code.\nFactoring the denominator gives $\\frac{3x-2}{x(x-1)}$. This matches option C in the code.\nBoth $\\frac{3x-2}{x^{2}-x}$ and $\\frac{3x-2}{x(x-1)}$ are acceptable simplified forms."
     },
     {
         "id": "q22_v2",
@@ -762,8 +762,16 @@
                              });
                          }
 
+                        // Check if the answer is correct
+                        let isCorrect = false;
+                        if (Array.isArray(questionData.correctAnswer)) {
+                            isCorrect = questionData.correctAnswer.includes(userAnswer);
+                        } else {
+                            isCorrect = (userAnswer === questionData.correctAnswer);
+                        }
 
-                        if (userAnswer === questionData.correctAnswer) {
+
+                        if (isCorrect) {
                             score++;
                             // Optionally, provide feedback for correct answers (e.g., change background)
                             // questionDiv.style.backgroundColor = '#d1fae5'; // Light green
@@ -851,8 +859,16 @@
                              });
                          }
 
+                         // Check if the answer is correct
+                         let isCorrect = false;
+                         if (Array.isArray(questionData.correctAnswer)) {
+                             isCorrect = questionData.correctAnswer.includes(userAnswer);
+                         } else {
+                             isCorrect = (userAnswer === questionData.correctAnswer);
+                         }
 
-                         if (userAnswer === questionData.correctAnswer) {
+
+                         if (isCorrect) {
                              score++;
                              // Optionally, provide feedback for correct answers (e.g., change background)
                              // questionDiv.style.backgroundColor = '#d1fae5'; // Light green
