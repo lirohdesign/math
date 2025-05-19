@@ -115,11 +115,11 @@
         .submit-btn:hover {
             background-color: #059669; /* Darker green */
         }
-         /* Style for the Unlock Explanations button */
-        #mainActionButton.unlock-btn { /* Use mainActionButton ID */
+         /* Style for the Unlock Explanations button (now using submit-btn style) */
+        #mainActionButton.unlock-btn { /* Keep this rule for the initial orange button */
              background-color: #f97316; /* Orange */
         }
-         #mainActionButton.unlock-btn:hover { /* Use mainActionButton ID */
+         #mainActionButton.unlock-btn:hover { /* Keep this rule for the initial orange button */
              background-color: #ea580c; /* Darker orange */
         }
 
@@ -283,7 +283,7 @@
             "d": "$\\{-2, 3\\}$"
         },
         "correctAnswer": "a",
-        "explanation": "The Quadratic Formula is $x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}$. For $2w^2 + 5w - 3 = 0$, $a=2$, $b=5$, $c=-3$. \n$w = \\frac{-(5) \\pm \\sqrt{(5)^2 - 4(2)(-3)}}{2(2)}$\n$w = \\frac{-5 \\pm \\sqrt{25 + 24}}{4}$\n$w = \\frac{-5 \\pm 7}{4}$\nTwo solutions:\n$w_1 = \\frac{-5 + 7}{4} = \\frac{2}{4} = \\frac{1}{2}$\n$w_2 = \\frac{-5 - 7}{4} = \\frac{-12}{4} = -3$\nThe solutions are $\{\\frac{1}{2}, -3\}$."
+        "explanation": "The Quadratic Formula is $x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}$. For $2w^2 + 5w - 3 = 0$, $a=2$, $b=5$, $c=-3$. \n$w = \\frac{-(5) \\pm \\sqrt{(5)^2 - 4(2)(-3)}}{2(2)}$\n$w = \\frac{-5 \\pm \\sqrt{25 + 24}}{4}$\n$w = \\frac{-5 \\pm \\sqrt{49}}{4}$\n$w = \\frac{-5 \\pm 7}{4}$\nTwo solutions:\n$w_1 = \\frac{-5 + 7}{4} = \\frac{2}{4} = \\frac{1}{2}$\n$w_2 = \\frac{-5 - 7}{4} = \\frac{-12}{4} = -3$\nThe solutions are $\{\\frac{1}{2}, -3\}$."
     },
     {
         "id": "q5_v2",
@@ -794,14 +794,14 @@
                 examScoreDiv.style.display = 'block'; // Show score
 
                 mainActionButton.textContent = 'Unlock Explanations';
-                mainActionButton.classList.remove('submit-btn'); // Remove green
-                mainActionButton.classList.add('unlock-btn'); // Add orange
+                // Keep the 'submit-btn' class for green color
+                mainActionButton.classList.remove('unlock-btn'); // Ensure unlock-btn is removed if present
 
                 quizState = 'graded';
                 alert('Exam submitted. Click "Unlock Explanations" to view solutions.');
 
             } else if (quizState === 'graded') {
-                // State 3 -> State 4: Unlock Explanations
+                // State 3 -> State 4: Unlock Explanations (now green)
                 document.querySelectorAll('.explanation').forEach(explanationDiv => {
                     explanationDiv.style.display = 'block';
                     // Process MathJax within the explanation if needed
@@ -813,8 +813,8 @@
                 });
 
                 mainActionButton.textContent = 'Submit'; // Change text to the final "Submit"
-                mainActionButton.classList.remove('unlock-btn'); // Remove orange
-                mainActionButton.classList.add('submit-btn'); // Add green
+                // Keep the 'submit-btn' class (already green)
+                mainActionButton.classList.remove('unlock-btn'); // Ensure unlock-btn is removed if present
 
                 quizState = 'explanations_visible';
                 alert('Explanations are now visible. Click "Submit" to re-calculate/confirm score.');
@@ -889,8 +889,8 @@
 
                  // Button text remains "Submit"
                  mainActionButton.textContent = 'Submit';
-                 mainActionButton.classList.remove('unlock-btn'); // Should already be green
-                 mainActionButton.classList.add('submit-btn');
+                 // Keep the 'submit-btn' class (already green)
+                 mainActionButton.classList.remove('unlock-btn'); // Ensure unlock-btn is removed if present
 
                  quizState = 'explanations_visible'; // Stay in this state
                  alert('Score re-calculated/confirmed. Explanations remain visible.');
@@ -911,3 +911,4 @@
     </script>
 </body>
 </html>
+
