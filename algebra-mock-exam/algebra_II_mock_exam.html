@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Algebra II Mock Exam</title>
+    <title>Algebra II Final Exam</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         // Configure MathJax before loading it
@@ -99,20 +99,6 @@
             display: none; /* Initially hidden */
             white-space: pre-wrap; /* Preserve line breaks in explanations */
         }
-        .show-answer-btn {
-            margin-top: 10px;
-            padding: 6px 12px;
-            background-color: #60a5fa; /* Blue */
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.9em;
-            display: none; /* Initially hidden */ /* Keep hidden by default */
-        }
-        .show-answer-btn:hover {
-            background-color: #3b82f6; /* Darker blue */
-        }
         .submit-btn {
             display: block;
             width: 100%;
@@ -130,12 +116,13 @@
             background-color: #059669; /* Darker green */
         }
          /* Style for the Unlock Explanations button */
-        #submitExam.unlock-btn {
+        #mainActionButton.unlock-btn { /* Use mainActionButton ID */
              background-color: #f97316; /* Orange */
         }
-         #submitExam.unlock-btn:hover {
+         #mainActionButton.unlock-btn:hover { /* Use mainActionButton ID */
              background-color: #ea580c; /* Darker orange */
         }
+
 
         /* Hide the initial Unlock Quiz button */
         #unlockQuiz {
@@ -232,201 +219,427 @@
 </head>
 <body>
     <div class="container">
-        <h1 class="text-2xl font-bold mb-6 text-center text-gray-800">Semester 2 Algebra II Mock Exam</h1>
+        <h1 class="text-2xl font-bold mb-6 text-center text-gray-800">Semester 2 Algebra II Final Exam</h1>
 
         <form id="examForm">
             <div class="questions-container" id="questionsContainer">
                 </div>
         </form>
 
-        <button type="button" class="submit-btn" id="submitExam">Unlock Multiple Choice</button>
+        <button type="button" class="submit-btn" id="mainActionButton">Unlock Multiple Choice</button>
         <div class="score" id="examScore"></div>
     </div>
 
     <script>
         // Define all questions and groups with their content
         const examData = [
-            // Discriminant and Number of Solutions
-            {
-                id: 'q1', type: 'multiple-choice', question: 'Find the discriminant and determine the number of real solutions for:\n$$-7a^{2}-8a-1=0$$',
-                options: { a: 'Discriminant: 36, 2 real solutions', b: 'Discriminant: -36, 0 real solutions', c: 'Discriminant: 0, 1 real solution', d: 'Discriminant: 64, 2 real solutions' }, correctAnswer: 'a',
-                explanation: 'The discriminant is $b^2 - 4ac$. For $-7a^2 - 8a - 1 = 0$, $a=-7$, $b=-8$, $c=-1$. The discriminant is $(-8)^2 - 4(-7)(-1) = 64 - 28 = 36$. Since the discriminant is positive ($>0$), there are 2 real solutions.'
-            },
-            {
-                id: 'q2', type: 'multiple-choice', question: 'Find the discriminant and determine the number of real solutions for:\n$$5x^{2}-10x+5=0$$',
-                options: { a: 'Discriminant: 0, 1 real solution', b: 'Discriminant: 100, 2 real solutions', c: 'Discriminant: -100, 0 real solutions', d: 'Discriminant: 200, 2 real solutions' }, correctAnswer: 'a',
-                explanation: 'The discriminant is $b^2 - 4ac$. For $5x^2 - 10x + 5 = 0$, $a=5$, $b=-10$, $c=5$. The discriminant is $(-10)^2 - 4(5)(5) = 100 - 100 = 0$. Since the discriminant is zero, there is 1 real solution.'
-            },
-            {
-                id: 'q3', type: 'multiple-choice', question: 'Find the discriminant and determine the number of real solutions for:\n$$-4x^{2}-6x-6=0$$',
-                options: { a: 'Discriminant: 0, 1 real solution', b: 'Discriminant: 36, 2 real solutions', c: 'Discriminant: 60, 2 real solutions', d: 'Discriminant: -60, 0 real solutions' }, correctAnswer: 'd',
-                explanation: 'The discriminant is $b^2 - 4ac$. For $-4x^2 - 6x - 6 = 0$, $a=-4$, $b=-6$, $c=-6$. The discriminant is $(-6)^2 - 4(-4)(-6) = 36 - 96 = -60$. Since the discriminant is negative ($<0$), there are 0 real solutions (2 complex solutions).'
-            },
-            // Quadratic Formula
-            {
-                id: 'q4', type: 'multiple-choice', question: 'Solve the equation using the Quadratic Formula:\n$$3v^{2}-10v-8=0$$',
-                options: { a: '$\{4, -\\frac{2}{3}\}$', b: '$\{2, 1\\frac{1}{3}\}$', c: '$\{1\\frac{3}{4}, -2\}$', d: '$\{8, -1\}$' }, correctAnswer: 'a',
-                explanation: 'The Quadratic Formula is $x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}$. For $3v^2 - 10v - 8 = 0$, $a=3$, $b=-10$, $c=-8$. \n$v = \\frac{-(-10) \\pm \\sqrt{(-10)^2 - 4(3)(-8)}}{2(3)}$\n$v = \\frac{10 \\pm \\sqrt{100 + 96}}{6}$\n$v = \\frac{10 \\pm \\sqrt{196}}{6}$\n$v = \\frac{10 \\pm 14}{6}$\nTwo solutions:\n$v_1 = \\frac{10 + 14}{6} = \\frac{24}{6} = 4$\n$v_2 = \\frac{10 - 14}{6} = \\frac{-4}{6} = -\\frac{2}{3}$\nThe solutions are $\{4, -\\frac{2}{3}\}$.'
-            },
-            // Simplifying Radicals
-            {
-                id: 'q5', type: 'multiple-choice', question: 'Simplify each radical expression:\n$$\\sqrt{245}$$',
-                options: { a: '$5\\sqrt{3}$', b: '$16\\sqrt{2}$', c: '$7\\sqrt{5}$', d: '$8\\sqrt{6}$' }, correctAnswer: 'c',
-                explanation: 'Find the largest perfect square factor of 245. $245 = 49 \\times 5$. $\\sqrt{245} = \\sqrt{49 \\times 5} = \\sqrt{49} \\times \\sqrt{5} = 7\\sqrt{5}$.'
-            },
-            {
-                id: 'q6', type: 'multiple-choice', question: 'Simplify each radical expression:\n$$8\\sqrt{98}$$',
-                options: { a: '$56\\sqrt{2}$', b: '$-64\\sqrt{5}$', c: '$32\\sqrt{2}$', d: '$14\\sqrt{3}$' }, correctAnswer: 'a',
-                explanation: 'Find the largest perfect square factor of 98. $98 = 49 \\times 2$. $8\\sqrt{98} = 8\\sqrt{49 \\times 2} = 8 \\times \\sqrt{49} \\times \\sqrt{2} = 8 \\times 7 \\times \\sqrt{2} = 56\\sqrt{2}$.'
-            },
-            {
-                id: 'q7', type: 'multiple-choice', question: 'Simplify each radical expression:\n$$-5\\sqrt{245n^{3}}$$',
-                options: { a: '$35n^{2}\\sqrt{2}$', b: '$-24\\sqrt{3n}$', c: '$42n^{2}\\sqrt{5}$', d: '$-35n\\sqrt{5n}$' }, correctAnswer: 'd',
-                explanation: 'Simplify the radical: $\\sqrt{245n^3} = \\sqrt{49 \\times 5 \\times n^2 \\times n} = \\sqrt{49} \\times \\sqrt{n^2} \\times \\sqrt{5n} = 7n\\sqrt{5n}$.\nNow multiply by -5: $-5 \\times 7n\\sqrt{5n} = -35n\\sqrt{5n}$.'
-            },
-            // Solving Equations
-            {
-                id: 'q8', type: 'multiple-choice', question: 'Solve the equation:\n$$\\sqrt{2r+5}=\\sqrt{6r+1}$$',
-                options: { a: '$r=1$', b: '$r=-1$', c: '$r=4$', d: '$r=-4$' }, correctAnswer: 'a',
-                explanation: 'Square both sides of the equation: $(\\sqrt{2r+5})^2 = (\\sqrt{6r+1})^2$.\n$2r + 5 = 6r + 1$.\nSubtract 2r from both sides: $5 = 4r + 1$.\nSubtract 1 from both sides: $4 = 4r$.\nDivide by 4: $r = 1$. Check the solution: $\\sqrt{2(1)+5} = \\sqrt{7}$ and $\\sqrt{6(1)+1} = \\sqrt{7}$. The solution is valid.'
-            },
-            {
-                id: 'q9', type: 'multiple-choice', question: 'Solve the equation:\n$$\\sqrt{6a+10}-7=1$$',
-                options: { a: '$a=9$', b: '$a=1$', c: '$a=-1$', d: '$a=3$' }, correctAnswer: 'a',
-                explanation: 'Add 7 to both sides: $\\sqrt{6a+10} = 8$.\nSquare both sides: $(\\sqrt{6a+10})^2 = 8^2$.\n$6a + 10 = 64$.\nSubtract 10 from both sides: $6a = 54$.\nDivide by 6: $a = 9$. Check the solution: $\\sqrt{6(9)+10} - 7 = \\sqrt{54+10} - 7 = \\sqrt{64} - 7 = 8 - 7 = 1$. The solution is valid.'
-            },
-            {
-                id: 'q10', type: 'multiple-choice', question: 'Solve the equation:\n$$a^{\\frac{1}{3}}=5$$',
-                options: { a: '$a=15$', b: '$a=\\frac{5}{3}$', c: '$a=125$', d: '$a=\\frac{1}{125}$' }, correctAnswer: 'c',
-                explanation: 'Raise both sides of the equation to the power of 3: $(a^{\\frac{1}{3}})^3 = 5^3$.\n$a = 125$.'
-            },
-            {
-                id: 'q11', type: 'multiple-choice', question: 'Solve the equation:\n$$515=(r-11)^{2}+3$$',
-                options: { a: '$r=11 \\pm \\sqrt{512}$', b: '$r=11 \\pm 16\\sqrt{2}$', c: '$r=11 \\pm 8\\sqrt{2}$', d: '$r=11 \\pm 4\\sqrt{32}$' }, correctAnswer: 'b',
-                explanation: 'Subtract 3 from both sides: $512 = (r-11)^2$.\nTake the square root of both sides: $\\pm\\sqrt{512} = r-11$.\nSimplify $\\sqrt{512}$: $512 = 256 \\times 2$, so $\\sqrt{512} = \\sqrt{256 \\times 2} = 16\\sqrt{2}$.\nSo, $\\pm 16\\sqrt{2} = r-11$.\nAdd 11 to both sides: $r = 11 \\pm 16\\sqrt{2}$.'
-            },
-             {
-                id: 'q12', type: 'multiple-choice', question: 'Solve the equation:\n$$3^{x}=\\frac{1}{27}$$',
-                options: { a: '$x=3$', b: '$x=-3$', c: '$x=\\frac{1}{3}$', d: '$x=\\frac{-1}{3}$' }, correctAnswer: 'b',
-                explanation: 'Rewrite the right side of the equation with the same base as the left side. $27 = 3^3$, so $\\frac{1}{27} = 3^{-3}$.\nThe equation becomes $3^x = 3^{-3}$. Since the bases are the same, the exponents must be equal: $x = -3$.'
-            },
-            // Logarithms
-            {
-                id: 'q13', type: 'multiple-choice', question: 'Solve the equation:\n$$log_{20}(4x+4)=log_{20}(5x-4)$$',
-                options: { a: '$\{11\}$', b: '$\\{-\\frac{7}{3}, -3\\}$', c: '$\{8\}$', d: '$\\{11, -3\\}$' }, correctAnswer: 'c',
-                explanation: 'Since the logarithms have the same base on both sides, the arguments must be equal:\n$4x + 4 = 5x - 4$.\nSubtract 4x from both sides: $4 = x - 4$.\nAdd 4 to both sides: $8 = x$. Check the solution in the original equation to ensure the arguments of the logarithms are positive: $4(8)+4 = 32+4 = 36 > 0$ and $5(8)-4 = 40-4 = 36 > 0$. The solution is valid.'
-            },
-            {
-                id: 'q14', type: 'multiple-choice', question: 'Condense into a single logarithm:\n$$24~log_{8}11-4~log_{8}6$$',
-                options: { a: '$log_{8}(\\frac{11^{24}}{6^4})$', b: '$log_{8}(11^{24} - 6^4)$', c: '$log_{8}(11^{24} + 6^4)$', d: '$log_{8}(11^{24} \\times 6^4)$' }, correctAnswer: 'a',
-                explanation: 'Use the power rule for logarithms ($n \\log_b x = \\log_b x^n$) and the quotient rule for logarithms ($\\log_b x - \\log_b y = \\log_b \\frac{x}{y}$). \n$24~log_{8}11 = log_{8}11^{24}$\n$4~log_{8}6 = log_{8}6^4$\nSo, $24~log_{8}11-4~log_{8}6 = log_{8}11^{24} - log_{8}6^4 = log_{8}(\\frac{11^{24}}{6^4})$.'
-            },
-            {
-                id: 'q15', type: 'multiple-choice', question: 'Expand the logarithm:\n$$log_{6}(x\\cdot y\\cdot z^{2})$$',
-                options: { a: '$log_{6}x + log_{6}y + 2log_{6}z$', b: '$log_{6}x + log_{6}y + (log_{6}z)^2$', c: '$log_{6}x \\cdot log_{6}y \\cdot (log_{6}z)^2$', d: '$log_{6}x + log_{6}y + log_{6}z^2$' }, correctAnswer: 'a',
-                explanation: 'Use the product rule for logarithms ($\\log_b (xy) = \\log_b x + \\log_b y$) and the power rule for logarithms ($ \\log_b x^n = n \\log_b x$).\n$log_{6}(x\\cdot y\\cdot z^{2}) = log_{6}x + log_{6}y + log_{6}z^2 = log_{6}x + log_{6}y + 2log_{6}z$. Note that option d is also technically correct, but option a is the fully expanded form.'
-            },
-             {
-                id: 'q28', type: 'multiple-choice', question: 'Evaluate each expression:\n$$log_{7}343$$',
-                options: { a: '3', b: '2', c: '-4', d: '49' }, correctAnswer: 'a',
-                explanation: 'We are looking for the power to which 7 must be raised to get 343. $7^1 = 7$, $7^2 = 49$, $7^3 = 343$. So, $log_{7}343 = 3$.'
-            },
-            {
-                id: 'q29', type: 'multiple-choice', question: 'Evaluate each expression:\n$$log_{2}\\frac{1}{16}$$',
-                options: { a: '3', b: '-5', c: '-4', d: '$\\frac{1}{32}$' }, correctAnswer: 'c',
-                explanation: 'We are looking for the power to which 2 must be raised to get $\\frac{1}{16}$. $\\frac{1}{16} = \\frac{1}{2^4} = 2^{-4}$. So, $log_{2}\\frac{1}{16} = -4$.'
-            },
-            {
-                id: 'q30', type: 'multiple-choice', question: 'Evaluate each expression. Round answers to the nearest ten-thousandth.\n$$log_{3}4$$',
-                options: { a: '.949', b: '1.616', c: '.742', d: '1.262' }, correctAnswer: 'd',
-                explanation: 'Use the change of base formula: $log_b x = \\frac{log_{10} x}{log_{10} b}$ or $log_b x = \\frac{ln x}{ln b}$.\n$log_{3}4 = \\frac{log_{10} 4}{log_{10} 3} \\approx \\frac{0.6021}{0.4771} \\approx 1.2618$. Rounded to the nearest ten-thousandth, this is 1.2618.'
-            },
-             {
-                id: 'q31', type: 'multiple-choice', question: 'Solve each equation. Round answers to the nearest ten-thousandth.\n$$8^{m-3}-9=37$$',
-                options: { a: '$m \\approx 4.8450$', b: '$m \\approx 3.8450$', c: '$m \\approx 2.8450$', d: '$m \\approx 5.8450$' }, correctAnswer: 'a',
-                explanation: 'Add 9 to both sides: $8^{m-3} = 46$.\nTake the logarithm of both sides (e.g., natural log or common log): $log(8^{m-3}) = log(46)$.\nUse the power rule for logarithms: $(m-3)log(8) = log(46)$.\nDivide by log(8): $m-3 = \\frac{log(46)}{log(8)}$.\n$m = 3 + \\frac{log(46)}{log(8)}$.\nUsing a calculator: $\\frac{log(46)}{log(8)} \\approx \\frac{1.6628}{0.9031} \\approx 1.8412$.\n$m \\approx 3 + 1.8412 = 4.8412$. Rounded to the nearest ten-thousandth, this is 4.8412. Let\'s recheck the options and calculation. Using a more precise calculator: $\\frac{log(46)}{log(8)} \\approx 1.8450$. So, $m \\approx 3 + 1.8450 = 4.8450$.'
-            },
-            {
-                id: 'q32', type: 'multiple-choice', question: 'Solve each equation:\n$$log_{8}(-n-7)=log_{8}(-2n-7)$$',
-                options: { a: '$n=0$', b: '$n=-1$', c: '$n=1$', d: 'No solution' }, correctAnswer: 'd',
-                explanation: 'Since the logarithms have the same base on both sides, the arguments must be equal:\n$-n - 7 = -2n - 7$.\nAdd 2n to both sides: $n - 7 = -7$.\nAdd 7 to both sides: $n = 0$. Check the solution in the original equation. If $n=0$, the arguments are $log_8(-0-7) = log_8(-7)$ and $log_8(-2(0)-7) = log_8(-7)$. The logarithm of a negative number is undefined in the real number system. Therefore, there is no real solution.'
-            },
-            // Simplifying Rational Expressions
-            {
-                id: 'q16', type: 'multiple-choice', question: 'Simplify each expression:\n$$\\frac{6x^{2}-18x}{x-3}$$',
-                options: { a: '$6x$', b: '$6x(x-3)$', c: '$6x(x+3)$', d: '$6x$' }, correctAnswer: 'a',
-                explanation: 'Factor the numerator: $6x^2 - 18x = 6x(x - 3)$.\nThe expression becomes $\\frac{6x(x-3)}{x-3}$.\nCancel out the common factor $(x-3)$, assuming $x \\neq 3$: $6x$.'
-            },
-            {
-                id: 'q17', type: 'multiple-choice', question: 'Simplify each expression:\n$$\\frac{k+6}{7}\\cdot\\frac{7k+42}{k^{2}+10k+24}$$',
-                options: { a: '$\\frac{9}{5}$', b: '$k-4$', c: '$\\frac{k-9}{3k^2}$', d: '$\\frac{k+6}{k+4}$' }, correctAnswer: 'd',
-                explanation: 'Factor the expressions:\n$7k + 42 = 7(k+6)$\n$k^2 + 10k + 24 = (k+6)(k+4)$\nThe expression becomes $\\frac{k+6}{7} \\cdot \\frac{7(k+6)}{(k+6)(k+4)}$.\nCancel out common factors $(k+6)$ and $7$: $\\frac{1}{1} \\cdot \\frac{1(k+6)}{1(k+4)} = \\frac{k+6}{k+4}$.'
-            },
-            {
-                id: 'q18', type: 'multiple-choice', question: 'Simplify each expression:\n$$\\frac{1}{k-6}\\div\\frac{k+8}{10k-60}$$',
-                options: { a: '$(k-7)(k+3)$', b: '12', c: '$\\frac{10}{k+8}$', d: '$\\frac{10}{k-6}$' }, correctAnswer: 'c',
-                explanation: 'Dividing by a fraction is the same as multiplying by its reciprocal:\n$\\frac{1}{k-6} \\times \\frac{10k-60}{k+8}$.\nFactor the numerator of the second fraction: $10k - 60 = 10(k-6)$.\nThe expression becomes $\\frac{1}{k-6} \\times \\frac{10(k-6)}{k+8}$.\nCancel out the common factor $(k-6)$: $\\frac{1}{1} \\times \\frac{10}{k+8} = \\frac{10}{k+8}$.'
-            },
-            {
-                id: 'q19', type: 'multiple-choice', question: 'Simplify each expression:\n$$\\frac{x+7}{4}\\div\\frac{(x-9)(x+7)}{(x-5)(x-9)}$$',
-                options: { a: '$\\frac{2}{x+8}$', b: '$\\frac{x-5}{4}$', c: '$\\frac{x+7}{x+10}$', d: '$\\frac{10}{x-6}$' }, correctAnswer: 'b',
-                explanation: 'Dividing by a fraction is the same as multiplying by its reciprocal:\n$\\frac{x+7}{4} \\times \\frac{(x-5)(x-9)}{(x-9)(x+7)}$.\nCancel out common factors $(x+7)$ and $(x-9)$: $\\frac{1}{4} \\times \\frac{(x-5)}{1} = \\frac{x-5}{4}$.'
-            },
-            // Function Operations
-            {
-                id: 'q20', type: 'multiple-choice', question: 'Given $g(n)=n^{2}-2n$ and $h(n)=3n+2$, find $g(n)+h(n)$.',
-                options: { a: '$-n^{3}+4n^{2}-4n+2$', b: '$n^{2}+n+2$', c: '$-4n-2$', d: '$n^{2}-n+2$' }, correctAnswer: 'b',
-                explanation: 'To find $g(n)+h(n)$, add the two functions:\n$(n^2 - 2n) + (3n + 2) = n^2 - 2n + 3n + 2$.\nCombine like terms: $n^2 + (-2n + 3n) + 2 = n^2 + n + 2$.'
-            },
-            {
-                id: 'q21', type: 'multiple-choice', question: 'Given $f(x)=-2x+5$ and $g(x)=x^{2}+4x$, find $(\\frac{f}{g})(x)$.',
-                options: { a: '$\\frac{x^{2}+4x}{-2x+5}$', b: '$\\frac{-2x+5}{x^{2}+4x}$', c: '$\\frac{4x-5}{x^{3}-5x}$', d: '$\\frac{x^{2}-4x}{2x+5}$' }, correctAnswer: 'b',
-                explanation: 'The notation $(\\frac{f}{g})(x)$ means to divide the function $f(x)$ by the function $g(x)$.\n$(\\frac{f}{g})(x) = \\frac{f(x)}{g(x)} = \\frac{-2x+5}{x^{2}+4x}$.'
-            },
-             {
-                id: 'q22', type: 'multiple-choice', question: 'Given $g(n)=n^{2}+5n$ and $h(n)=3n-4$, find $(g-h)(-6)$.',
-                options: { a: '-28', b: '7', c: '-52', d: '28' }, correctAnswer: 'd',
-                explanation: 'First, find $(g-h)(n)$ by subtracting $h(n)$ from $g(n)$:\n$(g-h)(n) = g(n) - h(n) = (n^2 + 5n) - (3n - 4) = n^2 + 5n - 3n + 4 = n^2 + 2n + 4.\nNow, evaluate $(g-h)(-6)$ by substituting $n=-6$ into the expression:\n$(g-h)(-6) = (-6)^2 + 2(-6) + 4 = 36 - 12 + 4 = 24 + 4 = 28$.'
-            },
-             {
-                id: 'q23', type: 'multiple-choice', question: 'Given $g(x)=x-5$ and $h(x)=x^{2}-2$, find $g(-1)\\cdot h(-1)$.',
-                options: { a: '13', b: '7', c: '-3', d: '1' }, correctAnswer: 'c',
-                explanation: `First, evaluate $g(-1)$ by substituting $x=-1$ into $g(x)$:
-$g(-1) = -1 - 5 = -6$.
-Next, evaluate $h(-1)$ by substituting $x=-1$ into $h(x)$:
-$h(-1) = (-1)^2 - 2 = 1 - 2 = -1$.
-Finally, find the product $g(-1) \\cdot h(-1)$: $(-6) \\cdot (-1) = 6$.
-Note: The calculated answer is 6, which is not among the provided options. Option C (-3) is provided as the correct answer in the source, but the calculation shows 6. There may be an error in the source material's options or intended question.`
-            },
-            {
-                id: 'q24', type: 'multiple-choice', question: 'Given $g(x)=x+2$, find $g(g(-3))$.',
-                options: { a: '4', b: '0', c: '-3', d: '1' }, correctAnswer: 'd',
-                explanation: 'This is a composite function. First, find $g(-3)$ by substituting $x=-3$ into $g(x)$:\n$g(-3) = -3 + 2 = -1$.\nNext, find $g(g(-3))$, which is $g(-1)$, by substituting $x=-1$ into $g(x)$:\n$g(-1) = -1 + 2 = 1$.'
-            },
-            // Multiplying Polynomials
-            {
-                id: 'q25', type: 'multiple-choice', question: 'Find the product:\n$$(-8x+4)(-7x-5)$$',
-                options: { a: '$56x^{2}+46x+8$', b: '$56x^{2}-20$', c: '$56x^{2}+12x-20$', d: '$56x^{2}+8$' }, correctAnswer: 'c',
-                explanation: 'Use the FOIL method (First, Outer, Inner, Last) to multiply the binomials:\n$(-8x)(-7x) + (-8x)(-5) + (4)(-7x) + (4)(-5)$\n$56x^2 + 40x - 28x - 20$\nCombine like terms: $56x^2 + (40x - 28x) - 20 = 56x^2 + 12x - 20$.'
-            },
-            // Note: Graphing questions 26 and 27 are omitted from the interactive multiple-choice quiz
-            // as they require graphing which is not supported by this format.
-            // They are included in the print version via the question text.
-            {
-                id: 'q26_print', type: 'text', question: 'Graph the exponential equation:\n$$y=5\\cdot(\\frac{1}{2})^{x}$$',
-                // No options or answer for print-only questions
-            },
-             {
-                id: 'q27_print', type: 'text', question: 'Graph the logarithmic function:\n$$y=log_{2}x$$',
-                // No options or answer for print-only questions
-            }
-        ];
+    {
+        "id": "q1_v2",
+        "type": "multiple-choice",
+        "question": "Find the discriminant and determine the number of real solutions for:\n$$2x^{2}+3x-5=0$$",
+        "options": {
+            "a": "Discriminant: 49, 2 real solutions",
+            "b": "Discriminant: -49, 0 real solutions",
+            "c": "Discriminant: 0, 1 real solution",
+            "d": "Discriminant: 25, 2 real solutions"
+        },
+        "correctAnswer": "a",
+        "explanation": "The discriminant is $b^2 - 4ac$. For $2x^2 + 3x - 5 = 0$, $a=2$, $b=3$, $c=-5$. The discriminant is $(3)^2 - 4(2)(-5) = 9 + 40 = 49$. Since the discriminant is positive ($>0$), there are 2 real solutions."
+    },
+    {
+        "id": "q2_v2",
+        "type": "multiple-choice",
+        "question": "Find the discriminant and determine the number of real solutions for:\n$$x^{2}-6x+9=0$$",
+        "options": {
+            "a": "Discriminant: 0, 1 real solution",
+            "b": "Discriminant: 36, 2 real solutions",
+            "c": "Discriminant: -36, 0 real solutions",
+            "d": "Discriminant: 18, 2 real solutions"
+        },
+        "correctAnswer": "a",
+        "explanation": "The discriminant is $b^2 - 4ac$. For $x^2 - 6x + 9 = 0$, $a=1$, $b=-6$, $c=9$. The discriminant is $(-6)^2 - 4(1)(9) = 36 - 36 = 0$. Since the discriminant is zero, there is 1 real solution."
+    },
+    {
+        "id": "q3_v2",
+        "type": "multiple-choice",
+        "question": "Find the discriminant and determine the number of real solutions for:\n$$3y^{2}-2y+1=0$$",
+        "options": {
+            "a": "Discriminant: 0, 1 real solution",
+            "b": "Discriminant: 4, 2 real solutions",
+            "c": "Discriminant: -8, 0 real solutions",
+            "d": "Discriminant: 16, 2 real solutions"
+        },
+        "correctAnswer": "c",
+        "explanation": "The discriminant is $b^2 - 4ac$. For $3y^2 - 2y + 1 = 0$, $a=3$, $b=-2$, $c=1$. The discriminant is $(-2)^2 - 4(3)(1) = 4 - 12 = -8$. Since the discriminant is negative ($<0$), there are 0 real solutions (2 complex solutions)."
+    },
+    {
+        "id": "q4_v2",
+        "type": "multiple-choice",
+        "question": "Solve the equation using the Quadratic Formula:\n$$2w^{2}+5w-3=0$$",
+        "options": {
+            "a": "$\\{\\frac{1}{2}, -3\\}$",
+            "b": "$\\{-1, \\frac{3}{2}\\}$",
+            "c": "$\\{2, -\\frac{3}{2}\\}$",
+            "d": "$\\{-2, 3\\}$"
+        },
+        "correctAnswer": "a",
+        "explanation": "The Quadratic Formula is $x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}$. For $2w^2 + 5w - 3 = 0$, $a=2$, $b=5$, $c=-3$. \n$w = \\frac{-(5) \\pm \\sqrt{(5)^2 - 4(2)(-3)}}{2(2)}$\n$w = \\frac{-5 \\pm \\sqrt{25 + 24}}{4}$\n$w = \\frac{-5 \\pm 7}{4}$\nTwo solutions:\n$w_1 = \\frac{-5 + 7}{4} = \\frac{2}{4} = \\frac{1}{2}$\n$w_2 = \\frac{-5 - 7}{4} = \\frac{-12}{4} = -3$\nThe solutions are $\{\\frac{1}{2}, -3\}$."
+    },
+    {
+        "id": "q5_v2",
+        "type": "multiple-choice",
+        "question": "Simplify each radical expression:\n$$\\sqrt{128}$$",
+        "options": {
+            "a": "$4\\sqrt{8}$",
+            "b": "$8\\sqrt{2}$",
+            "c": "$16\\sqrt{2}$",
+            "d": "$2\\sqrt{32}$"
+        },
+        "correctAnswer": "b",
+        "explanation": "Find the largest perfect square factor of 128. $128 = 64 \\times 2$. $\\sqrt{128} = \\sqrt{64 \\times 2} = \\sqrt{64} \\times \\sqrt{2} = 8\\sqrt{2}$."
+    },
+    {
+        "id": "q6_v2",
+        "type": "multiple-choice",
+        "question": "Simplify each radical expression:\n$$5\\sqrt{75}$$",
+        "options": {
+            "a": "$15\\sqrt{5}$",
+            "b": "$25\\sqrt{3}$",
+            "c": "$5\\sqrt{15}$",
+            "d": "$10\\sqrt{3}$"
+        },
+        "correctAnswer": "b",
+        "explanation": "Find the largest perfect square factor of 75. $75 = 25 \\times 3$. $5\\sqrt{75} = 5\\sqrt{25 \\times 3} = 5 \\times \\sqrt{25} \\times \\sqrt{3} = 5 \\times 5 \\times \\sqrt{3} = 25\\sqrt{3}$."
+    },
+    {
+        "id": "q7_v2",
+        "type": "multiple-choice",
+        "question": "Simplify each radical expression:\n$$-2\\sqrt{50m^{5}}$$",
+        "options": {
+            "a": "$-10m^{2}\\sqrt{2m}$",
+            "b": "$-2m^{2}\\sqrt{50m}$",
+            "c": "$10m^{2}\\sqrt{2m}$",
+            "d": "$-10m\\sqrt{5m}$"
+        },
+        "correctAnswer": "a",
+        "explanation": "Simplify the radical: $\\sqrt{50m^5} = \\sqrt{25 \\times 2 \\times m^4 \\times m} = \\sqrt{25} \\times \\sqrt{m^4} \\times \\sqrt{2m} = 5m^2\\sqrt{2m}$.\nNow multiply by -2: $-2 \\times 5m^2\\sqrt{2m} = -10m^2\\sqrt{2m}$."
+    },
+    {
+        "id": "q8_v2",
+        "type": "multiple-choice",
+        "question": "Solve the equation:\n$$\\sqrt{3x-2}=\\sqrt{x+4}$$",
+        "options": {
+            "a": "$x=3$",
+            "b": "$x=-3$",
+            "c": "$x=1$",
+            "d": "$x=-1$"
+        },
+        "correctAnswer": "a",
+        "explanation": "Square both sides of the equation: $(\\sqrt{3x-2})^2 = (\\sqrt{x+4})^2$.\n$3x - 2 = x + 4$.\nSubtract x from both sides: $2x - 2 = 4$.\nAdd 2 to both sides: $2x = 6$.\nDivide by 2: $x = 3$. Check the solution: $\\sqrt{3(3)-2} = \\sqrt{9-2} = \\sqrt{7}$ and $\\sqrt{3+4} = \\sqrt{7}$. The solution is valid."
+    },
+    {
+        "id": "q9_v2",
+        "type": "multiple-choice",
+        "question": "Solve the equation:\n$$\\sqrt{4b+1}-3=2$$",
+        "options": {
+            "a": "$b=2$",
+            "b": "$b=6$",
+            "c": "$b=-1$",
+            "d": "$b=0$"
+        },
+        "correctAnswer": "b",
+        "explanation": "Add 3 to both sides: $\\sqrt{4b+1} = 5$.\nSquare both sides: $(\\sqrt{4b+1})^2 = 5^2$.\n$4b + 1 = 25$.\nSubtract 1 from both sides: $4b = 24$.\nDivide by 4: $b = 6$. Check the solution: $\\sqrt{4(6)+1} - 3 = \\sqrt{24+1} - 3 = \\sqrt{25} - 3 = 5 - 3 = 2$. The solution is valid."
+    },
+    {
+        "id": "q10_v2",
+        "type": "multiple-choice",
+        "question": "Solve the equation:\n$$k^{\\frac{1}{4}}=2$$",
+        "options": {
+            "a": "$k=8$",
+            "b": "$k=16$",
+            "c": "$k=\\frac{1}{8}$",
+            "d": "$k=\\frac{1}{16}$"
+        },
+        "correctAnswer": "b",
+        "explanation": "Raise both sides of the equation to the power of 4: $(k^{\\frac{1}{4}})^4 = 2^4$.\n$k = 16$."
+    },
+    {
+        "id": "q11_v2",
+        "type": "multiple-choice",
+        "question": "Solve the equation:\n$$100=(p+5)^{2}-4$$",
+        "options": {
+            "a": "$p=-5 \\pm \\sqrt{104}$",
+            "b": "$p=5 \\pm 2\\sqrt{26}$",
+            "c": "$p=-5 \\pm 2\\sqrt{26}$",
+            "d": "$p=5 \\pm \\sqrt{104}$"
+        },
+        "correctAnswer": "c",
+        "explanation": "Add 4 to both sides: $104 = (p+5)^2$.\nTake the square root of both sides: $\\pm\\sqrt{104} = p+5$.\nSimplify $\\sqrt{104}$: $104 = 4 \\times 26$, so $\\sqrt{104} = \\sqrt{4 \\times 26} = 2\\sqrt{26}$.\nSo, $\\pm 2\\sqrt{26} = p+5$.\nSubtract 5 from both sides: $p = -5 \\pm 2\\sqrt{26}$."
+    },
+    {
+        "id": "q12_v2",
+        "type": "multiple-choice",
+        "question": "Solve the equation:\n$$5^{x}=\\frac{1}{125}$$",
+        "options": {
+            "a": "$x=3$",
+            "b": "$x=-3$",
+            "c": "$x=\\frac{1}{3}$",
+            "d": "$x=\\frac{-1}{3}$"
+        },
+        "correctAnswer": "b",
+        "explanation": "Rewrite the right side of the equation with the same base as the left side. $125 = 5^3$, so $\\frac{1}{125} = 5^{-3}$.\nThe equation becomes $5^x = 5^{-3}$. Since the bases are the same, the exponents must be equal: $x = -3$."
+    },
+    {
+        "id": "q13_v2",
+        "type": "multiple-choice",
+        "question": "Solve the equation:\n$$log_{5}(2m-1)=log_{5}(3m-4)$$",
+        "options": {
+            "a": "$\{3\}$",
+            "b": "$\\{-\\frac{7}{3}, -3\\}$",
+            "c": "$\\{2\\}$",
+            "d": "$\\{11, -3\\}$"
+        },
+        "correctAnswer": "a",
+        "explanation": "Since the logarithms have the same base on both sides, the arguments must be equal:\n$2m - 1 = 3m - 4$.\nSubtract 2m from both sides: $-1 = m - 4$.\nAdd 4 to both sides: $3 = m$. Check the solution in the original equation to ensure the arguments of the logarithms are positive: $2(3)-1 = 6-1 = 5 > 0$ and $3(3)-4 = 9-4 = 5 > 0$. The solution is valid."
+    },
+    {
+        "id": "q14_v2",
+        "type": "multiple-choice",
+        "question": "Condense into a single logarithm:\n$$5~log_{2}x+3~log_{2}y$$",
+        "options": {
+            "a": "$log_{2}(x^5+y^3)$",
+            "b": "$log_{2}(x^5y^3)$",
+            "c": "$log_{2}(\\frac{x^5}{y^3})$",
+            "d": "$log_{2}(x^5-y^3)$"
+        },
+        "correctAnswer": "b",
+        "explanation": "Use the power rule for logarithms ($n \\log_b x = \\log_b x^n$) and the product rule for logarithms ($\\log_b x + \\log_b y = \\log_b (xy)$). \n$5~log_{2}x = log_{2}x^5$\n$3~log_{2}y = log_{2}y^3$\nSo, $5~log_{2}x+3~log_{2}y = log_{2}x^5 + log_{2}y^3 = log_{2}(x^5y^3)$."
+    },
+    {
+        "id": "q15_v2",
+        "type": "multiple-choice",
+        "question": "Expand the logarithm:\n$$log_{10}(\\frac{a^3}{b})$$",
+        "options": {
+            "a": "$3log_{10}a - log_{10}b$",
+            "b": "$\\frac{log_{10}a^3}{log_{10}b}$",
+            "c": "$log_{10}a^3 + log_{10}b$",
+            "d": "$3log_{10}a + log_{10}b$"
+        },
+        "correctAnswer": "a",
+        "explanation": "Use the quotient rule for logarithms ($\\log_b \\frac{x}{y} = \\log_b x - \\log_b y$) and the power rule for logarithms ($ \\log_b x^n = n \\log_b x$).\n$log_{10}(\\frac{a^3}{b}) = log_{10}a^3 - log_{10}b = 3log_{10}a - log_{10}b$."
+    },
+    {
+        "id": "q28_v2",
+        "type": "multiple-choice",
+        "question": "Evaluate each expression:\n$$log_{4}64$$",
+        "options": {
+            "a": "2",
+            "b": "3",
+            "c": "4",
+            "d": "16"
+        },
+        "correctAnswer": "b",
+        "explanation": "We are looking for the power to which 4 must be raised to get 64. $4^1 = 4$, $4^2 = 16$, $4^3 = 64$. So, $log_{4}64 = 3$."
+    },
+    {
+        "id": "q29_v2",
+        "type": "multiple-choice",
+        "question": "Evaluate each expression:\n$$log_{3}\\frac{1}{9}$$",
+        "options": {
+            "a": "-2",
+            "b": "2",
+            "c": "-3",
+            "d": "$\\frac{1}{2}$"
+        },
+        "correctAnswer": "a",
+        "explanation": "We are looking for the power to which 3 must be raised to get $\\frac{1}{9}$. $\\frac{1}{9} = \\frac{1}{3^2} = 3^{-2}$. So, $log_{3}\\frac{1}{9} = -2$."
+    },
+    {
+        "id": "q30_v2",
+        "type": "multiple-choice",
+        "question": "Evaluate each expression. Round answers to the nearest ten-thousandth.\n$$log_{5}15$$",
+        "options": {
+            "a": "1.1761",
+            "b": "1.7610",
+            "c": "1.6826",
+            "d": "1.2041"
+        },
+        "correctAnswer": "c",
+        "explanation": "Use the change of base formula: $log_b x = \\frac{log_{10} x}{log_{10} b}$ or $log_b x = \\frac{ln x}{ln b}$.\n$log_{5}15 = \\frac{log_{10} 15}{log_{10} 5} \\approx \\frac{1.1761}{0.6990} \\approx 1.6825$. Rounded to the nearest ten-thousandth, this is 1.6825."
+    },
+    {
+        "id": "q31_v2",
+        "type": "multiple-choice",
+        "question": "Solve each equation. Round answers to the nearest ten-thousandth.\n$$10^{x+1} - 1.264 = 0$$",
+        "options": {
+            "a": "$x \\approx 0.8982$",
+            "b": "$x \\approx -0.8982$",
+            "c": "$x \\approx 1.2852$",
+            "d": "$x \\approx -1.2852$"
+        },
+        "correctAnswer": "b",
+        "explanation": "Add 1.264 to both sides: $10^{x+1} = 1.264$.\nTake the logarithm base 10 of both sides: $log_{10}(10^{x+1}) = log_{10}(1.264)$.\nUsing the property $log_b(b^n) = n$: $x+1 = log_{10}(1.264)$.\n$x = log_{10}(1.264) - 1$.\nUsing a calculator: $log_{10}(1.264) \\approx 0.1018$.\n$x \\approx 0.1018 - 1 = -0.8982$.\nRounded to the nearest ten-thousandth, this is -0.8982."
+    },
+    {
+        "id": "q32_v2",
+        "type": "multiple-choice",
+        "question": "Solve each equation:\n$$log_{2}(-y-3)=log_{2}(-3y-5)$$",
+        "options": {
+            "a": "$y=-1$",
+            "b": "$y=1$",
+            "c": "$y=-2$",
+            "d": "No solution"
+        },
+        "correctAnswer": "d",
+        "explanation": "Since the logarithms have the same base on both sides, the arguments must be equal:\n$-y - 3 = -3y - 5$.\nAdd 3y to both sides: $2y - 3 = -5$.\nAdd 3 to both sides: $2y = -2$.\nDivide by 2: $y = -1$. Check the solution in the original equation. If $y=-1$, the arguments are $log_2(-(-1)-3) = log_2(1-3) = log_2(-2)$ and $log_2(-3(-1)-5) = log_2(3-5) = log_2(-2)$. The logarithm of a negative number is undefined in the real number system. Therefore, there is no real solution."
+    },
+    {
+        "id": "q16_v2",
+        "type": "multiple-choice",
+        "question": "Simplify each expression:\n$$\\frac{4a^{2}-12a}{a-3}$$",
+        "options": {
+            "a": "$4a(a-3)$",
+            "b": "$4a$",
+            "c": "$4a(a+3)$",
+            "d": "$4a$"
+        },
+        "correctAnswer": "b",
+        "explanation": "Factor the numerator: $4a^2 - 12a = 4a(a - 3)$.\nThe expression becomes $\\frac{4a(a-3)}{a-3}$.\nCancel out the common factor $(a-3)$, assuming $a \\neq 3$: $4a$."
+    },
+    {
+        "id": "q17_v2",
+        "type": "multiple-choice",
+        "question": "Simplify each expression:\n$$\\frac{x+3}{2} \\cdot \\frac{4x+12}{x^2+6x+9}$$",
+        "options": {
+            "a": "$x+3$",
+            "b": "$2$",
+            "c": "$\\frac{x+3}{2}$",
+            "d": "$\\frac{2}{x+3}$"
+        },
+        "correctAnswer": "b",
+        "explanation": "Factor the expressions:\n$4x+12 = 4(x+3)$\n$x^2+6x+9 = (x+3)(x+3)$\nThe expression becomes $\\frac{x+3}{2} \\cdot \\frac{4(x+3)}{(x+3)(x+3)}$.\nCancel out common factors $(x+3)$: $\\frac{1}{2} \\cdot \\frac{4}{1} = \\frac{4}{2} = 2$."
+    },
+    {
+        "id": "q18_v2",
+        "type": "multiple-choice",
+        "question": "Simplify each expression:\n$$\\frac{1}{y+2} \\div \\frac{y+5}{3y+6}$$",
+        "options": {
+            "a": "$\\frac{y+5}{3}$",
+            "b": "$\\frac{3}{y+5}$",
+            "c": "$y+5$",
+            "d": "$3(y+2)$"
+        },
+        "correctAnswer": "b",
+        "explanation": "Dividing by a fraction is the same as multiplying by its reciprocal:\n$\\frac{1}{y+2} \\cdot \\frac{3y+6}{y+5}$.\nFactor the numerator of the second fraction: $3y+6 = 3(y+2)$.\nThe expression becomes $\\frac{1}{y+2} \\cdot \\frac{3(y+2)}{y+5} = \\frac{1}{1} \\cdot \\frac{3}{y+5} = \\frac{3}{y+5}$."
+    },
+    {
+        "id": "q19_v2",
+        "type": "multiple-choice",
+        "question": "Simplify each expression:\n$$\\frac{a-4}{5} \\div \\frac{(a-1)(a-4)}{(a-2)(a-1)}$$",
+        "options": {
+            "a": "$\\frac{a-2}{5}$",
+            "b": "$\\frac{5}{a-2}$",
+            "c": "$a-4$",
+            "d": "$a-2$"
+        },
+        "correctAnswer": "a",
+        "explanation": "Dividing by a fraction is the same as multiplying by its reciprocal:\n$\\frac{a-4}{5} \\cdot \\frac{(a-2)(a-1)}{(a-1)(a-4)}$.\nCancel out common factors $(a-4)$ and $(a-1)$: $\\frac{1}{5} \\cdot \\frac{a-2}{1} = \\frac{a-2}{5}$."
+    },
+    {
+        "id": "q20_v2",
+        "type": "multiple-choice",
+        "question": "Given $g(n)=n^{2}+3n$ and $h(n)=2n-1$, find $g(n)+h(n)$.",
+        "options": {
+            "a": "$n^{2}+5n-1$",
+            "b": "$n^{2}-n+1$",
+            "c": "$n^{2}+n-1$",
+            "d": "$n^{2}+5n+1$"
+        },
+        "correctAnswer": "a",
+        "explanation": "To find $g(n)+h(n)$, add the two functions:\n$(n^2 + 3n) + (2n - 1) = n^2 + 3n + 2n - 1$.\nCombine like terms: $n^2 + (3n + 2n) - 1 = n^2 + 5n - 1$."
+    },
+    {
+        "id": "q21_v2",
+        "type": "multiple-choice",
+        "question": "Given $f(x)=3x-2$ and $g(x)=x^{2}-x$, find $(\\frac{f}{g})(x)$.",
+        "options": {
+            "a": "$\\frac{x^{2}-x}{3x-2}$",
+            "b": "$\\frac{3x-2}{x^{2}-x}$",
+            "c": "$\\frac{3x-2}{x(x-1)}$",
+            "d": "$\\frac{x(x-1)}{3x-2}$"
+        },
+        "correctAnswer": "b",
+        "explanation": "The notation $(\\frac{f}{g})(x)$ means to divide the function $f(x)$ by the function $g(x)$.\n$(\\frac{f}{g})(x) = \\frac{f(x)}{g(x)} = \\frac{3x-2}{x^{2}-x}$. Optionally, factor the denominator: $\\frac{3x-2}{x(x-1)}$. Both forms are acceptable unless specified otherwise."
+    },
+    {
+        "id": "q22_v2",
+        "type": "multiple-choice",
+        "question": "Given $g(n)=n^{2}+4n$ and $h(n)=2n-5$, find $(g-h)(3)$.",
+        "options": {
+            "a": "10",
+            "b": "15",
+            "c": "20",
+            "d": "25"
+        },
+        "correctAnswer": "c",
+        "explanation": "First, find $(g-h)(n)$ by subtracting $h(n)$ from $g(n)$:\n$(g-h)(n) = g(n) - h(n) = (n^2 + 4n) - (2n - 5) = n^2 + 4n - 2n + 5 = n^2 + 2n + 5$.\nNow, evaluate $(g-h)(3)$ by substituting $n=3$ into the expression:\n$(g-h)(3) = (3)^2 + 2(3) + 5 = 9 + 6 + 5 = 15 + 5 = 20$."
+    },
+    {
+        "id": "q23_v2",
+        "type": "multiple-choice",
+        "question": "Given $g(x)=x$ and $h(x)=x+14$, find $g(1)\\cdot h(1)$.",
+        "options": {
+            "a": "10",
+            "b": "25",
+            "c": "15",
+            "d": "5"
+        },
+        "correctAnswer": "c",
+        "explanation": "First, evaluate $g(1)$ by substituting $x=1$ into $g(x)$: $g(1) = 1$.\nNext, evaluate $h(1)$ by substituting $x=1$ into $h(x)$: $h(1) = 1 + 14 = 15$.\nFinally, find the product $g(1) \\cdot h(1)$: $1 \\cdot 15 = 15$."
+    },
+    {
+        "id": "q24_v2",
+        "type": "multiple-choice",
+        "question": "Given $h(x)=x+1$, find $h(h(4))$.",
+        "options": {
+            "a": "5",
+            "b": "6",
+            "c": "7",
+            "d": "8"
+        },
+        "correctAnswer": "b",
+        "explanation": "This is a composite function. First, find $h(4)$ by substituting $x=4$ into $h(x)$:\n$h(4) = 4 + 1 = 5$.\nNext, find $h(h(4))$, which is $h(5)$, by substituting $x=5$ into $h(x)$:\n$h(5) = 5 + 1 = 6$."
+    },
+    {
+        "id": "q25_v2",
+        "type": "multiple-choice",
+        "question": "Find the product:\n$$(-3y+2)(-y-4)$$",
+        "options": {
+            "a": "$3y^{2}+10y-8$",
+            "b": "$3y^{2}+14y-8$",
+            "c": "$3y^{2}-10y-8$",
+            "d": "$3y^{2}-14y-8$"
+        },
+        "correctAnswer": "a",
+        "explanation": "Use the FOIL method (First, Outer, Inner, Last) to multiply the binomials:\n$(-3y)(-y) + (-3y)(-4) + (2)(-y) + (2)(-4)$\n$3y^2 + 12y - 2y - 8$\nCombine like terms: $3y^2 + (12y - 2y) - 8 = 3y^2 + 10y - 8$."
+    },
+    {
+        "id": "q26_print_v2",
+        "type": "text",
+        "question": "Graph the exponential equation:\n$$y=3\\cdot(2)^{x}$$"
+    },
+    {
+        "id": "q27_print_v2",
+        "type": "text",
+        "question": "Graph the logarithmic function:\n$$y=log_{3}x$$"
+    }
+];
 
         const questionsContainer = document.getElementById('questionsContainer');
-        const submitExamButton = document.getElementById('submitExam');
+        const mainActionButton = document.getElementById('mainActionButton');
         const examScoreDiv = document.getElementById('examScore');
 
-        let quizState = 'initial'; // 'initial', 'mc_unlocked', 'graded'
+        let quizState = 'initial'; // 'initial', 'mc_unlocked', 'graded', 'explanations_visible'
 
 
         // Function to render the questions
@@ -489,25 +702,6 @@ Note: The calculated answer is 6, which is not among the provided options. Optio
                 explanationDiv.classList.add('explanation');
                 explanationDiv.innerHTML = `<p><strong>Explanation:</strong> ${questionData.explanation}</p>`;
                 questionDiv.appendChild(explanationDiv);
-
-                 const showAnswerBtn = document.createElement('button');
-                 showAnswerBtn.classList.add('show-answer-btn');
-                 showAnswerBtn.textContent = 'Show Answer';
-                 showAnswerBtn.type = 'button'; // Prevent form submission
-                 showAnswerBtn.addEventListener('click', function() {
-                     // Find the explanation div within the same question
-                     const explanation = this.closest('.question').querySelector('.explanation');
-                     if (explanation) {
-                         explanation.style.display = 'block';
-                          // Process MathJax within the explanation if needed
-                         if (typeof MathJax !== 'undefined') {
-                             MathJax.typesetPromise([explanation]).catch(function (err) {
-                                 console.warn('MathJax typesetting failed for explanation:', err);
-                             });
-                         }
-                     }
-                 });
-                 questionDiv.appendChild(showAnswerBtn);
             } else if (questionData.type === 'text') {
                  // For text questions, just add the question text. No options or explanations.
                  // Add a space for answering in the interactive view
@@ -524,18 +718,18 @@ Note: The calculated answer is 6, which is not among the provided options. Optio
         }
 
 
-        // Function to handle the button clicks based on quizState
-        function handleButtonClick() {
+        // Function to handle the main button clicks based on quizState
+        function handleMainButtonClick() {
             if (quizState === 'initial') {
                 // State 1 -> State 2: Unlock MC
                 document.querySelectorAll('.options.initially-hidden').forEach(optionsDiv => {
                     optionsDiv.classList.remove('initially-hidden');
                 });
-                submitExamButton.textContent = 'Submit Exam';
-                submitExamButton.classList.remove('unlock-btn'); // Remove orange
-                submitExamButton.classList.add('submit-btn'); // Add green
+                mainActionButton.textContent = 'Submit';
+                mainActionButton.classList.remove('unlock-btn'); // Remove orange
+                mainActionButton.classList.add('submit-btn'); // Add green
                 quizState = 'mc_unlocked';
-                alert('Multiple choice options are now unlocked. Complete the exam and click "Submit Exam".');
+                alert('Multiple choice options are now unlocked. Complete the exam and click "Submit".');
 
             } else if (quizState === 'mc_unlocked') {
                 // State 2 -> State 3: Submit and Grade
@@ -556,23 +750,38 @@ Note: The calculated answer is 6, which is not among the provided options. Optio
                             userAnswer = selectedRadio ? selectedRadio.value : null;
                         }
 
+                        // Remove previous highlighting
+                        if (questionData.displayType === 'dropdown') {
+                             const selectElement = questionDiv.querySelector('select');
+                              if (selectElement) {
+                                  selectElement.classList.remove('incorrect');
+                              }
+                         } else {
+                             questionDiv.querySelectorAll('label.incorrect').forEach(label => {
+                                  label.classList.remove('incorrect');
+                             });
+                         }
+
+
                         if (userAnswer === questionData.correctAnswer) {
                             score++;
                             // Optionally, provide feedback for correct answers (e.g., change background)
                             // questionDiv.style.backgroundColor = '#d1fae5'; // Light green
                         } else {
-                            // Highlight incorrect answer
-                             if (questionData.displayType === 'dropdown') {
-                                 const selectElement = questionDiv.querySelector('select');
-                                  if (selectElement && userAnswer !== '') {
-                                      selectElement.classList.add('incorrect');
-                                  }
-                             } else {
-                                 const selectedRadio = questionDiv.querySelector(`input[name="${questionId}"]:checked`);
-                                 if (selectedRadio) {
-                                     const label = selectedRadio.closest('label');
-                                     if (label) {
-                                         label.classList.add('incorrect');
+                            // Highlight incorrect answer if an answer was selected
+                             if (userAnswer !== null && userAnswer !== '') {
+                                 if (questionData.displayType === 'dropdown') {
+                                     const selectElement = questionDiv.querySelector('select');
+                                      if (selectElement) {
+                                          selectElement.classList.add('incorrect');
+                                      }
+                                 } else {
+                                     const selectedRadio = questionDiv.querySelector(`input[name="${questionId}"]:checked`);
+                                     if (selectedRadio) {
+                                         const label = selectedRadio.closest('label');
+                                         if (label) {
+                                             label.classList.add('incorrect');
+                                         }
                                      }
                                  }
                              }
@@ -584,20 +793,15 @@ Note: The calculated answer is 6, which is not among the provided options. Optio
                 examScoreDiv.textContent = `Your score: ${score} out of ${totalQuestions} (${percentage.toFixed(2)}%)`;
                 examScoreDiv.style.display = 'block'; // Show score
 
-                submitExamButton.textContent = 'Unlock Explanations';
-                submitExamButton.classList.remove('submit-btn'); // Remove green
-                submitExamButton.classList.add('unlock-btn'); // Add orange (or a different style if preferred)
-
-                // Show 'Show Answer' buttons
-                document.querySelectorAll('.show-answer-btn').forEach(btn => {
-                     btn.style.display = 'block';
-                });
+                mainActionButton.textContent = 'Unlock Explanations';
+                mainActionButton.classList.remove('submit-btn'); // Remove green
+                mainActionButton.classList.add('unlock-btn'); // Add orange
 
                 quizState = 'graded';
                 alert('Exam submitted. Click "Unlock Explanations" to view solutions.');
 
             } else if (quizState === 'graded') {
-                // State 3: Unlock Explanations
+                // State 3 -> State 4: Unlock Explanations
                 document.querySelectorAll('.explanation').forEach(explanationDiv => {
                     explanationDiv.style.display = 'block';
                     // Process MathJax within the explanation if needed
@@ -607,20 +811,102 @@ Note: The calculated answer is 6, which is not among the provided options. Optio
                         });
                     }
                 });
-                submitExamButton.style.display = 'none'; // Hide the button after explanations are shown
-                alert('Explanations are now visible.');
+
+                mainActionButton.textContent = 'Submit'; // Change text to the final "Submit"
+                mainActionButton.classList.remove('unlock-btn'); // Remove orange
+                mainActionButton.classList.add('submit-btn'); // Add green
+
+                quizState = 'explanations_visible';
+                alert('Explanations are now visible. Click "Submit" to re-calculate/confirm score.');
+
+            } else if (quizState === 'explanations_visible') {
+                 // State 4: Re-submit/Confirm score (stays in this state)
+                 // Re-calculate and display score (same logic as mc_unlocked -> graded transition)
+                 let score = 0;
+                 const totalQuestions = examData.filter(item => item.type === 'multiple-choice').length;
+
+                 document.querySelectorAll('.question').forEach(questionDiv => {
+                     const questionId = questionDiv.getAttribute('data-id');
+                     const questionData = examData.find(item => item.id === questionId);
+
+                     if (questionData && questionData.type === 'multiple-choice') {
+                         let userAnswer = null;
+                         if (questionData.displayType === 'dropdown') {
+                             const selectElement = questionDiv.querySelector('select');
+                             userAnswer = selectElement ? selectElement.value : null;
+                         } else {
+                             const selectedRadio = questionDiv.querySelector(`input[name="${questionId}"]:checked`);
+                             userAnswer = selectedRadio ? selectedRadio.value : null;
+                         }
+
+                         // Remove previous highlighting before applying new
+                         if (questionData.displayType === 'dropdown') {
+                             const selectElement = questionDiv.querySelector('select');
+                              if (selectElement) {
+                                  selectElement.classList.remove('incorrect');
+                              }
+                         } else {
+                             questionDiv.querySelectorAll('label.incorrect').forEach(label => {
+                                  label.classList.remove('incorrect');
+                             });
+                         }
+
+
+                         if (userAnswer === questionData.correctAnswer) {
+                             score++;
+                             // Optionally, provide feedback for correct answers (e.g., change background)
+                             // questionDiv.style.backgroundColor = '#d1fae5'; // Light green
+                         } else {
+                             // Highlight incorrect answer if an answer was selected
+                             if (userAnswer !== null && userAnswer !== '') {
+                                 if (questionData.displayType === 'dropdown') {
+                                     const selectElement = questionDiv.querySelector('select');
+                                      if (selectElement) {
+                                          selectElement.classList.add('incorrect');
+                                      }
+                                 } else {
+                                     const selectedRadio = questionDiv.querySelector(`input[name="${questionId}"]:checked`);
+                                     if (selectedRadio) {
+                                         const label = selectedRadio.closest('label');
+                                         if (label) {
+                                             label.classList.add('incorrect');
+                                         }
+                                     }
+                                 }
+                             }
+                         }
+                     }
+                 });
+
+                 const percentage = (score / totalQuestions) * 100;
+                 examScoreDiv.textContent = `Your score: ${score} out of ${totalQuestions} (${percentage.toFixed(2)}%)`;
+                 examScoreDiv.style.display = 'block'; // Ensure score is visible
+
+                 // Explanations should remain visible in this state
+                 document.querySelectorAll('.explanation').forEach(explanationDiv => {
+                     explanationDiv.style.display = 'block';
+                 });
+
+                 // Button text remains "Submit"
+                 mainActionButton.textContent = 'Submit';
+                 mainActionButton.classList.remove('unlock-btn'); // Should already be green
+                 mainActionButton.classList.add('submit-btn');
+
+                 quizState = 'explanations_visible'; // Stay in this state
+                 alert('Score re-calculated/confirmed. Explanations remain visible.');
             }
         }
 
+
         // Event listeners
-        submitExamButton.addEventListener('click', handleButtonClick);
+        mainActionButton.addEventListener('click', handleMainButtonClick);
 
         // Initial rendering
         renderQuestions();
 
-        // Set initial text and class for the submit button
-        submitExamButton.textContent = 'Unlock Multiple Choice'; // Initial text
-        submitExamButton.classList.add('unlock-btn'); // Add orange style initially
+        // Set initial text and class for the main action button
+        mainActionButton.textContent = 'Unlock Multiple Choice'; // Initial text
+        mainActionButton.classList.add('unlock-btn'); // Add orange style initially
 
     </script>
 </body>
