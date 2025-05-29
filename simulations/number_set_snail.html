@@ -16,7 +16,8 @@
             background-color: #f0f8ff; /* AliceBlue background */
             margin: 0;
             color: #333;
-            overflow: hidden; /* Prevent scrollbars */
+            overflow-x: hidden; /* Prevent horizontal scrollbars */
+            overflow-y: auto; /* Allow vertical scrolling if content is too tall */
         }
 
         .game-container {
@@ -31,8 +32,10 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            min-height: 80vh; /* Ensure it takes up a good portion of the viewport height */
+            /* Changed justify-content to space-evenly for better vertical distribution */
+            justify-content: space-evenly;
+            min-height: 90vh; /* Increased min-height to ensure more space */
+            position: relative; /* For z-index context */
         }
 
         h1 {
@@ -40,11 +43,15 @@
             margin-bottom: 0.5rem; /* Equivalent to 8px */
             font-size: 2.25rem; /* Tailwind text-4xl */
             font-weight: bold;
+            z-index: 20; /* Ensure it's above other elements */
+            position: relative;
         }
 
         p {
             margin-bottom: 1.5rem; /* Equivalent to 24px */
             font-size: 1.125rem; /* Tailwind text-lg */
+            z-index: 20; /* Ensure it's above other elements */
+            position: relative;
         }
 
         .draggable-number {
@@ -56,15 +63,14 @@
             font-weight: bold;
             display: inline-block;
             cursor: grab;
-            margin-bottom: 2rem; /* Equivalent to 32px */
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-            transition: transform 0.2s ease-out;
+            transition: transform 0.2s ease-out, opacity 0.2s ease-out;
             user-select: none; /* Prevent text selection */
             -webkit-user-select: none; /* Safari */
             -moz-user-select: none; /* Firefox */
             -ms-user-select: none; /* IE10+ */
-            position: relative; /* Ensure z-index works */
-            z-index: 10; /* Ensure it's on top of other elements */
+            position: relative; /* Default position for numbers in the bottom container */
+            z-index: 10; /* Ensure it's on top of other elements when dragging */
         }
 
         .draggable-number:active {
@@ -75,18 +81,19 @@
         /* Snail container and concentric circles */
         .snail-container {
             position: relative;
-            width: 100%; /* Make it fluid */
+            width: 90%; /* Make it fluid, slightly less than 100% */
             max-width: 500px; /* Max width for larger screens */
-            padding-bottom: 100%; /* Creates a square aspect ratio for the container */
+            padding-bottom: 90%; /* Creates a square aspect ratio for the container, adjusted for width */
             margin: 2.5rem auto; /* Equivalent to 40px */
             border-radius: 50%;
             box-sizing: border-box;
             display: flex;
             justify-content: center;
             align-items: center;
-            /* Ensure the snail scales down on smaller screens */
-            transform: scale(0.8); /* Adjust initial scale for better fit on small screens */
+            /* Adjusted initial scale for better fit on small screens */
+            transform: scale(0.9);
             transform-origin: center;
+            flex-shrink: 0; /* Prevent it from shrinking too much */
         }
 
         @media (min-width: 640px) { /* Tailwind's sm breakpoint */
@@ -107,6 +114,7 @@
             transition: all 0.3s ease-in-out;
             cursor: default; /* Change cursor for drop zones */
             padding: 0.5rem; /* Padding for text inside */
+            overflow: hidden; /* Hide content that overflows, especially for dropped numbers */
         }
 
         /* Specific circle sizes and colors */
@@ -175,6 +183,8 @@
             font-size: 1.25rem; /* Tailwind text-xl */
             font-weight: bold;
             min-height: 1.5rem; /* Prevent layout shift */
+            z-index: 20; /* Ensure it's above other elements */
+            position: relative;
         }
 
         .feedback-correct {
@@ -196,6 +206,8 @@
             margin: 0.625rem; /* Equivalent to 10px */
             transition: background-color 0.3s ease, transform 0.1s ease;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            z-index: 20; /* Ensure buttons are above other elements */
+            position: relative;
         }
 
         .game-button:hover {
@@ -208,18 +220,73 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
-        #next-button {
+        #check-button {
             background-color: #4CAF50; /* Green */
         }
 
-        #next-button:hover {
+        #check-button:hover {
             background-color: #45a049;
         }
 
-        #next-button:disabled {
+        #check-button:disabled {
             background-color: #cccccc;
             cursor: not-allowed;
             box-shadow: none;
+            transform: none;
+        }
+
+        /* Styles for numbers inside circles */
+        .number-in-circle {
+            position: absolute; /* Position within the circle */
+            font-size: 1.2em; /* Smaller font inside circles */
+            padding: 0.4rem 0.8rem;
+            margin: 0;
+            background-color: #007bff;
+            color: white;
+            border-radius: 9999px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            cursor: default;
+            z-index: 5; /* Ensure numbers inside circles are above circle labels */
+        }
+
+        .number-in-circle.correct {
+            border: 2px solid #28a745; /* Green border for correct */
+            box-shadow: 0 0 8px rgba(40, 167, 69, 0.5);
+        }
+
+        .number-in-circle.incorrect {
+            border: 2px solid #dc3545; /* Red border for incorrect */
+            box-shadow: 0 0 8px rgba(220, 53, 69, 0.5);
+        }
+
+        /* Container for numbers at the bottom */
+        #draggable-numbers-container {
+            min-height: 100px; /* Increased min-height for visibility */
+            margin-top: 2rem;
+            padding: 1rem;
+            border: 1px dashed #ccc;
+            border-radius: 0.5rem;
+            background-color: #f8f8f8;
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 0.75rem; /* Space between numbers */
+            flex-shrink: 0; /* Prevent it from shrinking too much */
+            z-index: 20; /* Ensure it's above other elements */
+            position: relative;
+        }
+
+        #draggable-numbers-container .draggable-number {
+            margin-bottom: 0; /* Remove margin from individual numbers here */
+            font-size: 1.5rem; /* Slightly smaller for multiple numbers */
+            padding: 0.5rem 1rem;
+            /* Ensure numbers in the bottom container are not absolutely positioned */
+            position: relative;
+            left: auto;
+            top: auto;
             transform: none;
         }
     </style>
@@ -227,10 +294,7 @@
 <body>
     <div class="game-container">
         <h1>Where Do Numbers Live?</h1>
-        <p>Drag the number into its correct number set circle.</p>
-
-        <div id="number-display" class="draggable-number" draggable="true">
-            </div>
+        <p>Drag the number into its correct number set circle, then click "Check Answers".</p>
 
         <div class="snail-container">
             <div id="irrational-dropzone" class="number-set-circle" data-set="irrational">
@@ -248,8 +312,12 @@
         </div>
 
         <div id="feedback" class="feedback-area"></div>
+
+        <div id="draggable-numbers-container">
+            </div>
+
         <div class="flex flex-wrap justify-center mt-4">
-            <button id="next-button" class="game-button">Next Number</button>
+            <button id="check-button" class="game-button">Check Answers</button>
             <button id="reset-button" class="game-button">Reset Game</button>
         </div>
     </div>
@@ -257,41 +325,37 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // Get references to DOM elements
-            const numberDisplay = document.getElementById('number-display');
+            const draggableNumbersContainer = document.getElementById('draggable-numbers-container');
             const dropzones = document.querySelectorAll('.number-set-circle');
             const feedbackArea = document.getElementById('feedback');
-            const nextButton = document.getElementById('next-button');
+            const checkButton = document.getElementById('check-button');
             const resetButton = document.getElementById('reset-button');
 
             // Define the numbers to be sorted and their correct types
-            // Each object contains:
-            //   - value: The actual number value (for internal logic, if needed)
-            //   - type: The most specific number set it belongs to ('whole', 'integer', 'rational', 'irrational')
-            //   - display: How the number should be displayed to the user (e.g., '√9' instead of just '3')
             const numbers = [
-                { value: 7, type: 'whole', display: '7' },
-                { value: -5, type: 'integer', display: '-5' },
-                { value: 0.5, type: 'rational', display: '1/2' },
-                { value: 0.75, type: 'rational', display: '0.75' },
-                { value: 0, type: 'whole', display: '0' },
-                { value: -100, type: 'integer', display: '-100' },
-                { value: Math.sqrt(9), type: 'whole', display: '√9' }, // √9 = 3 (whole)
-                { value: Math.sqrt(2), type: 'irrational', display: '√2' },
-                { value: Math.PI, type: 'irrational', display: 'π' },
-                { value: Math.sqrt(48), type: 'irrational', display: '√48' }, // Simplified as 4√3 (irrational)
-                { value: 2.5, type: 'rational', display: '2.5' },
-                { value: -0.75, type: 'rational', display: '-3/4' },
-                { value: Math.sqrt(16), type: 'whole', display: '√16' }, // √16 = 4 (whole)
-                { value: Math.E, type: 'irrational', display: 'e' },
-                { value: 10, type: 'whole', display: '10' },
-                { value: 1/3, type: 'rational', display: '1/3' },
-                { value: -2.0, type: 'integer', display: '-2.0' }, // Still an integer
-                { value: Math.sqrt(7), type: 'irrational', display: '√7' }
+                { id: 'num-1', value: 7, type: 'whole', display: '7' },
+                { id: 'num-2', value: -5, type: 'integer', display: '-5' },
+                { id: 'num-3', value: 0.5, type: 'rational', display: '1/2' },
+                { id: 'num-4', value: 0.75, type: 'rational', display: '0.75' },
+                { id: 'num-5', value: 0, type: 'whole', display: '0' },
+                { id: 'num-6', value: -100, type: 'integer', display: '-100' },
+                { id: 'num-7', value: Math.sqrt(9), type: 'whole', display: '√9' },
+                { id: 'num-8', value: Math.sqrt(2), type: 'irrational', display: '√2' },
+                { id: 'num-9', value: Math.PI, type: 'irrational', display: 'π' },
+                { id: 'num-10', value: Math.sqrt(48), type: 'irrational', display: '√48' },
+                { id: 'num-11', value: 2.5, type: 'rational', display: '2.5' },
+                { id: 'num-12', value: -0.75, type: 'rational', display: '-3/4' },
+                { id: 'num-13', value: Math.sqrt(16), type: 'whole', display: '√16' },
+                { id: 'num-14', value: Math.E, type: 'irrational', display: 'e' },
+                { id: 'num-15', value: 10, type: 'whole', display: '10' },
+                { id: 'num-16', value: 1/3, type: 'rational', display: '1/3' },
+                { id: 'num-17', value: -2.0, type: 'integer', display: '-2.0' },
+                { id: 'num-18', value: Math.sqrt(7), type: 'irrational', display: '√7' }
             ];
 
-            let currentNumberIndex = 0; // Tracks the current number being displayed
-            let score = 0; // Player's score
-            let currentDraggableNumber = null; // Reference to the number element being dragged
+            // Map to keep track of where each number (by its ID) has been dropped
+            // Stores { numberId: { element: HTMLElement, droppedIn: 'zoneId' } }
+            const droppedNumbersMap = new Map();
 
             /**
              * Shuffles an array in place using the Fisher-Yates (Knuth) algorithm.
@@ -308,159 +372,152 @@
              * Initializes or restarts the game.
              */
             function startGame() {
-                shuffleArray(numbers); // Randomize the order of numbers
-                currentNumberIndex = 0;
-                score = 0;
-                loadNextNumber(); // Load the first number
-                resetButton.textContent = 'Reset Game'; // Ensure button text is correct
-                nextButton.style.display = 'inline-block'; // Ensure next button is visible
+                shuffleArray(numbers);
+                draggableNumbersContainer.innerHTML = ''; // Clear previous numbers
+                feedbackArea.textContent = '';
+                feedbackArea.className = 'feedback-area';
+                droppedNumbersMap.clear(); // Clear any tracked dropped numbers
+
+                // Create and append all draggable number elements to the bottom container
+                numbers.forEach(numData => {
+                    const numElement = document.createElement('div');
+                    numElement.id = numData.id;
+                    numElement.className = 'draggable-number';
+                    numElement.draggable = true;
+                    numElement.textContent = numData.display;
+                    numElement.dataset.type = numData.type; // Store the correct type
+                    draggableNumbersContainer.appendChild(numElement);
+
+                    // Add dragstart listener for each new number
+                    numElement.addEventListener('dragstart', (e) => {
+                        e.dataTransfer.setData('text/plain', e.target.id); // Transfer the ID of the dragged element
+                        e.target.classList.add('opacity-50');
+                    });
+
+                    // Add dragend listener for each new number
+                    numElement.addEventListener('dragend', (e) => {
+                        e.target.classList.remove('opacity-50');
+                    });
+                });
             }
 
-            /**
-             * Loads the next number in the sequence or ends the game if all numbers are sorted.
-             */
-            function loadNextNumber() {
-                if (currentNumberIndex < numbers.length) {
-                    const gameContainer = document.querySelector('.game-container');
-                    const snailContainer = document.querySelector('.snail-container'); // Get reference to snail container
+            // --- Drag and Drop Event Listeners for Dropzones ---
 
-                    // Ensure the numberDisplay is a child of game-container and positioned correctly
-                    // Append it before the snail-container to maintain initial layout
-                    if (numberDisplay.parentNode !== gameContainer || numberDisplay.nextElementSibling !== snailContainer) {
-                        gameContainer.insertBefore(numberDisplay, snailContainer);
+            dropzones.forEach(zone => {
+                zone.addEventListener('dragover', (e) => {
+                    e.preventDefault(); // Allow drop
+                    zone.classList.add('drag-over');
+                });
+
+                zone.addEventListener('dragleave', () => {
+                    zone.classList.remove('drag-over');
+                });
+
+                zone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    zone.classList.remove('drag-over');
+
+                    const draggedId = e.dataTransfer.getData('text/plain');
+                    const draggedElement = document.getElementById(draggedId);
+
+                    if (draggedElement) {
+                        // Remove from previous parent if it was already dropped
+                        if (draggedElement.parentNode) {
+                            draggedElement.parentNode.removeChild(draggedElement);
+                        }
+
+                        // Visually move the number into the dropzone
+                        zone.appendChild(draggedElement);
+                        draggedElement.classList.add('number-in-circle'); // Apply styling for numbers inside circles
+                        // Position relative to the parent circle, then center it
+                        draggedElement.style.position = 'absolute';
+                        draggedElement.style.left = '50%';
+                        draggedElement.style.top = '50%';
+                        draggedElement.style.transform = 'translate(-50%, -50%)';
+                        draggedElement.draggable = false; // Disable dragging after initial drop
+
+                        // Store the dropped location
+                        droppedNumbersMap.set(draggedId, {
+                            element: draggedElement,
+                            droppedIn: zone.dataset.set // Store the set name it was dropped into
+                        });
+
+                        // Clear any previous correct/incorrect styling
+                        draggedElement.classList.remove('correct', 'incorrect');
+                        feedbackArea.textContent = ''; // Clear feedback when a new number is dropped
                     }
+                });
+            });
 
-                    const num = numbers[currentNumberIndex];
-                    numberDisplay.textContent = num.display; // Set the text of the draggable number
-                    numberDisplay.dataset.type = num.type; // Store the correct type as a data attribute
-                    numberDisplay.style.display = 'inline-block'; // Ensure the number is visible
-                    numberDisplay.draggable = true; // Make it draggable again
-                    feedbackArea.textContent = ''; // Clear previous feedback
-                    feedbackArea.className = 'feedback-area'; // Reset feedback styling
-                    nextButton.disabled = true; // Disable "Next" until a drop is made
-                    currentDraggableNumber = numberDisplay; // Set the current draggable element
-                    // Reset position if it was moved into a dropzone in the previous round
-                    // These styles are set during drop, so they need to be cleared for the next round
-                    numberDisplay.style.position = '';
-                    numberDisplay.style.left = '';
-                    numberDisplay.style.top = '';
-                    numberDisplay.style.transform = '';
-                } else {
-                    endGame(); // All numbers sorted, end the game
+            /**
+             * Checks if a number's placement is correct based on number set hierarchy.
+             * @param {string} droppedType - The actual type of the number (e.g., 'whole').
+             * @param {string} targetSet - The type of the dropzone it was placed in (e.g., 'integer').
+             * @returns {boolean} True if the placement is correct, false otherwise.
+             */
+            function isPlacementCorrect(droppedType, targetSet) {
+                switch (targetSet) {
+                    case 'whole':
+                        return (droppedType === 'whole');
+                    case 'integer':
+                        return (droppedType === 'whole' || droppedType === 'integer');
+                    case 'rational':
+                        return (droppedType === 'whole' || droppedType === 'integer' || droppedType === 'rational');
+                    case 'irrational':
+                        return (droppedType === 'irrational');
+                    default:
+                        return false;
                 }
             }
 
-            /**
-             * Displays the final score and ends the game.
-             */
-            function endGame() {
-                numberDisplay.style.display = 'none'; // Hide the number display
-                feedbackArea.className = 'feedback-area feedback-correct';
-                feedbackArea.textContent = `Game Over! You scored ${score} out of ${numbers.length} correct.`;
-                nextButton.style.display = 'none'; // Hide the next button
-                resetButton.textContent = 'Play Again'; // Change reset button text
-            }
+            // --- Button Event Listeners ---
 
-            // --- Drag and Drop Event Listeners ---
+            checkButton.addEventListener('click', () => {
+                let correctCount = 0;
+                let totalDropped = 0;
 
-            // Event fired when dragging starts on the number display
-            numberDisplay.addEventListener('dragstart', (e) => {
-                // Set the data to be transferred (the type of the number)
-                e.dataTransfer.setData('text/plain', e.target.dataset.type);
-                // Add a class for visual feedback during drag
-                e.target.classList.add('opacity-50'); // Tailwind's opacity-50
-            });
+                // Iterate over all numbers that have been dropped
+                for (const [id, data] of droppedNumbersMap.entries()) {
+                    totalDropped++;
+                    const numElement = data.element;
+                    const correctType = numElement.dataset.type; // The true type of the number
+                    const droppedZoneType = data.droppedIn; // The type of the zone it was dropped into
 
-            // Event fired when dragging ends on the number display
-            numberDisplay.addEventListener('dragend', (e) => {
-                // Remove the visual feedback class
-                e.target.classList.remove('opacity-50');
-            });
-
-            // Iterate over each dropzone (number set circle)
-            dropzones.forEach(zone => {
-                // Event fired when a draggable element is dragged over a dropzone
-                zone.addEventListener('dragover', (e) => {
-                    e.preventDefault(); // Prevent default to allow drop
-                    zone.classList.add('drag-over'); // Add visual feedback for hover
-                });
-
-                // Event fired when a draggable element leaves a dropzone
-                zone.addEventListener('dragleave', () => {
-                    zone.classList.remove('drag-over'); // Remove visual feedback
-                });
-
-                // Event fired when a draggable element is dropped on a dropzone
-                zone.addEventListener('drop', (e) => {
-                    e.preventDefault(); // Prevent default browser drop behavior
-                    zone.classList.remove('drag-over'); // Remove drag-over class
-
-                    // If no number is currently being dragged, exit
-                    if (!currentDraggableNumber) return;
-
-                    const droppedType = currentDraggableNumber.dataset.type; // Get the actual type of the number
-                    const targetSet = zone.dataset.set; // Get the type of the dropzone
-
-                    let isCorrect = false;
-
-                    // Logic to determine if the number is placed correctly based on set hierarchy
-                    // A number can be correctly placed in its own set or any broader set it belongs to.
-                    // For example, a 'whole' number is also an 'integer', 'rational', and 'real' (implied by irrational circle).
-                    switch (targetSet) {
-                        case 'whole':
-                            isCorrect = (droppedType === 'whole');
-                            break;
-                        case 'integer':
-                            isCorrect = (droppedType === 'whole' || droppedType === 'integer');
-                            break;
-                        case 'rational':
-                            isCorrect = (droppedType === 'whole' || droppedType === 'integer' || droppedType === 'rational');
-                            break;
-                        case 'irrational':
-                            isCorrect = (droppedType === 'irrational');
-                            break;
-                    }
-
-                    // Provide feedback to the user
-                    if (isCorrect) {
-                        score++;
-                        feedbackArea.textContent = 'Correct!';
-                        feedbackArea.className = 'feedback-area feedback-correct';
+                    if (isPlacementCorrect(correctType, droppedZoneType)) {
+                        correctCount++;
+                        numElement.classList.add('correct');
+                        numElement.classList.remove('incorrect');
                     } else {
-                        feedbackArea.textContent = `Incorrect. ${numbers[currentNumberIndex].display} is a ${numbers[currentNumberIndex].type} number.`;
+                        numElement.classList.add('incorrect');
+                        numElement.classList.remove('correct');
+
+                        // "Spit out" incorrect numbers: move them back to the bottom container
+                        numElement.parentNode.removeChild(numElement); // Remove from circle
+                        draggableNumbersContainer.appendChild(numElement); // Add back to bottom
+                        numElement.classList.remove('number-in-circle'); // Remove circle styling
+                        numElement.style.position = ''; // Reset positioning
+                        numElement.style.left = '';
+                        numElement.style.top = '';
+                        numElement.style.transform = '';
+                        numElement.draggable = true; // Make it draggable again
+                        droppedNumbersMap.delete(id); // Remove from map as it's no longer 'dropped'
+                    }
+                }
+
+                if (totalDropped > 0) {
+                    feedbackArea.textContent = `You got ${correctCount} out of ${totalDropped} numbers correct!`;
+                    feedbackArea.className = 'feedback-area feedback-correct';
+                    if (correctCount < totalDropped) {
                         feedbackArea.className = 'feedback-area feedback-incorrect';
                     }
-
-                    // Visually move the number into the dropzone
-                    // This is a temporary visual effect for the current round.
-                    zone.appendChild(currentDraggableNumber);
-                    currentDraggableNumber.style.position = 'absolute'; // Allow precise positioning
-                    currentDraggableNumber.style.left = '50%';
-                    currentDraggableNumber.style.top = '50%';
-                    currentDraggableNumber.style.transform = 'translate(-50%, -50%)'; // Center it
-                    currentDraggableNumber.draggable = false; // Disable dragging after it's dropped
-
-                    nextButton.disabled = false; // Enable the "Next Number" button
-                });
-            });
-
-            // Event listener for the "Next Number" button
-            nextButton.addEventListener('click', () => {
-                currentNumberIndex++; // Move to the next number
-                // Remove the number from its current dropzone to prepare for the next round
-                if (currentDraggableNumber && currentDraggableNumber.parentNode) {
-                    currentDraggableNumber.parentNode.removeChild(currentDraggableNumber);
+                } else {
+                    feedbackArea.textContent = 'Drag some numbers into the circles first!';
+                    feedbackArea.className = 'feedback-area';
                 }
-                loadNextNumber(); // Load the next number
             });
 
-            // Event listener for the "Reset Game" button
             resetButton.addEventListener('click', () => {
-                // Clear any number currently in a dropzone
-                if (currentDraggableNumber && currentDraggableNumber.parentNode) {
-                    currentDraggableNumber.parentNode.removeChild(currentDraggableNumber);
-                }
-                startGame(); // Restart the game
+                startGame(); // Restart the game, clearing all numbers and re-populating the bottom
             });
 
             // Initial call to start the game when the page loads
