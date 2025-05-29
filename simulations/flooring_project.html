@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flooring Project Scenario</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for screenplay formatting */
+        .screenplay-container {
+            font-family: 'Inter', sans-serif; /* Using Inter font as per instructions */
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 1.5rem;
+            background-color: #f9fafb; /* Light gray background for the screenplay block */
+            border-radius: 0.5rem; /* Rounded corners */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+        }
+        .character-name {
+            text-align: center;
+            font-weight: bold;
+            margin-top: 1rem;
+            text-transform: uppercase;
+        }
+        .dialogue {
+            margin-left: 20%; /* Indent dialogue */
+            margin-right: 20%;
+            text-align: left;
+            margin-bottom: 0.5rem;
+        }
+        .action-line {
+            font-style: italic;
+            margin-top: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        /* Ensure the body and main container are responsive */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #e0e7ff; /* Light blue background */
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Align to top */
+            min-height: 100vh;
+            padding: 1.5rem;
+        }
+        .main-content-wrapper {
+            background-color: #ffffff;
+            border-radius: 1rem; /* More rounded corners for the main container */
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1); /* More prominent shadow */
+            padding: 2rem;
+            max-width: 900px;
+            width: 100%;
+            margin-top: 2rem; /* Add some top margin */
+            margin-bottom: 2rem; /* Add some bottom margin */
+        }
+        h1, h2 {
+            color: #1e40af; /* Darker blue for headings */
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        p {
+            margin-bottom: 1rem;
+        }
+        hr {
+            border-top: 1px solid #d1d5db;
+            margin: 2rem 0;
+        }
+        .image-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            background-color: #f9fafb;
+        }
+        .image-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.25rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .image-caption {
+            margin-top: 0.75rem;
+            font-size: 0.9rem;
+            color: #4b5563;
+            text-align: center;
+        }
+    </style>
+</head>
+<body class="font-inter antialiased">
+    <div class="main-content-wrapper">
+        <h1 class="text-4xl font-extrabold mb-6">Flooring Project Scenario: The Unhappy Client</h1>
+
+        <p class="text-lg text-gray-700 mb-4">
+            You are a project manager for a flooring installation company. A client has expressed dissatisfaction with the color of the recently installed luxury vinyl plank (LVP) flooring.
+        </p>
+
+        <p class="text-lg text-gray-700 mb-6">
+            Below is a brief scene that takes place during the installation. After reading the scene, your task is to develop a plan to address the client’s concern while maintaining the profitability of the project.
+        </p>
+
+        <p class="text-lg text-gray-700 mb-8 font-semibold">
+            Before making your decision, list any assumptions you are making about the situation. Justify your final decision based on these assumptions and the potential risks and benefits of your chosen course of action.
+        </p>
+
+        <hr>
+
+        <h2 class="text-3xl font-bold mb-6">Visual Aids</h2>
+
+        <div class="image-container">
+            <img src="./images/floor_plan.png"
+                 onerror="this.onerror=null;this.src='https://placehold.co/600x400/cccccc/ffffff?text=Floor+Plan+Not+Available';"
+                 alt="Floor Plan of the Main Floor Project">
+            <p class="image-caption">Figure 1: Proposed Main Floor Project Plan</p>
+        </div>
+
+        <div class="image-container">
+            <img src="./images/product.png"
+                 onerror="this.onerror=null;this.src='https://placehold.co/600x400/cccccc/ffffff?text=Product+Image+Not+Available';"
+                 alt="Luxury Vinyl Plank Product Image">
+            <p class="image-caption">Figure 2: Example of Luxury Vinyl Plank Product</p>
+        </div>
+
+        <hr>
+
+        <h2 class="text-3xl font-bold mb-6">Screenplay: The Unhappy Client</h2>
+
+        <div class="screenplay-container">
+            <div class="action-line">INT. LIVING ROOM - DAY</div>
+            <div class="action-line">Sunlight streams through windows. LUXURY VINYL PLANK flooring is being installed. Two half-full boxes of planks lie open.</div>
+            <div class="action-line">Two WORKERS, mid-twenties, move efficiently, laying down and securing the planks.</div>
+            <div class="action-line">MR. ROBESON, 50s, impeccably dressed, enters. He watches the workers with a critical eye.</div>
+
+            <div class="character-name">MR. ROBESON</div>
+            <div class="dialogue">Looking good, fellas. Good work.</div>
+
+            <div class="character-name">WORKER 1</div>
+            <div class="dialogue">Thanks, Mr. Robeson. Almost done with this room.</div>
+
+            <div class="action-line">Mr. Robeson nods approvingly, pulls out his phone, and snaps a picture of the LVP flooring.</div>
+
+            <div class="character-name">MR. ROBESON</div>
+            <div class="dialogue">Hmm, let me just... (He steps outside the room, muttering into his phone) ...no, I don't think so. It's too... I don't know... bright. (He returns to the room, looking shifty)</div>
+
+            <div class="character-name">MR. ROBESON</div>
+            <div class="dialogue">(Clears throat) Say, fellas, I don't think this color is quite right. It's a bit... much. What can we do about it?</div>
+
+            <div class="action-line">The WORKERS exchange a worried glance.</div>
+
+            <div class="action-line">FADE OUT.</div>
+        </div>
+    </div>
+</body>
+</html>
