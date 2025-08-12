@@ -525,8 +525,7 @@
                     workflowNameInput.value = '';
                 } else { // 'newBranch'
                     workflowCreationTitle.textContent = 'Create New Branch';
-                    workflowNameContainer.style.display = 'block';
-                    workflowNameInput.value = '';
+                    workflowNameContainer.style.display = 'none';
                 }
 
                 workflowCreationModal.classList.remove('hidden', 'is-closing');
@@ -677,6 +676,10 @@
                         task.tips = taskTipsInput.value.trim();
                         task.notes = taskNotesInput.value.trim();
                         task.dependencies = dependencies;
+                        if (task.branch) {
+                            task.branch.name = taskLabel;
+                            updateBreadcrumbs();
+                        }
                     }
                 } else { // Creating
                     const newId = 'task_' + Date.now();
