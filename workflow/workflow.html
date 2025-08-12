@@ -48,7 +48,6 @@
         }
         .node.completed text, .node.completed .node-label-text {
             fill: #166534; /* green-800 */
-            text-decoration: line-through;
         }
         /* Styling for blocked nodes */
         .node.blocked rect {
@@ -83,6 +82,14 @@
         }
         .branch-emoji:hover {
             transform: scale(1.2);
+        }
+
+        /* Progress bar on node */
+        .progress-bar-container {
+            fill: #e5e7eb; /* gray-200 */
+        }
+        .progress-bar {
+            transition: width 0.3s ease-in-out;
         }
 
 
@@ -164,6 +171,9 @@
                     <!-- Breadcrumbs will be dynamically inserted here -->
                 </div>
                 <div class="flex items-end gap-2">
+                    <div id="header-progress-bar-container" class="w-48 bg-gray-200 rounded-full h-2.5 dark:bg-gray-700 hidden">
+                        <div id="header-progress-bar" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
+                    </div>
                     <button id="add-task-btn" class="px-4 py-2 bg-green-600 text-white font-semibold rounded-md shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors">
                         Add New Task
                     </button>
@@ -220,7 +230,7 @@
 
     <!-- Edit/Add Task Modal -->
     <div id="edit-modal" class="modal task-modal fixed inset-0 z-50 items-center justify-center bg-black bg-opacity-50 hidden">
-        <div class="modal-content bg-white rounded-lg shadow-xl w-full max-w-2xl m-4">
+        <div class="modal-content bg-white rounded-lg shadow-xl w-full max-w-2xl m-4 flex flex-col max-h-[90vh]">
             <div class="modal-header flex items-center p-4 border-b border-gray-200">
                 <div class="flex-1">
                     <h2 id="modal-title" class="text-lg font-semibold text-gray-800">Edit Task</h2>
@@ -233,7 +243,7 @@
                     <button class="close-btn text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
                 </div>
             </div>
-            <div class="modal-body p-6">
+            <div class="modal-body p-6 overflow-y-auto">
                 <input type="hidden" id="task-id">
                 <div class="mb-4">
                     <label for="task-label" class="block text-sm font-medium text-gray-700 mb-1">Task Name</label>
@@ -256,9 +266,11 @@
                 </div>
             </div>
             <div id="modal-footer" class="bg-gray-50 px-6 py-3 flex justify-center items-center gap-2 rounded-b-lg flex-wrap">
-                <button id="toggle-complete-btn" class="px-4 py-2 bg-green-500 text-white font-semibold rounded-md shadow-sm hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors">Mark Complete</button>
-                <button id="toggle-blocked-btn" class="px-4 py-2 bg-red-500 text-white font-semibold rounded-md shadow-sm hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors">Mark Blocked</button>
-                <button id="toggle-pending-btn" class="px-4 py-2 bg-orange-500 text-white font-semibold rounded-md shadow-sm hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors">Mark Pending</button>
+                <div id="status-buttons-container">
+                    <button id="toggle-complete-btn" class="px-4 py-2 bg-green-500 text-white font-semibold rounded-md shadow-sm hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors">Mark Complete</button>
+                    <button id="toggle-blocked-btn" class="px-4 py-2 bg-red-500 text-white font-semibold rounded-md shadow-sm hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors">Mark Blocked</button>
+                    <button id="toggle-pending-btn" class="px-4 py-2 bg-orange-500 text-white font-semibold rounded-md shadow-sm hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors">Mark Pending</button>
+                </div>
                 <button id="delete-task-btn" class="px-4 py-2 bg-gray-700 text-white font-semibold rounded-md shadow-sm hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-600 transition-colors">Delete</button>
                 <button id="save-task-btn" class="px-4 py-2 bg-blue-600 text-white font-semibold rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">Save Changes</button>
             </div>
@@ -339,6 +351,8 @@
             const saveProjectBtn = document.getElementById('save-project-btn');
             const importFileInput = document.getElementById('import-file-input');
             const graphContainer = document.getElementById('graph-container');
+            const headerProgressBarContainer = document.getElementById('header-progress-bar-container');
+            const headerProgressBar = document.getElementById('header-progress-bar');
             
             // Workflow Creation Modal elements
             const workflowCreationModal = document.getElementById('workflow-creation-modal');
@@ -360,6 +374,7 @@
             const taskDependenciesInput = document.getElementById('task-dependencies');
             const dependencyContainer = document.getElementById('dependency-container');
             const dependencySuggestions = document.getElementById('dependency-suggestions');
+            const statusButtonsContainer = document.getElementById('status-buttons-container');
             
             // Confirmation Modal elements
             const confirmModal = document.getElementById('confirm-modal');
@@ -421,6 +436,47 @@
                     updateUIFromState();
                 }
             }
+            
+            function calculateTotalProgress(tasks) {
+                let statusCounts = { complete: 0, blocked: 0, pending: 0, incomplete: 0, total: 0 };
+                tasks.forEach(task => {
+                    if (task.branch) {
+                        const branchProgress = calculateTotalProgress(task.branch.tasks);
+                        statusCounts.complete += branchProgress.complete;
+                        statusCounts.blocked += branchProgress.blocked;
+                        statusCounts.pending += branchProgress.pending;
+                        statusCounts.incomplete += branchProgress.incomplete;
+                        statusCounts.total += branchProgress.total;
+                    } else {
+                        statusCounts[task.status]++;
+                        statusCounts.total++;
+                    }
+                });
+                return statusCounts;
+            }
+
+            function updateParentTaskStatus(workflow) {
+                if (!workflow || !workflow.tasks) return;
+
+                workflow.tasks.forEach(task => {
+                    if (task.branch && task.branch.tasks.length > 0) {
+                        // Recursively update statuses in the branch first
+                        updateParentTaskStatus(task.branch);
+
+                        const progress = calculateTotalProgress(task.branch.tasks);
+                        
+                        if (progress.blocked > 0) {
+                            task.status = 'blocked';
+                        } else if (progress.complete === progress.total) {
+                            task.status = 'complete';
+                        } else if (progress.pending > 0 || progress.complete > 0) {
+                            task.status = 'pending';
+                        } else {
+                            task.status = 'incomplete';
+                        }
+                    }
+                });
+            }
 
             function renderGraph() {
                 // --- FIX: Create a fresh SVG canvas every time ---
@@ -435,6 +491,15 @@
                     return;
                 }
                 
+                const progress = calculateTotalProgress(currentWorkflow.tasks);
+                if (progress.total > 0) {
+                    const completionPercentage = (progress.complete / progress.total) * 100;
+                    headerProgressBar.style.width = `${completionPercentage}%`;
+                    headerProgressBarContainer.classList.remove('hidden');
+                } else {
+                    headerProgressBarContainer.classList.add('hidden');
+                }
+
                 const g = new dagreD3.graphlib.Graph().setGraph({
                     rankdir: 'LR', marginx: 10, marginy: 10, nodesep: 30, ranksep: 100,
                 });
@@ -456,10 +521,36 @@
                     };
 
                     if (task.branch) {
+                        const branchProgress = calculateTotalProgress(task.branch.tasks);
+                        const totalSubtasks = branchProgress.total;
+                        
+                        let completeWidth = totalSubtasks > 0 ? (branchProgress.complete / totalSubtasks) * 100 : 0;
+                        let blockedWidth = totalSubtasks > 0 ? (branchProgress.blocked / totalSubtasks) * 100 : 0;
+                        let pendingWidth = totalSubtasks > 0 ? (branchProgress.pending / totalSubtasks) * 100 : 0;
+
+                        if (branchProgress.complete > 0 && completeWidth < 10) completeWidth = 10;
+                        if (branchProgress.blocked > 0 && blockedWidth < 10) blockedWidth = 10;
+                        if (branchProgress.pending > 0 && pendingWidth < 10) pendingWidth = 10;
+
+                        const totalWidth = completeWidth + blockedWidth + pendingWidth;
+                        if (totalWidth > 100) {
+                            const scale = 100 / totalWidth;
+                            completeWidth *= scale;
+                            blockedWidth *= scale;
+                            pendingWidth *= scale;
+                        }
+
                         nodeConfig.label = `
-                            <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-flex; align-items: center; white-space: nowrap; padding: 4px;">
-                                <span class="node-label-text">${task.label}</span>
-                                <span class="branch-emoji" data-node-id="${task.id}" title="Enter Branch" style="margin-left: 12px;">🌿</span>
+                            <div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; flex-direction: column; align-items: center; white-space: nowrap; padding: 4px;">
+                                <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                    <span class="node-label-text">${task.label}</span>
+                                    <span class="branch-emoji" data-node-id="${task.id}" title="Enter Branch" style="margin-left: 12px;">🌿</span>
+                                </div>
+                                <div style="width: 100px; height: 8px; background-color: #e5e7eb; border-radius: 4px; display: flex; overflow: hidden;">
+                                    <div style="width: ${completeWidth}%; height: 100%; background-color: #22c55e;"></div>
+                                    <div style="width: ${blockedWidth}%; height: 100%; background-color: #ef4444;"></div>
+                                    <div style="width: ${pendingWidth}%; height: 100%; background-color: #f97316;"></div>
+                                </div>
                             </div>
                         `;
                         nodeConfig.labelType = 'html';
@@ -511,6 +602,9 @@
             }
             
             function updateUIFromState() {
+                if (projectData) {
+                    updateParentTaskStatus(projectData);
+                }
                 updateBreadcrumbs();
                 renderGraph();
             }
@@ -537,10 +631,6 @@
                 
                 const branchBtn = document.getElementById('branch-btn');
                 const deleteBranchBtn = document.getElementById('delete-branch-btn');
-                const toggleCompleteBtn = document.getElementById('toggle-complete-btn');
-                const toggleBlockedBtn = document.getElementById('toggle-blocked-btn');
-                const togglePendingBtn = document.getElementById('toggle-pending-btn');
-                const deleteTaskBtn = document.getElementById('delete-task-btn');
                 
                 const currentWorkflow = getCurrentWorkflow();
                 if (!currentWorkflow) return;
@@ -568,15 +658,16 @@
                     if (task.branch) {
                         branchBtn.textContent = 'View Branch';
                         deleteBranchBtn.style.display = 'inline-block';
+                        statusButtonsContainer.style.display = 'none';
                     } else {
                         branchBtn.textContent = 'Create Branch';
                         deleteBranchBtn.style.display = 'none';
+                        statusButtonsContainer.style.display = 'block';
                     }
 
-                    toggleCompleteBtn.style.display = 'inline-block';
-                    toggleBlockedBtn.style.display = 'inline-block';
-                    togglePendingBtn.style.display = 'inline-block';
-                    deleteTaskBtn.style.display = 'inline-block';
+                    const toggleCompleteBtn = document.getElementById('toggle-complete-btn');
+                    const toggleBlockedBtn = document.getElementById('toggle-blocked-btn');
+                    const togglePendingBtn = document.getElementById('toggle-pending-btn');
 
                     if (task.status === 'complete') {
                         toggleCompleteBtn.textContent = 'Mark Incomplete';
@@ -617,10 +708,7 @@
                     
                     branchBtn.style.display = 'none'; 
                     deleteBranchBtn.style.display = 'none';
-                    toggleCompleteBtn.style.display = 'none';
-                    toggleBlockedBtn.style.display = 'none';
-                    togglePendingBtn.style.display = 'none';
-                    deleteTaskBtn.style.display = 'none';
+                    statusButtonsContainer.style.display = 'block';
                 }
                 
                 editTaskModal.classList.remove('hidden', 'is-closing');
@@ -775,8 +863,7 @@
 
             function deleteBranch() {
                 if (!updateTaskDataFromModal()) return;
-                updateUIFromState();
-
+                
                 const taskId = taskIdInput.value;
                 const currentWorkflow = getCurrentWorkflow();
                 if (!currentWorkflow) return;
@@ -786,13 +873,14 @@
 
                 showConfirm('Delete Branch?', 'This will permanently delete the nested workflow. This action cannot be undone.', () => {
                     task.branch = null;
+                    task.status = 'incomplete';
                     
                     const branchBtn = document.getElementById('branch-btn');
                     const deleteBranchBtn = document.getElementById('delete-branch-btn');
                     branchBtn.textContent = 'Create Branch';
                     deleteBranchBtn.style.display = 'none';
                     
-                    renderGraph();
+                    updateUIFromState();
                     showToast('Branch deleted successfully!');
                 });
             }
@@ -1036,28 +1124,24 @@
                                     showToast("Project imported successfully!");
                                 }, 0);
                             } else if (importContext === 'branch') {
-                            const parentTaskId = workflowCreationContext.parentTaskId;
-                            const currentWorkflow = getCurrentWorkflow();
-                            if (!currentWorkflow) return;
-                            const task = currentWorkflow.tasks.find(t => t.id === parentTaskId);
-                            if (task) {
-                                task.branch = loadedWorkflow;
-                                task.branch.name = task.label; // Inherit name from parent task
-                                
-                                // This is the fix:
-                                // If the imported workflow has a project ID, re-assign it as a branch ID.
-                                if (task.branch.id.startsWith('project_')) {
-                                    task.branch.id = 'branch_' + Date.now();
+                                const parentTaskId = workflowCreationContext.parentTaskId;
+                                const currentWorkflow = getCurrentWorkflow();
+                                if (!currentWorkflow) return;
+                                const task = currentWorkflow.tasks.find(t => t.id === parentTaskId);
+                                if (task) {
+                                    task.branch = loadedWorkflow;
+                                    task.branch.name = task.label;
+                                    if (task.branch.id.startsWith('project_')) {
+                                        task.branch.id = 'branch_' + Date.now();
+                                    }
+                                    closeWorkflowCreationModal();
+                                    closeEditModal();
+                                    navigateToBranch(parentTaskId);
+                                    showToast(`Branch '${task.branch.name}' loaded successfully!`);
+                                } else {
+                                    alert("Error: Could not find the parent task to attach the branch to.");
                                 }
-
-                                closeWorkflowCreationModal();
-                                closeEditModal();
-                                navigateToBranch(parentTaskId);
-                                showToast(`Branch '${task.branch.name}' loaded successfully!`);
-                            } else {
-                                alert("Error: Could not find the parent task to attach the branch to.");
                             }
-                        }
                         } catch (err) {
                             console.error("Import failed", err);
                             alert("Could not import file. It may be corrupted or in the wrong format.");
