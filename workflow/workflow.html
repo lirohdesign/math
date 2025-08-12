@@ -645,43 +645,77 @@
                 }, 200);
             }
 
-            function saveTaskChanges() {
+            function updateTaskDataFromModal() {
                 const taskId = taskIdInput.value;
+                if (!taskId) return false;
+
                 const taskLabel = taskLabelInput.value.trim();
                 if (!taskLabel) {
                     alert("Task name cannot be empty.");
-                    return;
+                    return false;
                 }
-                
+
                 const currentWorkflow = getCurrentWorkflow();
-                if (!currentWorkflow) return;
-                
-                const depString = taskDependenciesInput.value.trim();
-                let dependencies = [];
-                if(depString){
-                    dependencies = depString.split(',')
-                        .map(d => {
-                            const cleanLabel = d.trim().replace('#', '').replace('...', '');
-                            if (!cleanLabel) return null;
-                            const dependentTask = currentWorkflow.tasks.find(t => t.label.startsWith(cleanLabel));
-                            return dependentTask ? dependentTask.id : null;
-                        })
-                        .filter(Boolean);
+                if (!currentWorkflow) return false;
+
+                const task = currentWorkflow.tasks.find(t => t.id === taskId);
+                if (task) {
+                    task.label = taskLabel;
+                    task.tips = taskTipsInput.value.trim();
+                    task.notes = taskNotesInput.value.trim();
+                    
+                    const depString = taskDependenciesInput.value.trim();
+                    let dependencies = [];
+                    if(depString){
+                        dependencies = depString.split(',')
+                            .map(d => {
+                                const cleanLabel = d.trim().replace('#', '').replace('...', '');
+                                if (!cleanLabel) return null;
+                                const dependentTask = currentWorkflow.tasks.find(t => t.label.startsWith(cleanLabel));
+                                return dependentTask ? dependentTask.id : null;
+                            })
+                            .filter(Boolean);
+                    }
+                    task.dependencies = dependencies;
+
+                    if (task.branch) {
+                        task.branch.name = taskLabel;
+                    }
                 }
+                return true;
+            }
+
+            function saveTaskChanges() {
+                const taskId = taskIdInput.value;
                 
                 if (taskId) { // Editing
-                    const task = currentWorkflow.tasks.find(t => t.id === taskId);
-                    if (task) {
-                        task.label = taskLabel;
-                        task.tips = taskTipsInput.value.trim();
-                        task.notes = taskNotesInput.value.trim();
-                        task.dependencies = dependencies;
-                        if (task.branch) {
-                            task.branch.name = taskLabel;
-                            updateBreadcrumbs();
-                        }
+                    if (updateTaskDataFromModal()) {
+                        updateUIFromState();
+                        closeEditModal();
                     }
                 } else { // Creating
+                    const taskLabel = taskLabelInput.value.trim();
+                    if (!taskLabel) {
+                        alert("Task name cannot be empty.");
+                        return;
+                    }
+                    
+                    const currentWorkflow = getCurrentWorkflow();
+                    if (!currentWorkflow) return;
+
+                    const depString = taskDependenciesInput.value.trim();
+                    let dependencies = [];
+                    if(depString){
+                        dependencies = depString.split(',')
+                            .map(d => {
+                                const cleanLabel = d.trim().replace('#', '').replace('...', '');
+                                if (!cleanLabel) return null;
+                                const dependentTask = currentWorkflow.tasks.find(t => t.label.startsWith(cleanLabel));
+                                return dependentTask ? dependentTask.id : null;
+                            })
+                            .filter(Boolean);
+                    }
+
                     const newId = 'task_' + Date.now();
                     currentWorkflow.tasks.push({
                         id: newId, 
@@ -692,10 +726,9 @@
                         dependencies: dependencies, 
                         status: 'incomplete'
                     });
+                    updateUIFromState();
+                    closeEditModal();
                 }
-                
-                closeEditModal();
-                renderGraph();
             }
 
             function handleBranchAction(action, options = {}) {
@@ -722,6 +755,9 @@
             }
             
             function handleBranchButtonClick() {
+                if (!updateTaskDataFromModal()) return;
+                updateUIFromState();
+
                 const currentWorkflow = getCurrentWorkflow();
                 if (!currentWorkflow) return;
                 
@@ -738,6 +774,9 @@
             }
 
             function deleteBranch() {
+                if (!updateTaskDataFromModal()) return;
+                updateUIFromState();
+
                 const taskId = taskIdInput.value;
                 const currentWorkflow = getCurrentWorkflow();
                 if (!currentWorkflow) return;
@@ -759,18 +798,21 @@
             }
 
             function toggleTaskComplete() {
+                if (!updateTaskDataFromModal()) return;
+                
                 const currentWorkflow = getCurrentWorkflow();
                 if (!currentWorkflow) return;
                 const task = currentWorkflow.tasks.find(t => t.id === taskIdInput.value);
                 if (task) {
                     task.status = task.status === 'complete' ? 'incomplete' : 'complete';
                 }
-                saveTaskChanges();
                 closeEditModal();
-                renderGraph();
+                updateUIFromState();
             }
 
             function toggleTaskBlocked() {
+                if (!updateTaskDataFromModal()) return;
+
                 const currentWorkflow = getCurrentWorkflow();
                 if (!currentWorkflow) return;
                 const task = currentWorkflow.tasks.find(t => t.id === taskIdInput.value);
@@ -778,11 +820,12 @@
                     task.status = task.status === 'blocked' ? 'incomplete' : 'blocked';
                 }
                 closeEditModal();
-                saveTaskChanges();
-                renderGraph();
+                updateUIFromState();
             }
 
             function toggleTaskPending() {
+                if (!updateTaskDataFromModal()) return;
+
                 const currentWorkflow = getCurrentWorkflow();
                 if (!currentWorkflow) return;
                 const task = currentWorkflow.tasks.find(t => t.id === taskIdInput.value);
@@ -790,8 +833,7 @@
                     task.status = task.status === 'pending' ? 'incomplete' : 'pending';
                 }
                 closeEditModal();
-                saveTaskChanges();
-                renderGraph();
+                updateUIFromState();
             }
 
             function deleteTask() {
@@ -901,7 +943,7 @@
                 const signal = modalController.signal;
 
                 // Re-add listeners for the new buttons
-                editTaskModal.querySelector('.close-btn').addEventListener('click', closeEditModal, { signal });
+                editTaskModal.querySelector('.close-btn').addEventListener('click', () => closeEditModal(), { signal });
                 document.getElementById('save-task-btn').addEventListener('click', saveTaskChanges, { signal });
                 document.getElementById('delete-branch-btn').addEventListener('click', deleteBranch, { signal });
                 document.getElementById('toggle-complete-btn').addEventListener('click', toggleTaskComplete, { signal });
@@ -994,20 +1036,28 @@
                                     showToast("Project imported successfully!");
                                 }, 0);
                             } else if (importContext === 'branch') {
-                                const parentTaskId = workflowCreationContext.parentTaskId;
-                                const currentWorkflow = getCurrentWorkflow();
-                                if (!currentWorkflow) return;
-                                const task = currentWorkflow.tasks.find(t => t.id === parentTaskId);
-                                if (task) {
-                                    task.branch = loadedWorkflow;
-                                    closeWorkflowCreationModal();
-                                    closeEditModal();
-                                    navigateToBranch(parentTaskId);
-                                    showToast(`Branch '${loadedWorkflow.name}' loaded successfully!`);
-                                } else {
-                                    alert("Error: Could not find the parent task to attach the branch to.");
+                            const parentTaskId = workflowCreationContext.parentTaskId;
+                            const currentWorkflow = getCurrentWorkflow();
+                            if (!currentWorkflow) return;
+                            const task = currentWorkflow.tasks.find(t => t.id === parentTaskId);
+                            if (task) {
+                                task.branch = loadedWorkflow;
+                                task.branch.name = task.label; // Inherit name from parent task
+                                
+                                // This is the fix:
+                                // If the imported workflow has a project ID, re-assign it as a branch ID.
+                                if (task.branch.id.startsWith('project_')) {
+                                    task.branch.id = 'branch_' + Date.now();
                                 }
+
+                                closeWorkflowCreationModal();
+                                closeEditModal();
+                                navigateToBranch(parentTaskId);
+                                showToast(`Branch '${task.branch.name}' loaded successfully!`);
+                            } else {
+                                alert("Error: Could not find the parent task to attach the branch to.");
                             }
+                        }
                         } catch (err) {
                             console.error("Import failed", err);
                             alert("Could not import file. It may be corrupted or in the wrong format.");
