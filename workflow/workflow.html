@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workflow</title>
+    
+    <!-- D3.js and Dagre-D3 Libraries from CDN -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dagre-d3@0.6.4/dist/dagre-d3.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Custom styling to complement Tailwind */
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            overflow: hidden; /* Prevent body scroll, let container handle it */
+        }
+        
+        /* Graph Node and Edge Styling */
+        .graph-container {
+            flex-grow: 1;
+            background-color: #f9fafb; /* A very light gray background */
+        }
+        .node rect {
+            fill: #ffffff;
+            stroke: #d1d5db; /* gray-300 */
+            stroke-width: 2px;
+            transition: all 0.2s ease-in-out;
+        }
+        .node text {
+            font-weight: 500;
+            font-size: 14px;
+            fill: #1f2937; /* gray-800 */
+        }
+        .node:hover rect {
+             fill: #eff6ff; /* blue-50 */
+             stroke: #3b82f6; /* blue-500 */
+        }
+        .node:hover text {
+             fill: #1e40af; /* blue-800 */
+        }
+        /* Styling for completed nodes */
+        .node.completed rect {
+            fill: #dcfce7; /* green-100 */
+            stroke: #22c55e; /* green-500 */
+        }
+        .node.completed text, .node.completed .node-label-text {
+            fill: #166534; /* green-800 */
+            text-decoration: line-through;
+        }
+        /* Styling for blocked nodes */
+        .node.blocked rect {
+            fill: #fee2e2; /* red-100 */
+            stroke: #ef4444; /* red-500 */
+        }
+        .node.blocked text, .node.blocked .node-label-text {
+            fill: #991b1b; /* red-800 */
+        }
+        /* Styling for pending nodes using orange */
+        .node.pending rect {
+            fill: #ffedd5; /* orange-100 */
+            stroke: #f97316; /* orange-500 */
+        }
+        .node.pending text, .node.pending .node-label-text {
+            fill: #9a3412; /* orange-800 */
+        }
+        .edgePath path {
+            stroke: #6b7280; /* gray-500 */
+            fill: none;
+            stroke-width: 1.5px;
+        }
+        .arrowhead {
+            fill: #6b7280; /* gray-500 */
+        }
+
+        /* Branch emoji on node */
+        .branch-emoji {
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: transform 0.2s ease;
+        }
+        .branch-emoji:hover {
+            transform: scale(1.2);
+        }
+
+
+        /* Modal animation */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+        @keyframes slideIn { from { transform: translateY(-30px) scale(0.95); } to { transform: translateY(0) scale(1); } }
+        @keyframes slideOut { from { transform: translateY(0) scale(1); } to { transform: translateY(-30px) scale(0.95); } }
+        
+        .modal.is-opening {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+        .modal.is-opening .modal-content {
+            animation: slideIn 0.3s ease-out forwards;
+        }
+        .modal.is-closing {
+            animation: fadeOut 0.2s ease-in forwards;
+        }
+        .modal.is-closing .modal-content {
+            animation: slideOut 0.2s ease-in forwards;
+        }
+        #toast {
+            transition: opacity 0.5s, transform 0.5s;
+        }
+        .breadcrumb-link {
+            cursor: pointer;
+        }
+        .breadcrumb-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 flex flex-col h-screen">
+
+    <!-- Welcome Screen -->
+    <div id="welcome-screen" class="fixed inset-0 bg-gray-100 z-50 flex flex-col">
+        <div class="flex-grow flex items-center justify-center">
+            <div class="text-center p-8 max-w-lg">
+                <div class="flex items-center justify-center gap-4 mb-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25A2.25 2.25 0 015.25 3h4.5M7.5 3v1.5M16.5 3v1.5m-0 9.75l-4.5-4.5m0 0l-4.5 4.5M12 6v6.75" />
+                    </svg>
+                    <h1 class="text-4xl font-bold text-gray-800">Workflow</h1>
+                </div>
+                <p class="text-gray-600 mb-8">
+                    This is a self-contained HTML file. To save your work, you must use the "Save Project" button to export a JSON file. To continue later, use the "Load Project" button and select your saved file.
+                </p>
+                <div class="flex justify-center gap-4">
+                    <button id="start-new-btn" class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors text-lg">
+                        Start New Project
+                    </button>
+                    <button id="load-project-btn" class="px-6 py-3 bg-white text-gray-700 font-semibold rounded-md shadow-sm border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors text-lg">
+                        Load Project
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header & Controls -->
+    <header class="bg-white border-b border-gray-200 shadow-sm z-10 hidden">
+        <div class="container mx-auto px-4">
+            <!-- Top Row: Title and Save Project Button -->
+            <div class="flex items-center justify-between py-4">
+                <div class="flex items-center gap-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25A2.25 2.25 0 015.25 3h4.5M7.5 3v1.5M16.5 3v1.5m-0 9.75l-4.5-4.5m0 0l-4.5 4.5M12 6v6.75" />
+                    </svg>
+                    <h1 class="text-xl font-bold text-gray-700">Workflow</h1>
+                </div>
+                <button id="save-project-btn" class="px-4 py-2 bg-blue-600 text-white font-semibold rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                    Save Project
+                </button>
+            </div>
+            <!-- Bottom Row: Other Controls -->
+            <div class="flex items-end gap-x-6 gap-y-4 flex-wrap border-t border-gray-200 pt-4 pb-2">
+                 <div id="breadcrumb-container" class="flex items-center gap-2 text-sm text-gray-500 mr-auto">
+                    <!-- Breadcrumbs will be dynamically inserted here -->
+                </div>
+                <div class="flex items-end gap-2">
+                    <button id="add-task-btn" class="px-4 py-2 bg-green-600 text-white font-semibold rounded-md shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors">
+                        Add New Task
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Graph Container -->
+    <main id="graph-container" class="graph-container flex-grow overflow-auto hidden">
+        <!-- SVG will be dynamically created here -->
+    </main>
+
+    <!-- Footer for Import/Export -->
+    <footer class="bg-white border-t border-gray-200 p-2 fixed bottom-0 right-0 w-full z-20 hidden">
+        <div class="container mx-auto flex justify-end items-center gap-4 px-4">
+            <!-- Main footer is now empty -->
+        </div>
+    </footer>
+
+    <!-- Universal Workflow Creation Modal -->
+    <div id="workflow-creation-modal" class="modal fixed inset-0 z-50 items-center justify-center bg-black bg-opacity-50 hidden">
+        <div class="modal-content bg-white rounded-lg shadow-xl w-full max-w-sm m-4 p-6 relative">
+            <h3 id="workflow-creation-title" class="text-lg font-medium text-gray-900 mb-4">Create</h3>
+            
+            <div id="workflow-name-container" class="mb-4">
+                <label for="workflow-name-input" class="block text-sm font-medium text-gray-700 mb-1">Project Name</label>
+                <input type="text" id="workflow-name-input" placeholder="My Awesome Project" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+            </div>
+
+            <!-- Option 1: Create from Template -->
+            <p class="text-sm text-gray-600 mb-2">Choose a template.</p>
+            <div class="mb-4">
+                <label for="workflow-template-select" class="block text-sm font-medium text-gray-700 mb-1">Template</label>
+                <select id="workflow-template-select" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"></select>
+            </div>
+            <button id="create-workflow-from-template-btn" class="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Create</button>
+
+            <!-- Separator -->
+            <div class="my-6 flex items-center">
+                <div class="flex-grow border-t border-gray-300"></div>
+                <span class="flex-shrink mx-4 text-gray-400 text-sm">OR</span>
+                <div class="flex-grow border-t border-gray-300"></div>
+            </div>
+
+            <!-- Option 2: Load from Project File -->
+            <p class="text-sm text-gray-600 mb-2">Import an existing project file.</p>
+            <button id="load-workflow-btn" class="w-full px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">Load Project</button>
+            
+            <button id="close-workflow-creation-modal-btn" class="absolute top-2 right-3 text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
+        </div>
+    </div>
+
+
+    <!-- Edit/Add Task Modal -->
+    <div id="edit-modal" class="modal fixed inset-0 z-50 items-center justify-center bg-black bg-opacity-50 hidden">
+        <div class="modal-content bg-white rounded-lg shadow-xl w-full max-w-2xl m-4">
+            <div class="modal-header flex items-center p-4 border-b border-gray-200">
+                <div class="flex-1">
+                    <h2 id="modal-title" class="text-lg font-semibold text-gray-800">Edit Task</h2>
+                </div>
+                <div class="flex-1 text-center flex justify-center gap-2">
+                    <button id="branch-btn" class="px-4 py-2 bg-purple-600 text-white font-semibold rounded-md shadow-sm hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors">Create Branch</button>
+                    <button id="delete-branch-btn" class="hidden px-4 py-2 bg-gray-600 text-white font-semibold rounded-md shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors">Delete Branch</button>
+                </div>
+                <div class="flex-1 flex justify-end">
+                    <button class="close-btn text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
+                </div>
+            </div>
+            <div class="modal-body p-6">
+                <input type="hidden" id="task-id">
+                <div class="mb-4">
+                    <label for="task-label" class="block text-sm font-medium text-gray-700 mb-1">Task Name</label>
+                    <input type="text" id="task-label" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                </div>
+                <div class="mb-4">
+                    <label for="task-tips" class="block text-sm font-medium text-gray-700 mb-1">Tips</label>
+                    <textarea id="task-tips" placeholder="Add general tips or instructions for this type of task..." rows="3" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
+                </div>
+                <div class="mb-4">
+                    <label for="task-notes" class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                    <textarea id="task-notes" placeholder="Add project-specific notes here..." rows="3" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
+                </div>
+                <div>
+                    <label for="task-dependencies" class="block text-sm font-medium text-gray-700 mb-1">Dependencies (use '#' to add)</label>
+                    <div id="dependency-container" class="relative">
+                       <input type="text" id="task-dependencies" placeholder="e.g., #Project Initi..." class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                       <div id="dependency-suggestions" class="hidden absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg mt-1 max-h-40 overflow-y-auto"></div>
+                    </div>
+                </div>
+            </div>
+            <div id="modal-footer" class="bg-gray-50 px-6 py-3 flex justify-center items-center gap-2 rounded-b-lg flex-wrap">
+                <button id="toggle-complete-btn" class="px-4 py-2 bg-green-500 text-white font-semibold rounded-md shadow-sm hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors">Mark Complete</button>
+                <button id="toggle-blocked-btn" class="px-4 py-2 bg-red-500 text-white font-semibold rounded-md shadow-sm hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors">Mark Blocked</button>
+                <button id="toggle-pending-btn" class="px-4 py-2 bg-orange-500 text-white font-semibold rounded-md shadow-sm hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors">Mark Pending</button>
+                <button id="delete-task-btn" class="px-4 py-2 bg-gray-700 text-white font-semibold rounded-md shadow-sm hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-600 transition-colors">Delete</button>
+                <button id="save-task-btn" class="px-4 py-2 bg-blue-600 text-white font-semibold rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">Save Changes</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Custom Confirmation Modal -->
+    <div id="confirm-modal" class="modal fixed inset-0 z-50 items-center justify-center bg-black bg-opacity-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-sm m-4 p-6 text-center">
+            <h3 id="confirm-title" class="text-lg font-medium text-gray-900 mb-2">Are you sure?</h3>
+            <p id="confirm-text" class="text-sm text-gray-500 mb-4">This action cannot be undone.</p>
+            <div class="flex justify-center gap-4">
+                <button id="confirm-cancel" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">Cancel</button>
+                <button id="confirm-ok" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed top-5 left-5 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg opacity-0 transform -translate-x-full z-[100]">
+        Template saved successfully!
+    </div>
+    
+    <input type="file" id="import-file-input" class="hidden" accept=".json">
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- DATA STRUCTURE & STATE MANAGEMENT ---
+            let initialTemplates;
+            let projectData; // Holds the entire nested project object
+            let navigationStack = []; // An array of workflow objects, representing the path
+            let importContext = 'project'; // 'project' or 'branch'
+            let modalController; // AbortController for modal event listeners
+            let workflowCreationContext = { context: 'project', parentTaskId: null };
+
+            // Define templates as a JSON string. This makes it easy to copy/paste from saved files.
+            const defaultTemplatesJSON = `{
+                "blank": {
+                    "tasks": []
+                },
+                "limited": {
+                    "tasks": [
+                        {
+                            "id": "task_1753988493306",
+                            "label": "sample task 1",
+                            "branch": null,
+                            "notes": "sample note 1",
+                            "tips": "sample tip 1",
+                            "dependencies": [],
+                            "status": "incomplete"
+                        },
+                        {
+                            "id": "task_1753988512914",
+                            "label": "sample task 2",
+                            "branch": null,
+                            "notes": "sample note 2",
+                            "tips": "sample tip 2",
+                            "dependencies": [
+                                "task_1753988493306"
+                            ],
+                            "status": "incomplete"
+                        }
+                    ]
+                }
+            }`;
+            
+            // --- DOM ELEMENTS ---
+            const welcomeScreen = document.getElementById('welcome-screen');
+            const startNewBtn = document.getElementById('start-new-btn');
+            const loadProjectBtn = document.getElementById('load-project-btn');
+            const appHeader = document.querySelector('header');
+            const appMain = document.querySelector('main');
+            const appFooter = document.querySelector('footer');
+
+            const breadcrumbContainer = document.getElementById('breadcrumb-container');
+            const addTaskButton = document.getElementById('add-task-btn');
+            const saveProjectBtn = document.getElementById('save-project-btn');
+            const importFileInput = document.getElementById('import-file-input');
+            const graphContainer = document.getElementById('graph-container');
+            
+            // Workflow Creation Modal elements
+            const workflowCreationModal = document.getElementById('workflow-creation-modal');
+            const workflowCreationTitle = document.getElementById('workflow-creation-title');
+            const workflowNameContainer = document.getElementById('workflow-name-container');
+            const workflowNameInput = document.getElementById('workflow-name-input');
+            const workflowTemplateSelect = document.getElementById('workflow-template-select');
+            const createWorkflowFromTemplateBtn = document.getElementById('create-workflow-from-template-btn');
+            const loadWorkflowBtn = document.getElementById('load-workflow-btn');
+            const closeWorkflowCreationModalBtn = document.getElementById('close-workflow-creation-modal-btn');
+
+            // Edit Task Modal elements
+            const editTaskModal = document.getElementById('edit-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const taskIdInput = document.getElementById('task-id');
+            const taskLabelInput = document.getElementById('task-label');
+            const taskTipsInput = document.getElementById('task-tips');
+            const taskNotesInput = document.getElementById('task-notes');
+            const taskDependenciesInput = document.getElementById('task-dependencies');
+            const dependencyContainer = document.getElementById('dependency-container');
+            const dependencySuggestions = document.getElementById('dependency-suggestions');
+            
+            // Confirmation Modal elements
+            const confirmModal = document.getElementById('confirm-modal');
+            const confirmTitle = document.getElementById('confirm-title');
+            const confirmText = document.getElementById('confirm-text');
+            const confirmOkBtn = document.getElementById('confirm-ok');
+            const confirmCancelBtn = document.getElementById('confirm-cancel');
+            let confirmCallback = null;
+
+            // --- CORE FUNCTIONALITY & NAVIGATION ---
+            function getCurrentWorkflow() {
+                return navigationStack.length > 0 ? navigationStack[navigationStack.length - 1] : null;
+            }
+
+            function showMainApp() {
+                welcomeScreen.classList.add('hidden');
+                appHeader.classList.remove('hidden');
+                appMain.classList.remove('hidden');
+                appFooter.classList.remove('hidden');
+            }
+
+            function updateBreadcrumbs() {
+                breadcrumbContainer.innerHTML = '';
+                navigationStack.forEach((workflow, index) => {
+                    const isLast = index === navigationStack.length - 1;
+                    
+                    if (isLast) {
+                        const span = document.createElement('span');
+                        span.className = 'font-semibold text-gray-800';
+                        span.textContent = workflow.name || 'Current Branch';
+                        breadcrumbContainer.appendChild(span);
+                    } else {
+                        const a = document.createElement('a');
+                        a.className = 'breadcrumb-link text-blue-600 hover:underline';
+                        a.textContent = workflow.name;
+                        a.onclick = () => navigateToLevel(index);
+                        breadcrumbContainer.appendChild(a);
+
+                        const separator = document.createElement('span');
+                        separator.className = 'text-gray-400 mx-2';
+                        separator.textContent = '>';
+                        breadcrumbContainer.appendChild(separator);
+                    }
+                });
+            }
+
+            function navigateToLevel(level) {
+                navigationStack = navigationStack.slice(0, level + 1);
+                updateUIFromState();
+            }
+
+            function navigateToBranch(taskId) {
+                const activeWorkflow = getCurrentWorkflow();
+                if (!activeWorkflow) return;
+
+                const task = activeWorkflow.tasks.find(t => t.id === taskId);
+                if (task && task.branch) {
+                    navigationStack.push(task.branch);
+                    updateUIFromState();
+                }
+            }
+
+            function renderGraph() {
+                // --- FIX: Create a fresh SVG canvas every time ---
+                graphContainer.innerHTML = ''; // Clear the container
+                const svg = d3.select(graphContainer).append('svg')
+                    .attr('class', 'w-full h-full min-w-[800px] min-h-[600px]');
+                const inner = svg.append('g');
+                // --- END FIX ---
+                
+                const currentWorkflow = getCurrentWorkflow();
+                if (appMain.classList.contains('hidden') || !currentWorkflow) {
+                    return;
+                }
+                
+                const g = new dagreD3.graphlib.Graph().setGraph({
+                    rankdir: 'LR', marginx: 10, marginy: 10, nodesep: 30, ranksep: 100,
+                });
+                
+                const tasksToRender = currentWorkflow.tasks;
+
+                const taskIdsToRender = new Set(tasksToRender.map(t => t.id));
+
+                if (tasksToRender.length === 0) return;
+
+                tasksToRender.forEach(task => {
+                    let nodeClass = 'task-node';
+                    if (task.status === 'complete') nodeClass += ' completed';
+                    else if (task.status === 'blocked') nodeClass += ' blocked';
+                    else if (task.status === 'pending') nodeClass += ' pending';
+                    
+                    let nodeConfig = {
+                        rx: 8, ry: 8, padding: 15, class: nodeClass
+                    };
+
+                    if (task.branch) {
+                        nodeConfig.label = `
+                            <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-flex; align-items: center; white-space: nowrap; padding: 4px;">
+                                <span class="node-label-text">${task.label}</span>
+                                <span class="branch-emoji" data-node-id="${task.id}" title="Enter Branch" style="margin-left: 12px;">🌿</span>
+                            </div>
+                        `;
+                        nodeConfig.labelType = 'html';
+                    } else {
+                        nodeConfig.label = task.label;
+                    }
+
+                    g.setNode(task.id, nodeConfig);
+                });
+
+                tasksToRender.forEach(task => {
+                    task.dependencies.forEach(depId => {
+                        if (taskIdsToRender.has(depId)) {
+                            g.setEdge(depId, task.id, { arrowhead: 'vee', curve: d3.curveBasis});
+                        }
+                    });
+                });
+
+                const render = new dagreD3.render();
+                inner.call(render, g);
+                
+                const zoom = d3.zoom().on('zoom', (event) => inner.attr('transform', event.transform));
+                svg.call(zoom);
+                
+                const graphWidth = g.graph().width;
+                const graphHeight = g.graph().height;
+                if (graphWidth > 0) {
+                    const svgWidth = svg.node().getBoundingClientRect().width;
+                    const svgHeight = svg.node().getBoundingClientRect().height;
+                    const initialScale = Math.min(0.9, svgWidth / (graphWidth + 60), svgHeight / (graphHeight + 60));
+                    const initialTransform = d3.zoomIdentity
+                        .translate((svgWidth - graphWidth * initialScale) / 2, (svgHeight - graphHeight * initialScale) / 2)
+                        .scale(initialScale);
+                    svg.call(zoom.transform, initialTransform);
+                }
+
+                inner.selectAll('g.node')
+                    .on('click', (event, nodeId) => {
+                        const target = event.target.closest('.branch-emoji');
+                        if (target) {
+                            event.stopPropagation();
+                            const id = target.getAttribute('data-node-id');
+                            navigateToBranch(id);
+                        } else {
+                            openTaskEditor(nodeId);
+                        }
+                    })
+                    .style('cursor', 'pointer');
+            }
+            
+            function updateUIFromState() {
+                updateBreadcrumbs();
+                renderGraph();
+            }
+
+            // --- MODAL & EDITING LOGIC ---
+            function openWorkflowCreationModal(context, parentId = null) {
+                workflowCreationContext = { context: context, parentTaskId: parentId };
+
+                if (context === 'newProject') {
+                    workflowCreationTitle.textContent = 'Create New Project';
+                    workflowNameContainer.style.display = 'block';
+                    workflowNameInput.value = '';
+                } else { // 'newBranch'
+                    workflowCreationTitle.textContent = 'Create New Branch';
+                    workflowNameContainer.style.display = 'block';
+                    workflowNameInput.value = '';
+                }
+
+                workflowCreationModal.classList.remove('hidden');
+                workflowCreationModal.classList.add('flex', 'is-opening');
+            }
+            
+            function openTaskEditor(taskId = null) {
+                setupModalEventListeners();
+                
+                const branchBtn = document.getElementById('branch-btn');
+                const deleteBranchBtn = document.getElementById('delete-branch-btn');
+                const toggleCompleteBtn = document.getElementById('toggle-complete-btn');
+                const toggleBlockedBtn = document.getElementById('toggle-blocked-btn');
+                const togglePendingBtn = document.getElementById('toggle-pending-btn');
+                const deleteTaskBtn = document.getElementById('delete-task-btn');
+                
+                const currentWorkflow = getCurrentWorkflow();
+                if (!currentWorkflow) return;
+
+                if (taskId) { // Editing an existing task
+                    const task = currentWorkflow.tasks.find(t => t.id === taskId);
+                    if (!task) return;
+
+                    taskIdInput.value = task.id;
+                    modalTitle.textContent = `Edit: ${task.label}`;
+                    taskLabelInput.value = task.label;
+                    taskTipsInput.value = task.tips || "";
+                    taskNotesInput.value = task.notes;
+                    taskDependenciesInput.value = task.dependencies.map(depId => {
+                        const dependentTask = currentWorkflow.tasks.find(t => t.id === depId);
+                        if (dependentTask) {
+                            const label = dependentTask.label;
+                            const truncatedLabel = label.length > 18 ? label.substring(0, 18) + '' : label;
+                            return `#${truncatedLabel}`;
+                        }
+                        return '';
+                    }).filter(Boolean).join(', ');
+                    
+                    branchBtn.style.display = 'inline-block';
+                    if (task.branch) {
+                        branchBtn.textContent = 'View Branch';
+                        deleteBranchBtn.style.display = 'inline-block';
+                    } else {
+                        branchBtn.textContent = 'Create Branch';
+                        deleteBranchBtn.style.display = 'none';
+                    }
+
+                    toggleCompleteBtn.style.display = 'inline-block';
+                    toggleBlockedBtn.style.display = 'inline-block';
+                    togglePendingBtn.style.display = 'inline-block';
+                    deleteTaskBtn.style.display = 'inline-block';
+
+                    if (task.status === 'complete') {
+                        toggleCompleteBtn.textContent = 'Mark Incomplete';
+                        toggleCompleteBtn.classList.add('bg-gray-500', 'hover:bg-gray-600');
+                        toggleCompleteBtn.classList.remove('bg-green-500', 'hover:bg-green-600');
+                    } else {
+                        toggleCompleteBtn.textContent = 'Mark Complete';
+                        toggleCompleteBtn.classList.add('bg-green-500', 'hover:bg-green-600');
+                        toggleCompleteBtn.classList.remove('bg-gray-500', 'hover:bg-gray-600');
+                    }
+
+                    if (task.status === 'blocked') {
+                        toggleBlockedBtn.textContent = 'Unblock';
+                        toggleBlockedBtn.classList.add('bg-gray-500', 'hover:bg-gray-600');
+                        toggleBlockedBtn.classList.remove('bg-red-500', 'hover:bg-red-600');
+                    } else {
+                        toggleBlockedBtn.textContent = 'Mark Blocked';
+                        toggleBlockedBtn.classList.add('bg-red-500', 'hover:bg-red-600');
+                        toggleBlockedBtn.classList.remove('bg-gray-500', 'hover:bg-gray-600');
+                    }
+
+                    if (task.status === 'pending') {
+                        togglePendingBtn.textContent = 'Reset Status';
+                        togglePendingBtn.classList.add('bg-gray-500', 'hover:bg-gray-600');
+                        togglePendingBtn.classList.remove('bg-orange-500', 'hover:bg-orange-600');
+                    } else {
+                        togglePendingBtn.textContent = 'Mark Pending';
+                        togglePendingBtn.classList.add('bg-orange-500', 'hover:bg-orange-600');
+                        togglePendingBtn.classList.remove('bg-gray-500', 'hover:bg-gray-600');
+                    }
+                } else { // Adding a new task
+                    modalTitle.textContent = 'Add New Task';
+                    taskIdInput.value = '';
+                    taskLabelInput.value = '';
+                    taskTipsInput.value = '';
+                    taskNotesInput.value = '';
+                    taskDependenciesInput.value = '';
+                    
+                    branchBtn.style.display = 'none'; 
+                    deleteBranchBtn.style.display = 'none';
+                    toggleCompleteBtn.style.display = 'none';
+                    toggleBlockedBtn.style.display = 'none';
+                    togglePendingBtn.style.display = 'none';
+                    deleteTaskBtn.style.display = 'none';
+                }
+                
+                editTaskModal.classList.remove('hidden');
+                editTaskModal.classList.add('flex', 'is-opening');
+                editTaskModal.classList.remove('is-closing');
+            }
+
+            function closeEditModal(callback) {
+                editTaskModal.classList.add('is-closing');
+                editTaskModal.classList.remove('is-opening');
+                setTimeout(() => {
+                    editTaskModal.classList.add('hidden');
+                    dependencySuggestions.classList.add('hidden');
+                    if (callback) callback();
+                }, 200);
+            }
+            
+            function closeWorkflowCreationModal() {
+                workflowCreationModal.classList.add('is-closing');
+                setTimeout(() => {
+                    workflowCreationModal.classList.add('hidden');
+                }, 200);
+            }
+
+            function saveTaskChanges() {
+                const taskId = taskIdInput.value;
+                const taskLabel = taskLabelInput.value.trim();
+                if (!taskLabel) {
+                    alert("Task name cannot be empty.");
+                    return;
+                }
+                
+                const currentWorkflow = getCurrentWorkflow();
+                if (!currentWorkflow) return;
+                
+                const depString = taskDependenciesInput.value.trim();
+                let dependencies = [];
+                if(depString){
+                    dependencies = depString.split(',')
+                        .map(d => {
+                            const cleanLabel = d.trim().replace('#', '').replace('...', '');
+                            if (!cleanLabel) return null;
+                            const dependentTask = currentWorkflow.tasks.find(t => t.label.startsWith(cleanLabel));
+                            return dependentTask ? dependentTask.id : null;
+                        })
+                        .filter(Boolean);
+                }
+                
+                if (taskId) { // Editing
+                    const task = currentWorkflow.tasks.find(t => t.id === taskId);
+                    if (task) {
+                        task.label = taskLabel;
+                        task.tips = taskTipsInput.value.trim();
+                        task.notes = taskNotesInput.value.trim();
+                        task.dependencies = dependencies;
+                    }
+                } else { // Creating
+                    const newId = 'task_' + Date.now();
+                    currentWorkflow.tasks.push({
+                        id: newId, 
+                        label: taskLabel, 
+                        branch: null,
+                        tips: taskTipsInput.value.trim(),
+                        notes: taskNotesInput.value.trim(),
+                        dependencies: dependencies, 
+                        status: 'incomplete'
+                    });
+                }
+                
+                closeEditModal();
+                renderGraph();
+            }
+
+            function handleBranchAction(action, options = {}) {
+                const { type } = options;
+                const parentTaskId = workflowCreationContext.parentTaskId;
+                const currentWorkflow = getCurrentWorkflow();
+                if (!currentWorkflow) return;
+                
+                const parentTask = currentWorkflow.tasks.find(t => t.id === parentTaskId);
+                if (!parentTask) return;
+
+                const newBranchWorkflow = {
+                    id: 'branch_' + Date.now(),
+                    name: parentTask.label, 
+                    workflowType: type,
+                    tasks: JSON.parse(JSON.stringify(initialTemplates[type].tasks))
+                };
+                
+                ensureDataStructure(newBranchWorkflow);
+                parentTask.branch = newBranchWorkflow;
+                
+                closeWorkflowCreationModal();
+                navigateToBranch(parentTaskId);
+            }
+            
+            function handleBranchButtonClick() {
+                const currentWorkflow = getCurrentWorkflow();
+                if (!currentWorkflow) return;
+                
+                const task = currentWorkflow.tasks.find(t => t.id === taskIdInput.value);
+                if (task && task.branch) {
+                    closeEditModal(() => {
+                        navigateToBranch(task.id);
+                    });
+                } else {
+                    closeEditModal(() => {
+                        openWorkflowCreationModal('newBranch', taskIdInput.value);
+                    });
+                }
+            }
+
+            function deleteBranch() {
+                const taskId = taskIdInput.value;
+                const currentWorkflow = getCurrentWorkflow();
+                if (!currentWorkflow) return;
+                
+                const task = currentWorkflow.tasks.find(t => t.id === taskId);
+                if (!task) return;
+
+                showConfirm('Delete Branch?', 'This will permanently delete the nested workflow. This action cannot be undone.', () => {
+                    task.branch = null;
+                    
+                    const branchBtn = document.getElementById('branch-btn');
+                    const deleteBranchBtn = document.getElementById('delete-branch-btn');
+                    branchBtn.textContent = 'Create Branch';
+                    deleteBranchBtn.style.display = 'none';
+                    
+                    renderGraph();
+                    showToast('Branch deleted successfully!');
+                });
+            }
+
+            function toggleTaskComplete() {
+                const currentWorkflow = getCurrentWorkflow();
+                if (!currentWorkflow) return;
+                const task = currentWorkflow.tasks.find(t => t.id === taskIdInput.value);
+                if (task) {
+                    task.status = task.status === 'complete' ? 'incomplete' : 'complete';
+                }
+                saveTaskChanges();
+                closeEditModal();
+                renderGraph();
+            }
+
+            function toggleTaskBlocked() {
+                const currentWorkflow = getCurrentWorkflow();
+                if (!currentWorkflow) return;
+                const task = currentWorkflow.tasks.find(t => t.id === taskIdInput.value);
+                if (task) {
+                    task.status = task.status === 'blocked' ? 'incomplete' : 'blocked';
+                }
+                closeEditModal();
+                saveTaskChanges();
+                renderGraph();
+            }
+
+            function toggleTaskPending() {
+                const currentWorkflow = getCurrentWorkflow();
+                if (!currentWorkflow) return;
+                const task = currentWorkflow.tasks.find(t => t.id === taskIdInput.value);
+                if (task) {
+                    task.status = task.status === 'pending' ? 'incomplete' : 'pending';
+                }
+                closeEditModal();
+                saveTaskChanges();
+                renderGraph();
+            }
+
+            function deleteTask() {
+                const taskIdToDelete = taskIdInput.value;
+                const currentWorkflow = getCurrentWorkflow();
+                if (!currentWorkflow) return;
+                
+                showConfirm('Delete Task?', `This will permanently delete the task and any nested branches. This cannot be undone.`, () => {
+                    currentWorkflow.tasks = currentWorkflow.tasks.filter(t => t.id !== taskIdToDelete);
+                    currentWorkflow.tasks.forEach(task => {
+                        task.dependencies = task.dependencies.filter(depId => depId !== taskIdToDelete);
+                    });
+                    closeEditModal();
+                    renderGraph();
+                });
+            }
+            
+            // --- CONFIRMATION & NOTIFICATION LOGIC ---
+            function showConfirm(title, text, callback) {
+                confirmTitle.textContent = title;
+                confirmText.textContent = text;
+                confirmCallback = callback;
+                confirmOkBtn.textContent = 'Confirm';
+                confirmOkBtn.classList.add('bg-red-600', 'hover:bg-red-700');
+                confirmOkBtn.classList.remove('bg-gray-200');
+                confirmModal.classList.remove('hidden');
+                confirmModal.classList.add('flex');
+            }
+            
+            function showToast(message) {
+                const toast = document.getElementById('toast');
+                toast.textContent = message;
+                toast.classList.remove('opacity-0', '-translate-x-full');
+                toast.classList.add('opacity-100', 'translate-x-0');
+                setTimeout(() => {
+                    toast.classList.remove('opacity-100', 'translate-x-0');
+                    toast.classList.add('opacity-0', '-translate-x-full');
+                }, 2000);
+            }
+
+            confirmOkBtn.addEventListener('click', () => {
+                if (confirmCallback) confirmCallback();
+                confirmModal.classList.add('hidden');
+                confirmModal.classList.remove('flex');
+            });
+
+            confirmCancelBtn.addEventListener('click', () => {
+                confirmModal.classList.add('hidden');
+                confirmModal.classList.remove('flex');
+            });
+
+            // --- DEPENDENCY AUTOCOMPLETE LOGIC ---
+            taskDependenciesInput.addEventListener('input', (e) => {
+                const value = e.target.value;
+                const lastPart = value.split(',').pop().trim();
+                const currentWorkflow = getCurrentWorkflow();
+                if (!currentWorkflow) return;
+
+                if (lastPart.startsWith('#')) {
+                    const query = lastPart.substring(1).toLowerCase();
+                    const currentTaskId = taskIdInput.value;
+                    const existingDeps = new Set(value.split(',').map(d => d.trim()));
+                    const allOtherTasks = currentWorkflow.tasks
+                        .filter(t => t.id !== currentTaskId && !existingDeps.has(`#${t.label.length > 15 ? t.label.substring(0, 15) + '...' : t.label}`))
+                        .filter(t => t.label.toLowerCase().includes(query) || t.id.toLowerCase().includes(query));
+
+                    dependencySuggestions.innerHTML = '';
+                    if (allOtherTasks.length > 0) {
+                        allOtherTasks.forEach(task => {
+                            const div = document.createElement('div');
+                            div.className = "px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer";
+                            div.textContent = `${task.label}`;
+                            div.onclick = () => {
+                                const parts = value.split(',');
+                                parts.pop();
+                                const label = task.label;
+                                const truncatedLabel = label.length > 18 ? label.substring(0, 18) + '' : label;
+                                parts.push(` #${truncatedLabel}`);
+                                taskDependenciesInput.value = parts.join(',').trim() + ', ';
+                                dependencySuggestions.classList.add('hidden');
+                                taskDependenciesInput.focus();
+                            };
+                            dependencySuggestions.appendChild(div);
+                        });
+                        dependencySuggestions.classList.remove('hidden');
+                    } else {
+                        dependencySuggestions.classList.add('hidden');
+                    }
+                } else {
+                    dependencySuggestions.classList.add('hidden');
+                }
+            });
+            
+            document.addEventListener('click', (e) => {
+                if (!dependencyContainer.contains(e.target)) {
+                    dependencySuggestions.classList.add('hidden');
+                }
+            });
+
+            // --- EVENT LISTENERS ---
+            function setupModalEventListeners() {
+                // Abort any previous listeners to prevent duplicates
+                if (modalController) {
+                    modalController.abort();
+                }
+                modalController = new AbortController();
+                const signal = modalController.signal;
+
+                // Re-add listeners for the new buttons
+                editTaskModal.querySelector('.close-btn').addEventListener('click', closeEditModal, { signal });
+                document.getElementById('save-task-btn').addEventListener('click', saveTaskChanges, { signal });
+                document.getElementById('delete-branch-btn').addEventListener('click', deleteBranch, { signal });
+                document.getElementById('toggle-complete-btn').addEventListener('click', toggleTaskComplete, { signal });
+                document.getElementById('toggle-pending-btn').addEventListener('click', toggleTaskPending, { signal });
+                document.getElementById('toggle-blocked-btn').addEventListener('click', toggleTaskBlocked, { signal });
+                document.getElementById('delete-task-btn').addEventListener('click', deleteTask, { signal });
+                document.getElementById('branch-btn').addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    handleBranchButtonClick();
+                }, { signal });
+            }
+            
+            function setupEventListeners() {
+                startNewBtn.addEventListener('click', () => {
+                    openWorkflowCreationModal('newProject');
+                });
+
+                loadProjectBtn.addEventListener('click', () => {
+                    importContext = 'project';
+                    importFileInput.click();
+                });
+                
+                //closeWorkflowCreationModalBtn.addEventListener('click', closeWorkflowCreationModal);
+
+                createWorkflowFromTemplateBtn.addEventListener('click', () => {
+                    const type = workflowTemplateSelect.value;
+                    if (workflowCreationContext.context === 'newProject') {
+                        const name = workflowNameInput.value.trim();
+                        projectData = {
+                            id: 'project_' + Date.now(),
+                            name: name || "Untitled Project",
+                            workflowType: type,
+                            tasks: JSON.parse(JSON.stringify(initialTemplates[type].tasks))
+                        };
+                        ensureDataStructure(projectData);
+                        navigationStack = [projectData];
+                        closeWorkflowCreationModal();
+                        showMainApp();
+                        setTimeout(updateUIFromState, 0);
+                    } else {
+                        handleBranchAction('create-from-template', { type });
+                    }
+                });
+
+                loadWorkflowBtn.addEventListener('click', () => {
+                    importContext = workflowCreationContext.context === 'newProject' ? 'project' : 'branch';
+                    importFileInput.click();
+                });
+
+                addTaskButton.addEventListener('click', () => openTaskEditor());
+
+                saveProjectBtn.addEventListener('click', () => {
+                    try {
+                        const stateString = JSON.stringify({ projectData }, null, 2);
+                        const blob = new Blob([stateString], {type: "application/json"});
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        const projectName = projectData.name || 'workflow';
+                        a.download = `${projectName}.json`;
+                        a.click();
+                        URL.revokeObjectURL(url);
+                        showToast("Project Saved!");
+                    } catch(e) {
+                        console.error("Save failed", e);
+                        alert("Could not save project data.");
+                    }
+                });
+
+                importFileInput.addEventListener('change', (event) => {
+                    const file = event.target.files[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        try {
+                            const state = JSON.parse(e.target.result);
+                            if (!state.projectData) {
+                                alert("Invalid project file format.");
+                                return;
+                            }
+                            const loadedWorkflow = state.projectData;
+                            ensureDataStructure(loadedWorkflow);
+                            if (importContext === 'project') {
+                                projectData = loadedWorkflow;
+                                navigationStack = [projectData];
+                                //closeWorkflowCreationModal();
+                                showMainApp();
+                                setTimeout(() => {
+                                    updateUIFromState();
+                                    showToast("Project imported successfully!");
+                                }, 0);
+                            } else if (importContext === 'branch') {
+                                const parentTaskId = workflowCreationContext.parentTaskId;
+                                const currentWorkflow = getCurrentWorkflow();
+                                if (!currentWorkflow) return;
+                                const task = currentWorkflow.tasks.find(t => t.id === parentTaskId);
+                                if (task) {
+                                    task.branch = loadedWorkflow;
+                                    //closeWorkflowCreationModal();
+                                    closeEditModal();
+                                    navigateToBranch(parentTaskId);
+                                    showToast(`Branch '${loadedWorkflow.name}' loaded successfully!`);
+                                } else {
+                                    alert("Error: Could not find the parent task to attach the branch to.");
+                                }
+                            }
+                        } catch (err) {
+                            console.error("Import failed", err);
+                            alert("Could not import file. It may be corrupted or in the wrong format.");
+                        } finally {
+                            importFileInput.value = '';
+                            importContext = 'project';
+                        }
+                    };
+                    reader.readAsText(file);
+                });
+            }
+            
+            function ensureDataStructure(workflow) {
+                if (!workflow || !workflow.tasks) return;
+                
+                // Handle legacy project/branch naming and add IDs if missing
+                if (workflow.projectName && !workflow.name) {
+                    workflow.name = workflow.projectName;
+                    delete workflow.projectName;
+                }
+                if (!workflow.id) {
+                    // Simple check to differentiate project vs branch on legacy files
+                    const isProject = navigationStack.length === 0;
+                    workflow.id = (isProject ? 'project_' : 'branch_') + Date.now();
+                }
+
+                workflow.tasks.forEach(task => {
+                    if (task.branch === undefined) {
+                        task.branch = null;
+                    } else if (task.branch) {
+                        // Recurse for nested branches
+                        ensureDataStructure(task.branch);
+                    }
+                });
+            }
+            
+            // --- INITIALIZATION ---
+            function populateTemplateDropdowns() {
+                const selects = [workflowTemplateSelect];
+                selects.forEach(select => {
+                    if (!select) return;
+                    select.innerHTML = ''; // Clear existing options
+                    Object.keys(initialTemplates).forEach(templateName => {
+                        const option = document.createElement('option');
+                        option.value = templateName;
+                        option.textContent = templateName.charAt(0).toUpperCase() + templateName.slice(1);
+                        select.appendChild(option);
+                    });
+                    select.value = 'blank';
+                });
+            }
+
+            initialTemplates = JSON.parse(defaultTemplatesJSON);
+            populateTemplateDropdowns();
+            setupEventListeners();
+            window.addEventListener('resize', renderGraph);
+        });
+    </script>
+</body>
+</html>
