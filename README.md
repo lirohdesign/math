@@ -1,4 +1,7 @@
 Math Projects Repository
+
+https://lirohdesign.github.io/math/
+
 Welcome to my math projects repository! This repository serves as a collection of various educational resources I've created, including mock exams, simulations, and other tools designed to help students learn and practice math concepts.
 
 Projects
