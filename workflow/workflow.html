@@ -489,69 +489,62 @@
                 });
             }
 
-            // --- GRAPH RENDERING LOGIC (REFACTORED) ---
-            
-            /**
-             * RENDER: The main function to render the graph. It now separates layout from rendering.
-             */
             function renderGraph() {
+                graphContainer.innerHTML = ''; 
+                const svg = d3.select(graphContainer).append('svg')
+                    .attr('class', 'w-full h-full');
+                const inner = svg.append('g');
+                
                 const currentWorkflow = getCurrentWorkflow();
                 if (appMain.classList.contains('hidden') || !currentWorkflow) {
                     return;
                 }
+                
+                const progress = calculateTotalProgress(currentWorkflow.tasks);
+                if (progress.total > 0) {
+                    const completionPercentage = (progress.complete / progress.total) * 100;
+                    headerProgressBar.style.width = `${completionPercentage}%`;
+                    headerProgressBarContainer.classList.remove('hidden');
+                } else {
+                    headerProgressBarContainer.classList.add('hidden');
+                }
 
-                // 1. Clear previous graph and setup SVG
-                graphContainer.innerHTML = ''; 
-                const svg = d3.select(graphContainer).append('svg').attr('class', 'w-full h-full');
-                const inner = svg.append('g');
-
-                // 2. Build the graph data structure
                 const g = new dagreD3.graphlib.Graph().setGraph({
                     rankdir: 'LR', marginx: 20, marginy: 20, nodesep: 50, ranksep: 100,
                 });
                 
                 const tasksToRender = currentWorkflow.tasks;
-                populateGraph(g, tasksToRender);
 
-                // 3. ARRANGE (only if necessary)
-                const needsLayout = tasksToRender.some(t => t.x === null || t.y === null);
-                if (needsLayout) {
-                    dagre.layout(g);
-                    // After layout, save the calculated coordinates back to our main data source
-                    g.nodes().forEach(nodeId => {
-                        const task = tasksToRender.find(t => t.id === nodeId);
-                        const node = g.node(nodeId);
-                        if (task && node) {
-                            task.x = node.x;
-                            task.y = node.y;
-                        }
-                    });
-                }
-
-                // 4. RENDER the graph using dagre-d3
-                const renderer = new dagreD3.render();
-                renderer(inner, g);
-
-                // 5. Apply styles, handlers, and zoom
-                applyStylesAndHandlers(inner, g, tasksToRender);
-                setupZoom(svg, inner, g);
-                updateHeaderProgress(tasksToRender);
-            }
-
-            /**
-             * Populates the dagre graph object with nodes and edges from our data.
-             */
-            function populateGraph(g, tasksToRender) {
                 tasksToRender.forEach(task => {
-                    let nodeConfig = { rx: 8, ry: 8, padding: 15 };
+                    let nodeClass = 'task-node';
+                    if (task.status === 'complete') nodeClass += ' completed';
+                    else if (task.status === 'blocked') nodeClass += ' blocked';
+                    else if (task.status === 'pending') nodeClass += ' pending';
+                    
+                    let nodeConfig = {
+                        rx: 8, ry: 8, padding: 15, class: nodeClass
+                    };
 
                     if (task.branch) {
                         const branchProgress = calculateTotalProgress(task.branch.tasks);
                         const totalSubtasks = branchProgress.total;
+                        
                         let completeWidth = totalSubtasks > 0 ? (branchProgress.complete / totalSubtasks) * 100 : 0;
                         let blockedWidth = totalSubtasks > 0 ? (branchProgress.blocked / totalSubtasks) * 100 : 0;
                         let pendingWidth = totalSubtasks > 0 ? (branchProgress.pending / totalSubtasks) * 100 : 0;
-                        
+
+                        if (branchProgress.complete > 0 && completeWidth < 10) completeWidth = 10;
+                        if (branchProgress.blocked > 0 && blockedWidth < 10) blockedWidth = 10;
+                        if (branchProgress.pending > 0 && pendingWidth < 10) pendingWidth = 10;
+
+                        const totalWidth = completeWidth + blockedWidth + pendingWidth;
+                        if (totalWidth > 100) {
+                            const scale = 100 / totalWidth;
+                            completeWidth *= scale;
+                            blockedWidth *= scale;
+                            pendingWidth *= scale;
+                        }
+
                         nodeConfig.label = `
                             <div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; flex-direction: column; align-items: center; white-space: nowrap; padding: 4px;">
                                 <div style="display: flex; align-items: center; margin-bottom: 8px;">
@@ -563,24 +556,19 @@
                                     <div style="width: ${blockedWidth}%; height: 100%; background-color: #ef4444;"></div>
                                     <div style="width: ${pendingWidth}%; height: 100%; background-color: #f97316;"></div>
                                 </div>
-                            </div>`;
+                            </div>
+                        `;
                         nodeConfig.labelType = 'html';
                     } else {
                         nodeConfig.label = task.label;
                     }
 
                     g.setNode(task.id, nodeConfig);
-                    // If coordinates exist in our data, apply them to the graph object.
-                    if (task.x !== null && task.y !== null) {
-                        g.node(task.id).x = task.x;
-                        g.node(task.id).y = task.y;
-                    }
                 });
 
                 tasksToRender.forEach(task => {
                     task.dependencies.forEach(depId => {
                         if (tasksToRender.some(t => t.id === depId)) {
-                            // Add classes to the edge group for easy selection later
                             g.setEdge(depId, task.id, { 
                                 arrowhead: 'vee', 
                                 curve: d3.curveBasis,
@@ -589,57 +577,43 @@
                         }
                     });
                 });
-            }
-            
-            /**
-             * Applies styles and attaches event handlers to the rendered graph nodes.
-             */
-            function applyStylesAndHandlers(container, g, tasksToRender) {
-                const nodes = container.selectAll('g.node');
-                
-                // Apply status-based styling
-                nodes.each(function(nodeId) {
-                    const task = tasksToRender.find(t => t.id === nodeId);
-                    if(task) {
-                        d3.select(this)
-                          .classed('completed', task.status === 'complete')
-                          .classed('blocked', task.status === 'blocked')
-                          .classed('pending', task.status === 'pending');
-                    }
-                });
 
-                // Define the new, efficient drag behavior
+                const render = new dagreD3.render();
+                inner.call(render, g);
+
+                // // After rendering, select all nodes and apply saved positions if they exist
+                // inner.selectAll('g.node').each(function(nodeId) {
+                //     const task = tasksToRender.find(t => t.id === nodeId);
+                //     if (task && task.x !== null && task.y !== null) {
+                //         d3.select(this).attr('transform', `translate(${task.x}, ${task.y})`);
+                //     }
+                // });
+
                 const drag = d3.drag()
-                    .on('start', function(event) {
-                        d3.select(this).raise(); // Bring node to front
+                    .on('start', (event) => {
                         event.sourceEvent.stopPropagation();
                     })
                     .on('drag', function(event, nodeId) {
-                        // Lightweight: just move the visual element
-                        const node = d3.select(this);
-                        const currentTransform = d3.select(this).attr('transform');
-                        const parts = /translate\(([^,]+),([^)]+)\)/.exec(currentTransform);
-                        const x = parseFloat(parts[1]) + event.dx;
-                        const y = parseFloat(parts[2]) + event.dy;
-                        node.attr('transform', `translate(${x}, ${y})`);
-
-                        // CONNECT: Live update of edge paths
-                        connect(nodeId, x, y, container, g);
-                    })
-                    .on('end', function(event, nodeId) {
-                        // ARRANGE: Update the JSON data once the drag is complete
                         const task = tasksToRender.find(t => t.id === nodeId);
                         if (task) {
-                            const finalTransform = d3.select(this).attr('transform');
-                            const parts = /translate\(([^,]+),([^)]+)\)/.exec(finalTransform);
-                            task.x = parseFloat(parts[1]);
-                            task.y = parseFloat(parts[2]);
+                            if (task.x === null || task.y === null) {
+                                const node = g.node(nodeId);
+                                task.x = node.x;
+                                task.y = node.y;
+                            }
+                            task.x += event.dx;
+                            task.y += event.dy;
+                            d3.select(this).attr('transform', `translate(${task.x}, ${task.y})`);
+                            connectPaths(nodeId, task.x, task.y, inner, g);
                         }
+                    })
+                    .on('end', function(event, nodeId) {
+                        //renderGraph();
                     });
 
+                const nodes = inner.selectAll('g.node');
                 nodes.call(drag);
                 
-                // Click and double-click handlers
                 nodes.on('click', (event, nodeId) => {
                     if (event.defaultPrevented) return;
                     const target = event.target.closest('.branch-emoji');
@@ -651,46 +625,10 @@
                 }).on('dblclick', (event, nodeId) => {
                     openTaskEditor(nodeId);
                 });
-            }
-
-            /**
-             * CONNECT: Redraws the paths of edges connected to a moving node.
-             */
-            function connect(nodeId, newX, newY, container, g) {
-                const line = d3.line()
-                    .x(d => d.x)
-                    .y(d => d.y)
-                    .curve(d3.curveBasis);
-
-                // Update outgoing edges
-                container.selectAll(`.edge-from-${nodeId}`).each(function(edgeId) {
-                    const edge = g.edge(edgeId);
-                    if (edge && edge.points) {
-                        edge.points[0].x = newX;
-                        edge.points[0].y = newY;
-                        d3.select(this).select('path').attr('d', line(edge.points));
-                    }
-                });
-
-                // Update incoming edges
-                container.selectAll(`.edge-to-${nodeId}`).each(function(edgeId) {
-                    const edge = g.edge(edgeId);
-                    if (edge && edge.points) {
-                        const lastPoint = edge.points[edge.points.length - 1];
-                        lastPoint.x = newX;
-                        lastPoint.y = newY;
-                        d3.select(this).select('path').attr('d', line(edge.points));
-                    }
-                });
-            }
-
-            /**
-             * Sets up and applies the zoom and pan behavior.
-             */
-            function setupZoom(svg, inner, g) {
-                const zoom = d3.zoom().on('zoom', (event) => {
-                    inner.attr('transform', event.transform);
-                });
+                
+                const zoom = d3.zoom()
+                    .on('zoom', (event) => inner.attr('transform', event.transform));
+                
                 svg.call(zoom).on("dblclick.zoom", null);
                 
                 const graphWidth = g.graph().width;
@@ -707,17 +645,34 @@
             }
             
             /**
-             * Updates the progress bar in the header.
+             * CONNECT: Redraws the paths of edges connected to a moving node.
              */
-            function updateHeaderProgress(tasksToRender) {
-                const progress = calculateTotalProgress(tasksToRender);
-                if (progress.total > 0) {
-                    const completionPercentage = (progress.complete / progress.total) * 100;
-                    headerProgressBar.style.width = `${completionPercentage}%`;
-                    headerProgressBarContainer.classList.remove('hidden');
-                } else {
-                    headerProgressBarContainer.classList.add('hidden');
-                }
+            function connectPaths(nodeId, newX, newY, container, g) {
+                const line = d3.line()
+                    .x(d => d.x)
+                    .y(d => d.y)
+                    .curve(d3.curveBasis);
+
+                // Update outgoing edges
+                container.selectAll(`.edge-from-${nodeId}`).each(function(edgeObj) {
+                    const edge = g.edge(edgeObj);
+                    if (edge && edge.points) {
+                        edge.points[0].x = newX;
+                        edge.points[0].y = newY;
+                        d3.select(this).select('path').attr('d', line(edge.points));
+                    }
+                });
+
+                // Update incoming edges
+                container.selectAll(`.edge-to-${nodeId}`).each(function(edgeObj) {
+                    const edge = g.edge(edgeObj);
+                    if (edge && edge.points) {
+                        const lastPoint = edge.points[edge.points.length - 1];
+                        lastPoint.x = newX;
+                        lastPoint.y = newY;
+                        d3.select(this).select('path').attr('d', line(edge.points));
+                    }
+                });
             }
 
             function updateUIFromState() {
@@ -728,7 +683,7 @@
                 renderGraph();
             }
 
-            // --- MODAL & EDITING LOGIC (UNCHANGED) ---
+            // --- MODAL & EDITING LOGIC ---
             function openWorkflowCreationModal(context, parentId = null) {
                 workflowCreationContext = { context: context, parentTaskId: parentId };
 
