@@ -138,6 +138,85 @@
              <button id="save-leaderboard-btn" class="px-8 py-4 bg-blue-600 hover:bg-blue-500 rounded-lg text-2xl font-bold">Save Leaderboard</button>
         </div>
     </div>
+    
+    <!-- Instructions Modal -->
+    <div id="instructions-modal" class="fixed inset-0 bg-gray-900/95 z-50 p-8 text-left overflow-y-auto" style="display: none;">
+        <div class="w-full max-w-4xl mx-auto bg-gray-800 p-6 rounded-lg">
+            <h2 class="text-3xl font-bold mb-4 text-yellow-400">🌊 Sea Animal Scavenger Hunt: Versus - Game Manual</h2>
+            <p class="mb-4">Welcome to the ultimate underwater showdown! This is a fast-paced game of hiding, seeking, and teamwork. Get ready to hide your sea animal resource, team up with new friends each round, and hunt down your targets before the clock runs out!</p>
+            
+            <h3 class="text-2xl font-bold mt-6 mb-2 text-yellow-300">Game Objective 🎯</h3>
+            <p class="mb-4">The main goal is to be the player with the highest score at the end of the game. You earn points by being on a team that successfully finds hidden sea animal resources. Special awards are also given for unique achievements!</p>
+
+            <h3 class="text-2xl font-bold mt-6 mb-2 text-yellow-300">Getting Started 🚀</h3>
+            <p class="mb-4">Before the hunt begins, you need to set up your game.</p>
+            <ol class="list-decimal list-inside space-y-2 mb-4">
+                <li><strong class="text-white">Player Selection:</strong> First, choose who's playing! Click on the emoji of each sea animal to select it as a player. You need at least 3 players to start a game. Selected players will have a bright yellow border.</li>
+                <li><strong class="text-white">Game Settings:</strong> Next, customize your game experience:
+                    <ul class="list-disc list-inside ml-4 mt-2">
+                        <li><strong>Round Time:</strong> Set how long each hunting round will last (in minutes).</li>
+                        <li><strong>Hide Resource Time:</strong> Choose how much time players get to hide their resource and return at the start of each round (1, 2, or 5 minutes).</li>
+                        <li><strong>Enable Hiding Spot Ratings:</strong> Check this box to allow teams to vote 👍 or 👎 on a hiding spot after they find a resource.</li>
+                    </ul>
+                </li>
+                <li><strong class="text-white">Go!:</strong> Once you've selected your players and tweaked the settings, hit the Go button to start the game!</li>
+            </ol>
+            <p class="text-sm text-gray-400">💾 Pro Tip: You can Save a game in progress to finish later or Load a previously saved game from this screen.</p>
+
+            <h3 class="text-2xl font-bold mt-6 mb-2 text-yellow-300">How to Play: The Game Loop</h3>
+            <p class="mb-4">The game is played in a series of rounds. The number of rounds is equal to the number of players. Each round follows the same four steps.</p>
+            <ol class="list-decimal list-inside space-y-2 mb-4">
+                <li><strong class="text-white">The Hideout Phase:</strong> At the beginning of each round, the "Time to Hide Resources!" screen appears.
+                    <ul class="list-disc list-inside ml-4 mt-2">
+                        <li>Every player takes their physical object that matches their sea animal emoji (e.g., a toy shark 🦈, a picture of a turtle 🐢).</li>
+                        <li>A countdown begins! Players must run and hide their object somewhere in the play area.</li>
+                        <li>After hiding your object, you must return to the screen and click your emoji to mark yourself as "Ready."</li>
+                        <li>If you don't return and click your emoji before the timer runs out, you'll get a "dislike" point!</li>
+                        <li>Once everyone is ready (or the time is up), the round officially begins.</li>
+                    </ul>
+                </li>
+                <li><strong class="text-white">Teaming Up:</strong> A screen will appear showing the new teams for the round. Teams change every round, so you'll get to play with everyone! After reviewing your new team, press the GO! button.</li>
+                <li><strong class="text-white">The Hunt!:</strong> This is the main event! The screen splits into two, with one team on top and one on the bottom.
+                    <ul class="list-disc list-inside ml-4 mt-2">
+                        <li><strong>Timer:</strong> A central timer shows the remaining time in the round.</li>
+                        <li><strong>Your Target:</strong> Your team's current TARGET is displayed as a large emoji. This is the sea animal you need to find.</li>
+                        <li><strong>Finding a Target:</strong> When your team physically locates the hidden object for your target animal, one person must run back and click the large target emoji on your side of the screen.</li>
+                        <li><strong>Scoring:</strong> Your team earns points based on how much time is left on the clock. The faster you are, the more points you get!</li>
+                        <li><strong>New Target:</strong> After finding a resource, your team will immediately be assigned a new target to find. Keep hunting!</li>
+                        <li><strong>Skip:</strong> If you can't find your target, you can use the Skip button to get a new one. Be warned, the player you skipped gets a point in the "Skipper" award category!</li>
+                    </ul>
+                </li>
+                <li><strong class="text-white">Rate the Spot! (Optional):</strong> If "Hiding Spot Ratings" are enabled, a voting panel will pop up after your team finds a resource.
+                    <ul class="list-disc list-inside ml-4 mt-2">
+                        <li>Vote Thumbs Up (👍) for a clever, creative, or challenging hiding spot.</li>
+                        <li>Vote Thumbs Down (👎) for a spot that was too easy or poorly hidden.</li>
+                        <li>These votes contribute to the end-of-game awards!</li>
+                    </ul>
+                </li>
+            </ol>
+            <p class="mb-4">The round ends when all resources have been found or when the main timer hits zero. Then, it's back to the Hideout Phase for the next round!</p>
+
+            <h3 class="text-2xl font-bold mt-6 mb-2 text-yellow-300">Winning the Game 🏆</h3>
+            <p class="mb-4">The game ends after the final round is complete. A leaderboard will appear, showing the final results.</p>
+            <ul class="list-disc list-inside space-y-2">
+                <li><strong class="text-white">Rankings:</strong> Players are ranked from top to bottom based on the total score they accumulated throughout the game.</li>
+                <li><strong class="text-white">Special Awards:</strong> In addition to the main ranking, several awards are given out for notable achievements:
+                    <ul class="list-disc list-inside ml-4 mt-2">
+                        <li>🌟 Superstar: The player who received the most "likes" (👍) for their hiding spots.</li>
+                        <li>👻 Sneaky: The player who received the most "dislikes" (👎).</li>
+                        <li>⏳ Biggest Bottleneck: The player whose resource took the longest total time to be found across all rounds.</li>
+                        <li>💨 Piece of Cake: The player whose resource was found the fastest.</li>
+                        <li>⏭️ Skipper: The player who was skipped the most times.</li>
+                        <li>🤝 Teamwork: Awarded to the team lineup that had the best single-round performance (finding the most items in the shortest time).</li>
+                    </ul>
+                </li>
+            </ul>
+            <p class="mt-6 font-bold text-center">Good luck, and may the best sea creature win!</p>
+            <div class="mt-8 text-center">
+                 <button id="close-instructions-btn" class="px-8 py-4 bg-red-600 hover:bg-red-500 rounded-lg text-xl font-bold">Close</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Settings Modal -->
     <div id="settings-modal" class="fixed inset-0 bg-black/60 items-center justify-center z-50" style="display: none;">
@@ -166,6 +245,7 @@
                 </div>
             </div>
             <div class="mt-6 flex flex-col sm:flex-row gap-3">
+                <button id="instructions-btn" class="flex-1 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-lg font-bold">How to Play</button>
                 <button id="save-game-btn" class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg font-bold">Save Game</button>
                 <label class="flex-1 px-4 py-2 bg-purple-600 hover:bg-purple-500 rounded-lg font-bold text-center cursor-pointer">
                     Load Game
@@ -220,6 +300,7 @@
         const newRoundTitle = document.getElementById('new-round-title');
         const hideResourcesModal = document.getElementById('hide-resources-modal');
         const leaderboardModal = document.getElementById('leaderboard-modal');
+        const instructionsModal = document.getElementById('instructions-modal');
         const timeSettingInput = document.getElementById('setting-time');
         const hideTimeSettingInput = document.getElementById('setting-hide-time');
         const ratingsSettingInput = document.getElementById('setting-ratings');
@@ -813,6 +894,14 @@
         document.getElementById('save-game-btn').addEventListener('click', saveGame);
         document.getElementById('save-leaderboard-btn').addEventListener('click', saveLeaderboard);
         document.getElementById('load-game-input').addEventListener('change', loadGameState);
+        document.getElementById('instructions-btn').addEventListener('click', () => {
+            instructionsModal.style.display = 'block';
+            settingsModal.style.display = 'none';
+        });
+        document.getElementById('close-instructions-btn').addEventListener('click', () => {
+            instructionsModal.style.display = 'none';
+            settingsModal.style.display = 'flex';
+        });
 
         document.getElementById('thumbs-up').addEventListener('click', () => {
             if (!gameData.resourceToVoteOn) return;
