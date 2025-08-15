@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sea Animal Scavenger Hunt - Versus</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #1a202c;
+        }
+        .rotate-180 { transform: rotate(180deg); }
+        .un-rotate-180 { transform: rotate(180deg); }
+        .game-outcome {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 4rem; font-weight: 800; color: white;
+            text-shadow: 3px 3px 5px rgba(0,0,0,0.5);
+            pointer-events: none;
+        }
+        #player-selection-grid .player-selected {
+            border-color: #FBBF24; /* amber-400 */
+            transform: scale(1.1);
+            background-color: #4A5568; /* gray-700 */
+        }
+        #hide-resources-players .player-ready {
+            opacity: 1;
+            border-color: #10B981; /* green-500 */
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 flex flex-col items-center justify-center min-h-screen p-4">
+
+    <div id="game-container" class="w-full max-w-2xl mx-auto flex-col border-4 border-gray-700 rounded-2xl shadow-2xl bg-gray-800 overflow-hidden hidden">
+        
+        <!-- Main Game Board -->
+        <div id="game-board" class="flex-grow flex flex-col relative">
+            <!-- Divider & Controls -->
+            <div class="absolute inset-x-0 top-1/2 -translate-y-1/2 h-2 bg-yellow-400 z-10 flex items-center justify-center">
+                 <div id="timer-display" class="bg-gray-900 text-yellow-400 border-2 border-yellow-400 rounded-full px-6 py-2 text-3xl font-bold z-20">10:00</div>
+            </div>
+
+            <!-- Team A Panel (Top) -->
+            <div id="team-a-panel" class="team-panel flex-1 p-5 bg-blue-800 w-full relative rotate-180 flex items-center justify-center">
+                <div class="un-rotate-180 text-center w-full">
+                     <div id="team-a-target" class="mb-2 cursor-pointer group">
+                        <h3 class="text-lg font-semibold text-blue-200">TARGET</h3>
+                        <div class="text-7xl bg-black/20 rounded-lg p-2 inline-block transition-transform group-hover:scale-110"></div>
+                    </div>
+                    <button id="skip-team-a" class="mb-2 px-3 py-1 bg-yellow-500 text-black rounded-lg font-semibold hover:bg-yellow-400 text-sm">Skip</button>
+                    <div id="team-a-players" class="flex flex-wrap justify-center gap-4 p-2">
+                        <!-- Player cards for team A will be rendered here -->
+                    </div>
+                </div>
+                <div id="team-a-outcome" class="game-outcome"></div>
+            </div>
+            
+            <!-- Team B Panel (Bottom) -->
+            <div id="team-b-panel" class="team-panel flex-1 p-5 bg-red-800 w-full relative flex items-center justify-center">
+                 <div class="text-center w-full">
+                    <div id="team-b-target" class="mb-2 cursor-pointer group">
+                        <h3 class="text-lg font-semibold text-red-200">TARGET</h3>
+                        <div class="text-7xl bg-black/20 rounded-lg p-2 inline-block transition-transform group-hover:scale-110"></div>
+                    </div>
+                    <button id="skip-team-b" class="mb-2 px-3 py-1 bg-yellow-500 text-black rounded-lg font-semibold hover:bg-yellow-400 text-sm">Skip</button>
+                    <div id="team-b-players" class="flex flex-wrap justify-center gap-4 p-2">
+                        <!-- Player cards for team B will be rendered here -->
+                    </div>
+                </div>
+                 <div id="team-b-outcome" class="game-outcome"></div>
+            </div>
+        </div>
+
+        <!-- Voting Interface -->
+        <div id="voting-interface-container" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30">
+            <div id="voting-interface" class="text-center bg-gray-900/80 backdrop-blur-sm p-4 rounded-xl border border-yellow-400" style="display: none;">
+                <h4 id="voting-question" class="text-lg font-semibold mb-3 text-white">Rate the hiding spot?</h4>
+                <div class="flex justify-center gap-4">
+                    <button id="thumbs-up" class="text-4xl p-2 rounded-full hover:bg-green-500/20 transition-transform transform hover:scale-110">👍</button>
+                    <button id="thumbs-down" class="text-4xl p-2 rounded-full hover:bg-red-500/20 transition-transform transform hover:scale-110">👎</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Hide Resources Modal -->
+    <div id="hide-resources-modal" class="fixed inset-0 bg-gray-900/95 flex-col items-center justify-center z-50 p-8 text-center" style="display: none;">
+        <h2 class="text-4xl font-bold mb-4 text-yellow-400">Time to Hide Resources!</h2>
+        <p class="text-gray-400 mb-2">Click your emoji when you are ready.</p>
+        <div id="hide-resources-players" class="flex flex-wrap justify-center gap-4 mb-4"></div>
+        <div class="mt-8 text-8xl font-bold text-white" id="hide-resources-countdown"></div>
+        <button id="hide-save-game-btn" class="absolute bottom-4 right-4 px-3 py-1 bg-blue-600 hover:bg-blue-500 rounded-lg font-semibold text-sm">Save Game</button>
+    </div>
+
+    <!-- New Round Modal -->
+    <div id="new-round-modal" class="fixed inset-0 bg-black/80 flex-col items-center justify-center z-50 p-8 text-center" style="display: none;">
+        <h2 id="new-round-title" class="text-6xl font-bold mb-4 text-yellow-400">Round 1</h2>
+        <div class="w-full max-w-4xl flex flex-col md:flex-row gap-8">
+            <div class="flex-1 bg-blue-900/50 p-4 rounded-lg border-2 border-blue-600">
+                <h3 class="text-2xl font-bold mb-3">Team A</h3>
+                <div id="new-round-team-a" class="flex justify-center flex-wrap gap-4 text-5xl"></div>
+            </div>
+            <div class="flex-1 bg-red-900/50 p-4 rounded-lg border-2 border-red-600">
+                <h3 class="text-2xl font-bold mb-3">Team B</h3>
+                <div id="new-round-team-b" class="flex justify-center flex-wrap gap-4 text-5xl"></div>
+            </div>
+        </div>
+        <div class="mt-8">
+            <button id="start-round-btn" class="px-8 py-4 bg-green-600 hover:bg-green-500 rounded-lg text-2xl font-bold">GO!</button>
+        </div>
+    </div>
+
+    <!-- Leaderboard Modal -->
+    <div id="leaderboard-modal" class="fixed inset-0 bg-gray-900/95 flex-col items-center justify-center z-50 p-8 text-center" style="display: none;">
+        <h2 class="text-5xl font-bold mb-4 text-yellow-400">Final Results</h2>
+        <div class="w-full max-w-4xl flex flex-col md:flex-row gap-8">
+            <div class="flex-1 bg-gray-800 p-4 rounded-lg border-2 border-gray-600">
+                <h3 class="text-2xl font-bold mb-3">Rankings</h3>
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="border-b border-gray-500">
+                            <th class="p-2">Rank</th>
+                            <th class="p-2">Player</th>
+                            <th class="p-2">Score</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ranking-table-body"></tbody>
+                </table>
+            </div>
+            <div class="flex-1 bg-gray-800 p-4 rounded-lg border-2 border-gray-600">
+                <h3 class="text-2xl font-bold mb-3">Awards</h3>
+                <div id="awards-list" class="space-y-2 text-left"></div>
+            </div>
+        </div>
+        <div class="flex gap-4 mt-8">
+             <button id="play-again-btn" class="px-8 py-4 bg-yellow-600 hover:bg-yellow-500 rounded-lg text-2xl font-bold">Play Again</button>
+             <button id="save-leaderboard-btn" class="px-8 py-4 bg-blue-600 hover:bg-blue-500 rounded-lg text-2xl font-bold">Save Leaderboard</button>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="fixed inset-0 bg-black/60 items-center justify-center z-50" style="display: none;">
+        <div class="bg-gray-800 p-6 rounded-lg shadow-2xl w-full max-w-2xl border border-gray-600">
+            <h2 class="text-2xl font-bold mb-4">Start New Game</h2>
+            <p class="text-gray-400 mb-4">Select at least 3 players by clicking their emojis.</p>
+            <div id="player-selection-grid" class="grid grid-cols-6 gap-4 mb-6"></div>
+            <div class="space-y-4">
+                <div>
+                    <label for="setting-time" class="block text-sm font-medium text-gray-300">Round Time (minutes)</label>
+                    <input type="number" id="setting-time" class="mt-1 block w-full bg-gray-700 border-gray-600 rounded-md shadow-sm py-2 px-3 text-white" value="10">
+                </div>
+                 <div>
+                    <label for="setting-hide-time" class="block text-sm font-medium text-gray-300">Hide Resource Time</label>
+                    <select id="setting-hide-time" class="mt-1 block w-full bg-gray-700 border-gray-600 rounded-md shadow-sm py-2 px-3 text-white">
+                        <option value="60">1 Minute</option>
+                        <option value="120">2 Minutes</option>
+                        <option value="300">5 Minutes</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="setting-ratings" class="flex items-center text-sm font-medium text-gray-300">
+                        <input type="checkbox" id="setting-ratings" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" checked>
+                        <span class="ml-2">Enable Hiding Spot Ratings</span>
+                    </label>
+                </div>
+            </div>
+            <div class="mt-6 flex flex-col sm:flex-row gap-3">
+                <button id="save-game-btn" class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg font-bold">Save Game</button>
+                <label class="flex-1 px-4 py-2 bg-purple-600 hover:bg-purple-500 rounded-lg font-bold text-center cursor-pointer">
+                    Load Game
+                    <input type="file" id="load-game-input" class="hidden" accept=".json">
+                </label>
+            </div>
+            <div class="mt-4">
+                <button id="go-btn" class="w-full px-4 py-2 bg-green-600 hover:bg-green-500 rounded-lg font-bold">Go</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- GAME DATA ---
+        let gameData = {
+            allResources: [
+                { id: "Shark", emoji: "🦈" }, { id: "Dolphin", emoji: "🐬" },
+                { id: "Whale", emoji: "🐋" }, { id: "Octopus", emoji: "🐙" },
+                { id: "Jellyfish", emoji: "🪼" }, { id: "Turtle", emoji: "🐢" },
+                { id: "Crab", emoji: "🦀" }, { id: "Starfish", emoji: "⭐" },
+                { id: "Fish", emoji: "🐠" }, { id: "Blowfish", emoji: "🐡" },
+                { id: "Squid", emoji: "🦑" }, { id: "Lobster", emoji: "🦞" }
+            ],
+            tournament: null,
+            settings: {
+                time: 600,
+                hideTime: 60,
+                selectedPlayers: [],
+                ratingsEnabled: true,
+            },
+            timer: 600,
+            timerInterval: null,
+            hideTimerInterval: null,
+            resourceToVoteOn: null,
+            isVoting: false,
+            isRoundOver: false,
+        };
+
+        // --- DOM ELEMENTS ---
+        const gameContainer = document.getElementById('game-container');
+        const timerDisplay = document.getElementById('timer-display');
+        const teamAPlayersContainer = document.getElementById('team-a-players');
+        const teamBPlayersContainer = document.getElementById('team-b-players');
+        const teamATargetEl = document.getElementById('team-a-target').querySelector('div');
+        const teamBTargetEl = document.getElementById('team-b-target').querySelector('div');
+        const teamAOutcomeEl = document.getElementById('team-a-outcome');
+        const teamBOutcomeEl = document.getElementById('team-b-outcome');
+        const votingInterface = document.getElementById('voting-interface');
+        const votingQuestion = document.getElementById('voting-question');
+        const settingsModal = document.getElementById('settings-modal');
+        const newRoundModal = document.getElementById('new-round-modal');
+        const newRoundTitle = document.getElementById('new-round-title');
+        const hideResourcesModal = document.getElementById('hide-resources-modal');
+        const leaderboardModal = document.getElementById('leaderboard-modal');
+        const timeSettingInput = document.getElementById('setting-time');
+        const hideTimeSettingInput = document.getElementById('setting-hide-time');
+        const ratingsSettingInput = document.getElementById('setting-ratings');
+        const goBtn = document.getElementById('go-btn');
+        const playerSelectionGrid = document.getElementById('player-selection-grid');
+        const startRoundBtn = document.getElementById('start-round-btn');
+        const playAgainBtn = document.getElementById('play-again-btn');
+        const hideResourcesPlayersContainer = document.getElementById('hide-resources-players');
+
+        // --- GAME LIFECYCLE & SETUP ---
+
+        function showSettingsScreen() {
+            settingsModal.style.display = 'flex';
+            gameContainer.style.display = 'none';
+            newRoundModal.style.display = 'none';
+            hideResourcesModal.style.display = 'none';
+            leaderboardModal.style.display = 'none';
+            renderPlayerSelectionGrid();
+        }
+
+        function initializeGame() {
+            populateTournamentSchedule();
+            showHideResourcesModal();
+        }
+        
+        function showHideResourcesModal() {
+            if (gameData.tournament) {
+                gameData.tournament.players.forEach(p => p.ready = false);
+            }
+            hideResourcesModal.style.display = 'flex';
+            renderHideResourcesPlayers();
+            let countdown = gameData.settings.hideTime;
+            const countdownEl = document.getElementById('hide-resources-countdown');
+            
+            const updateCountdown = () => {
+                 const minutes = Math.floor(countdown / 60);
+                 const seconds = countdown % 60;
+                 countdownEl.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            };
+            
+            updateCountdown();
+            gameData.hideTimerInterval = setInterval(() => {
+                countdown--;
+                updateCountdown();
+                if (countdown < 0) {
+                    if (gameData.settings.ratingsEnabled) {
+                        gameData.tournament.players.forEach(p => {
+                            if (!p.ready) p.dislikes++;
+                        });
+                    }
+                    proceedToNewRound();
+                }
+            }, 1000);
+        }
+        
+        function proceedToNewRound() {
+            clearInterval(gameData.hideTimerInterval);
+            gameData.hideTimerInterval = null;
+            hideResourcesModal.style.display = 'none';
+            showNewRoundModal();
+        }
+
+        function populateTournamentSchedule() {
+            const players = gameData.allResources
+                .filter(r => gameData.settings.selectedPlayers.includes(r.id))
+                .map(r => ({ ...r, score: 0, likes: 0, dislikes: 0, ready: false, skipped: false, totalTimeAsTarget: 0, targetStartTime: 0, itemsFound: 0, skipCount: 0 }));
+
+            const matchups = generateDiverseMatchups(players);
+            
+            gameData.tournament = {
+                players: players,
+                matchups: matchups,
+                roundStats: [],
+                currentRound: 0,
+                maxRounds: matchups.length,
+            };
+        }
+
+        function generateDiverseMatchups(players) {
+            const allPossibleMatchups = [];
+            const n = players.length;
+            const teamSize = Math.floor(n / 2);
+
+            for (let i = 1; i < (1 << n) / 2; i++) {
+                const teamA = [];
+                const teamB = [];
+                for (let j = 0; j < n; j++) {
+                    if ((i >> j) & 1) teamA.push(players[j]);
+                    else teamB.push(players[j]);
+                }
+                
+                if (teamA.length !== teamSize) continue;
+
+                const sumA = teamA.reduce((sum, p) => sum + players.indexOf(p), 0);
+                const sumB = teamB.reduce((sum, p) => sum + players.indexOf(p), 0);
+                const diversity = Math.abs(sumA - sumB);
+
+                allPossibleMatchups.push({ teamA, teamB, diversity });
+            }
+
+            allPossibleMatchups.sort((a, b) => b.diversity - a.diversity);
+
+            const finalMatchups = [];
+            const leaderCount = {};
+            players.forEach(p => leaderCount[p.id] = 0);
+
+            let targetRounds = players.length;
+            if (allPossibleMatchups.length < targetRounds) {
+                targetRounds = allPossibleMatchups.length;
+            }
+
+            for (const matchup of allPossibleMatchups) {
+                if (finalMatchups.length >= targetRounds) break;
+                const leaderA = matchup.teamA[0].id;
+                const leaderB = matchup.teamB[0].id;
+                if (leaderCount[leaderA] === 0 || leaderCount[leaderB] === 0) {
+                    finalMatchups.push(matchup);
+                    leaderCount[leaderA]++;
+                    leaderCount[leaderB]++;
+                }
+            }
+            
+            let i = 0;
+            while (finalMatchups.length < targetRounds && i < allPossibleMatchups.length) {
+                if (!finalMatchups.includes(allPossibleMatchups[i])) {
+                    finalMatchups.push(allPossibleMatchups[i]);
+                }
+                i++;
+            }
+            return finalMatchups;
+        }
+
+        function startRound() {
+            gameData.isRoundOver = false;
+            gameContainer.style.display = 'flex';
+            
+            resetTimer();
+            votingInterface.style.display = 'none';
+            teamAOutcomeEl.textContent = '';
+            teamBOutcomeEl.textContent = '';
+
+            const currentMatchup = gameData.tournament.matchups[gameData.tournament.currentRound - 1];
+            
+            currentMatchup.teamA.forEach(p => gameData.tournament.players.find(pl=>pl.id===p.id).foundInRound = false);
+            currentMatchup.teamB.forEach(p => gameData.tournament.players.find(pl=>pl.id===p.id).foundInRound = false);
+            
+            currentMatchup.teamA.targetId = null;
+            currentMatchup.teamB.targetId = null;
+
+            assignNewTarget('teamA');
+            assignNewTarget('teamB');
+            updateTeamUI();
+            gameData.timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        function assignNewTarget(teamKey) {
+            const currentMatchup = gameData.tournament.matchups[gameData.tournament.currentRound - 1];
+            const homeTeam = currentMatchup[teamKey];
+            const opponentTeam = currentMatchup[teamKey === 'teamA' ? 'teamB' : 'teamA'];
+
+            const homePlayerIds = homeTeam.map(p => p.id);
+            const opponentPlayerIds = opponentTeam.map(p => p.id);
+
+            let availableTargets = opponentPlayerIds.filter(id => 
+                !gameData.tournament.players.find(p => p.id === id).foundInRound
+            );
+            
+            if (availableTargets.length === 0) {
+                availableTargets = homePlayerIds.filter(id => 
+                    !gameData.tournament.players.find(p => p.id === id).foundInRound
+                );
+            }
+            
+            const nonSkipped = availableTargets.filter(id => !gameData.tournament.players.find(p => p.id === id).skipped);
+            
+            let targetId = null;
+            if (nonSkipped.length > 0) {
+                targetId = nonSkipped[Math.floor(Math.random() * nonSkipped.length)];
+            } else if (availableTargets.length > 0) {
+                targetId = availableTargets[Math.floor(Math.random() * availableTargets.length)];
+            }
+            
+            homeTeam.targetId = targetId;
+            if (targetId) {
+                const targetPlayer = gameData.tournament.players.find(p => p.id === targetId);
+                if (targetPlayer) {
+                    targetPlayer.targetStartTime = Date.now();
+                }
+            }
+        }
+
+        function endGame() {
+            clearInterval(gameData.timerInterval);
+            timerDisplay.textContent = "GAME OVER!";
+            showLeaderboardModal();
+        }
+
+        // --- ROUND LOGIC ---
+
+        function handleItemFound(findingTeamKey) { // 'teamA' or 'teamB'
+            if (gameData.isVoting || gameData.isRoundOver) return;
+
+            const currentMatchup = gameData.tournament.matchups[gameData.tournament.currentRound - 1];
+            const winningTeam = currentMatchup[findingTeamKey];
+            const targetId = winningTeam.targetId;
+
+            if (!targetId) return;
+
+            const points = Math.max(10, Math.floor(gameData.timer / 10));
+            winningTeam.forEach(winner => {
+                const playerInGame = gameData.tournament.players.find(p => p.id === winner.id);
+                if (playerInGame) {
+                    playerInGame.score += points;
+                    playerInGame.itemsFound++;
+                }
+            });
+            
+            const foundResource = gameData.tournament.players.find(p => p.id === targetId);
+            if(foundResource) {
+                foundResource.foundInRound = true;
+                const timeAsTarget = Date.now() - foundResource.targetStartTime;
+                foundResource.totalTimeAsTarget += timeAsTarget;
+            }
+
+            const allRoundItemsFound = [...currentMatchup.teamA, ...currentMatchup.teamB]
+                .every(p => gameData.tournament.players.find(pl => pl.id === p.id).foundInRound);
+
+            if (gameData.settings.ratingsEnabled) {
+                gameData.isVoting = true;
+                gameData.resourceToVoteOn = targetId;
+                votingQuestion.textContent = `Rate ${targetId}'s hiding spot?`;
+                votingInterface.style.display = 'block';
+            } else if (allRoundItemsFound) {
+                endRound();
+            }
+            
+            assignNewTarget('teamA');
+            assignNewTarget('teamB');
+            updateTeamUI();
+        }
+        
+        function endRound() {
+            if (gameData.isRoundOver) return;
+            gameData.isRoundOver = true;
+
+            clearInterval(gameData.timerInterval);
+            const roundTime = gameData.settings.time - gameData.timer;
+            const currentMatchup = gameData.tournament.matchups[gameData.tournament.currentRound - 1];
+            
+            const itemsFoundA = currentMatchup.teamA.filter(p => gameData.tournament.players.find(pl=>pl.id===p.id).foundInRound).length;
+            const itemsFoundB = currentMatchup.teamB.filter(p => gameData.tournament.players.find(pl=>pl.id===p.id).foundInRound).length;
+
+            gameData.tournament.roundStats.push({
+                round: gameData.tournament.currentRound,
+                teamA: { players: currentMatchup.teamA.map(p => p.id), itemsFound: itemsFoundA, roundTime: roundTime },
+                teamB: { players: currentMatchup.teamB.map(p => p.id), itemsFound: itemsFoundB, roundTime: roundTime },
+            });
+            
+            if (gameData.tournament.currentRound >= gameData.tournament.maxRounds) {
+                setTimeout(endGame, 500);
+            } else {
+                setTimeout(showHideResourcesModal, 500);
+            }
+        }
+
+        function showNewRoundModal() {
+            gameData.tournament.currentRound++;
+            
+            if (gameData.tournament.currentRound > gameData.tournament.maxRounds) {
+                endGame();
+                return;
+            }
+            
+            const nextMatchup = gameData.tournament.matchups[gameData.tournament.currentRound - 1];
+            document.getElementById('new-round-team-a').innerHTML = nextMatchup.teamA.map(p => p.emoji).join(' ');
+            document.getElementById('new-round-team-b').innerHTML = nextMatchup.teamB.map(p => p.emoji).join(' ');
+
+            gameContainer.style.display = 'none';
+            newRoundModal.style.display = 'flex';
+            newRoundTitle.textContent = `Round ${gameData.tournament.currentRound}`;
+            startRoundBtn.style.display = 'block';
+            playAgainBtn.classList.add('hidden');
+        }
+
+        function handleSkip(teamKey) {
+            const currentMatchup = gameData.tournament.matchups[gameData.tournament.currentRound - 1];
+            const team = currentMatchup[teamKey];
+            const targetId = team.targetId;
+            
+            if (!targetId) return;
+
+            const targetPlayer = gameData.tournament.players.find(p => p.id === targetId);
+            if (targetPlayer) {
+                targetPlayer.skipped = true;
+                targetPlayer.skipCount++;
+                const timeAsTarget = Date.now() - targetPlayer.targetStartTime;
+                targetPlayer.totalTimeAsTarget += timeAsTarget;
+            }
+            
+            assignNewTarget(teamKey);
+            updateTeamUI();
+        }
+
+        // --- UI & SETTINGS ---
+
+        function renderPlayerCards(container, players) {
+            container.innerHTML = '';
+            players.forEach(player => {
+                const playerData = gameData.tournament.players.find(p => p.id === player.id);
+                if (!playerData) return;
+
+                const isFound = playerData.foundInRound ? 'opacity-40' : '';
+                const item = document.createElement('div');
+                item.className = `relative flex flex-col items-center justify-center text-2xl bg-gray-700 rounded-md aspect-square p-1 w-24 h-24 ${isFound}`;
+                item.innerHTML = `
+                    <div class="text-4xl">${playerData.emoji}</div>
+                    <div class="text-sm font-bold text-yellow-300">${playerData.score || 0}</div>
+                    ${gameData.settings.ratingsEnabled ? `
+                    <div class="absolute top-0 left-0 bg-green-500 text-white text-xs font-bold px-1 py-0.5 rounded-br-md rounded-tl-md">${playerData.likes || 0}</div>
+                    <div class="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold px-1 py-0.5 rounded-bl-md rounded-tr-md">${playerData.dislikes || 0}</div>
+                    ` : ''}
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function updateTeamUI() {
+            const { teamA, teamB } = gameData.tournament.matchups[gameData.tournament.currentRound - 1];
+            renderPlayerCards(teamAPlayersContainer, teamA);
+            renderPlayerCards(teamBPlayersContainer, teamB);
+
+            const targetA = gameData.tournament.players.find(p => p.id === teamA.targetId);
+            teamATargetEl.textContent = targetA ? targetA.emoji : '🎉';
+
+            const targetB = gameData.tournament.players.find(p => p.id === teamB.targetId);
+            teamBTargetEl.textContent = targetB ? targetB.emoji : '🎉';
+        }
+
+        function updateTimer() {
+            gameData.timer--;
+            if (gameData.timer < 0) {
+                gameData.timer = 0;
+                clearInterval(gameData.timerInterval);
+                endRound();
+            }
+            const minutes = Math.floor(gameData.timer / 60);
+            const seconds = gameData.timer % 60;
+            timerDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+        
+        function resetTimer() {
+            clearInterval(gameData.timerInterval);
+            gameData.timer = gameData.settings.time;
+            timerDisplay.classList.remove('hidden');
+            updateTimer();
+        }
+        
+        function renderPlayerSelectionGrid() {
+            playerSelectionGrid.innerHTML = '';
+            gameData.allResources.forEach(resource => {
+                const playerCard = document.createElement('div');
+                playerCard.className = 'p-2 text-5xl bg-gray-900 rounded-lg cursor-pointer border-4 border-gray-600 transition-all flex items-center justify-center aspect-square';
+                playerCard.textContent = resource.emoji;
+                playerCard.dataset.id = resource.id;
+
+                if (gameData.settings.selectedPlayers.includes(resource.id)) {
+                    playerCard.classList.add('player-selected');
+                }
+
+                playerCard.addEventListener('click', () => {
+                    playerCard.classList.toggle('player-selected');
+                    const selectedId = playerCard.dataset.id;
+                    const index = gameData.settings.selectedPlayers.indexOf(selectedId);
+                    if (index > -1) {
+                        gameData.settings.selectedPlayers.splice(index, 1);
+                    } else {
+                        gameData.settings.selectedPlayers.push(selectedId);
+                    }
+                });
+                playerSelectionGrid.appendChild(playerCard);
+            });
+        }
+
+        function renderHideResourcesPlayers() {
+            hideResourcesPlayersContainer.innerHTML = '';
+            gameData.tournament.players.forEach(player => {
+                const playerCard = document.createElement('div');
+                playerCard.className = 'p-2 text-5xl bg-gray-800 rounded-lg cursor-pointer border-4 border-gray-600 transition-all flex items-center justify-center aspect-square opacity-50';
+                playerCard.textContent = player.emoji;
+                playerCard.dataset.id = player.id;
+                
+                playerCard.addEventListener('click', () => {
+                    playerCard.classList.toggle('player-ready');
+                    const playerInGame = gameData.tournament.players.find(p => p.id === player.id);
+                    playerInGame.ready = !playerInGame.ready;
+
+                    const allReady = gameData.tournament.players.every(p => p.ready);
+                    if (allReady) {
+                        proceedToNewRound();
+                    }
+                });
+                hideResourcesPlayersContainer.appendChild(playerCard);
+            });
+        }
+
+        function showLeaderboardModal() {
+            const players = gameData.tournament.players;
+            
+            const rankedPlayers = [...players].sort((a, b) => b.score - a.score);
+            const rankingBody = document.getElementById('ranking-table-body');
+            rankingBody.innerHTML = '';
+            rankedPlayers.forEach((p, index) => {
+                const row = document.createElement('tr');
+                row.className = 'border-b border-gray-700';
+                row.innerHTML = `
+                    <td class="p-2">${index + 1}</td>
+                    <td class="p-2">${p.emoji} ${p.id}</td>
+                    <td class="p-2">${p.score}</td>
+                `;
+                rankingBody.appendChild(row);
+            });
+
+            // Awards
+            const awardsList = document.getElementById('awards-list');
+            awardsList.innerHTML = '';
+            const awardsData = {
+                'Biggest Bottleneck': { player: [...players].sort((a, b) => b.totalTimeAsTarget - a.totalTimeAsTarget)[0], metric: 'totalTimeAsTarget', unit: 's' },
+                'Piece of Cake': { player: [...players].sort((a, b) => a.totalTimeAsTarget - b.totalTimeAsTarget)[0], metric: 'totalTimeAsTarget', unit: 's' },
+                'Skipper': { player: [...players].sort((a, b) => b.skipCount - a.skipCount)[0], metric: 'skipCount', unit: ' skips' },
+            };
+            
+            if (gameData.settings.ratingsEnabled) {
+                awardsData['Superstar'] = { player: [...players].sort((a, b) => b.likes - a.likes)[0], metric: 'likes', unit: ' likes' };
+                awardsData['Sneaky'] = { player: [...players].sort((a, b) => b.dislikes - a.dislikes)[0], metric: 'dislikes', unit: ' dislikes' };
+            }
+            
+            for (const [award, data] of Object.entries(awardsData)) {
+                if (data.player) {
+                    const value = data.metric === 'totalTimeAsTarget' ? Math.round(data.player[data.metric] / 1000) : data.player[data.metric];
+                    if (value > 0) {
+                        const awardEl = document.createElement('div');
+                        awardEl.innerHTML = `<span class="font-bold text-yellow-400">${award}:</span> ${data.player.emoji} ${data.player.id} (${value}${data.unit})`;
+                        awardsList.appendChild(awardEl);
+                    }
+                }
+            }
+            
+            const allRoundPerformances = [...gameData.tournament.roundStats.map(r => r.teamA), ...gameData.tournament.roundStats.map(r => r.teamB)];
+            if (allRoundPerformances.length > 0) {
+                const bestTeamPerformance = allRoundPerformances.sort((a, b) => {
+                    if (b.itemsFound !== a.itemsFound) {
+                        return b.itemsFound - a.itemsFound;
+                    }
+                    return a.roundTime - b.roundTime; // Lower time is better
+                })[0];
+
+                if (bestTeamPerformance) {
+                    const teamworkAwardEl = document.createElement('div');
+                    const teamEmojis = bestTeamPerformance.players.map(id => gameData.tournament.players.find(p => p.id === id).emoji).join(' ');
+                    teamworkAwardEl.innerHTML = `<span class="font-bold text-yellow-400">Teamwork:</span> ${teamEmojis} (${bestTeamPerformance.itemsFound} items in ${bestTeamPerformance.roundTime}s)`;
+                    awardsList.appendChild(teamworkAwardEl);
+                }
+            }
+            
+            gameContainer.style.display = 'none';
+            leaderboardModal.style.display = 'flex';
+        }
+        
+        function applySettings() {
+            gameData.settings.time = parseInt(timeSettingInput.value, 10) * 60 || 600;
+            gameData.settings.hideTime = parseInt(hideTimeSettingInput.value, 10) || 60;
+            gameData.settings.ratingsEnabled = ratingsSettingInput.checked;
+        }
+
+        function saveGame() {
+            const dataStr = JSON.stringify(gameData.tournament, null, 2);
+            const dataBlob = new Blob([dataStr], {type: "application/json"});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.download = 'scavenger-hunt-save.json';
+            link.href = url;
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        function saveLeaderboard() {
+            const players = gameData.tournament.players;
+            const rankedPlayers = [...players].sort((a, b) => b.score - a.score);
+            const leaderboardData = {
+                rankings: rankedPlayers.map((p, index) => ({
+                    rank: index + 1,
+                    player: p.id,
+                    emoji: p.emoji,
+                    score: p.score,
+                    likes: p.likes,
+                    dislikes: p.dislikes,
+                    timeAsTarget: Math.round(p.totalTimeAsTarget / 1000)
+                })),
+                awards: {}
+            };
+            
+            const awardsData = {
+                'Biggest Bottleneck': { player: [...players].sort((a, b) => b.totalTimeAsTarget - a.totalTimeAsTarget)[0], metric: 'totalTimeAsTarget', unit: 's' },
+                'Piece of Cake': { player: [...players].sort((a, b) => a.totalTimeAsTarget - b.totalTimeAsTarget)[0], metric: 'totalTimeAsTarget', unit: 's' },
+                'Skipper': { player: [...players].sort((a, b) => b.skipCount - a.skipCount)[0], metric: 'skipCount', unit: ' skips' },
+            };
+            if (gameData.settings.ratingsEnabled) {
+                awardsData['Superstar'] = { player: [...players].sort((a, b) => b.likes - a.likes)[0], metric: 'likes', unit: ' likes' };
+                awardsData['Sneaky'] = { player: [...players].sort((a, b) => b.dislikes - a.dislikes)[0], metric: 'dislikes', unit: ' dislikes' };
+            }
+            for (const [award, data] of Object.entries(awardsData)) {
+                if (data.player) {
+                    const value = data.metric === 'totalTimeAsTarget' ? Math.round(data.player[data.metric] / 1000) : data.player[data.metric];
+                    if (value > 0) {
+                        leaderboardData.awards[award] = { player: `${data.player.emoji} ${data.player.id}`, value: value, unit: data.unit };
+                    }
+                }
+            }
+
+            const allRoundPerformances = [...gameData.tournament.roundStats.map(r => r.teamA), ...gameData.tournament.roundStats.map(r => r.teamB)];
+            if(allRoundPerformances.length > 0) {
+                const bestTeamPerformance = allRoundPerformances.sort((a, b) => {
+                    if (b.itemsFound !== a.itemsFound) {
+                        return b.itemsFound - a.itemsFound;
+                    }
+                    return a.roundTime - b.roundTime;
+                })[0];
+                if (bestTeamPerformance) {
+                    const teamEmojis = bestTeamPerformance.players.map(id => gameData.tournament.players.find(p => p.id === id).emoji).join(' ');
+                    leaderboardData.awards['Teamwork'] = { team: teamEmojis, itemsFound: bestTeamPerformance.itemsFound, time: bestTeamPerformance.roundTime };
+                }
+            }
+
+
+            const dataStr = JSON.stringify(leaderboardData, null, 2);
+            const dataBlob = new Blob([dataStr], {type: "application/json"});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.download = 'scavenger-hunt-leaderboard.json';
+            link.href = url;
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function loadGameState(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const loadedData = JSON.parse(e.target.result);
+                    if (loadedData.players && loadedData.matchups) {
+                        gameData.tournament = loadedData;
+                        alert('Game state loaded successfully! Starting game.');
+                        settingsModal.style.display = 'none';
+                        showHideResourcesModal();
+                    } else {
+                        alert('Invalid save file format.');
+                    }
+                } catch (error) {
+                    console.error("Failed to load or parse game state:", error);
+                    alert('Failed to load save file.');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // --- EVENT LISTENERS ---
+        document.getElementById('team-a-target').addEventListener('click', () => handleItemFound('teamA'));
+        document.getElementById('team-b-target').addEventListener('click', () => handleItemFound('teamB'));
+        document.getElementById('skip-team-a').addEventListener('click', () => handleSkip('teamA'));
+        document.getElementById('skip-team-b').addEventListener('click', () => handleSkip('teamB'));
+        
+        goBtn.addEventListener('click', () => {
+            applySettings();
+            const selectedCount = gameData.settings.selectedPlayers.length;
+            if (selectedCount < 3) {
+                alert('Please select at least 3 players.');
+                return;
+            }
+            settingsModal.style.display = 'none';
+            initializeGame();
+        });
+
+        startRoundBtn.addEventListener('click', () => {
+            newRoundModal.style.display = 'none';
+            startRound();
+        });
+        playAgainBtn.addEventListener('click', showSettingsScreen);
+        document.getElementById('save-game-btn').addEventListener('click', saveGame);
+        document.getElementById('save-leaderboard-btn').addEventListener('click', saveLeaderboard);
+        document.getElementById('load-game-input').addEventListener('change', loadGameState);
+
+        document.getElementById('thumbs-up').addEventListener('click', () => {
+            if (!gameData.resourceToVoteOn) return;
+            gameData.isVoting = false;
+            const resource = gameData.tournament.players.find(r => r.id === gameData.resourceToVoteOn);
+            if (resource) resource.likes++;
+            updateTeamUI();
+            votingInterface.style.display = 'none';
+            
+            const currentMatchup = gameData.tournament.matchups[gameData.tournament.currentRound - 1];
+            const allRoundItemsFound = [...currentMatchup.teamA, ...currentMatchup.teamB]
+                .every(p => gameData.tournament.players.find(pl => pl.id === p.id).foundInRound);
+            if(allRoundItemsFound) endRound();
+
+        });
+
+        document.getElementById('thumbs-down').addEventListener('click', () => {
+             if (!gameData.resourceToVoteOn) return;
+            gameData.isVoting = false;
+            const resource = gameData.tournament.players.find(r => r.id === gameData.resourceToVoteOn);
+            if (resource) resource.dislikes++;
+            updateTeamUI();
+            votingInterface.style.display = 'none';
+            
+            const currentMatchup = gameData.tournament.matchups[gameData.tournament.currentRound - 1];
+            const allRoundItemsFound = [...currentMatchup.teamA, ...currentMatchup.teamB]
+                .every(p => gameData.tournament.players.find(pl => pl.id === p.id).foundInRound);
+            if(allRoundItemsFound) endRound();
+        });
+        
+        // --- INITIALIZE APP ---
+        window.onload = () => {
+            showSettingsScreen();
+        };
+    </script>
+
+</body>
+</html>
