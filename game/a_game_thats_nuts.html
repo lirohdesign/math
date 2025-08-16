@@ -505,7 +505,7 @@
 
             const currentMatchup = gameData.tournament.matchups[gameData.tournament.currentRound - 1];
             const winningTeam = currentMatchup[findingTeamKey];
-            const targetId = winningTeam.targetId;
+            const targetId = winningTeam.targetId; // This is the ID of the player who was found.
 
             if (!targetId) return;
 
@@ -537,8 +537,21 @@
                 endRound();
             }
             
-            assignNewTarget('teamA');
-            assignNewTarget('teamB');
+            // --- START: CORRECTED TARGET ASSIGNMENT LOGIC ---
+            const otherTeamKey = findingTeamKey === 'teamA' ? 'teamB' : 'teamA';
+            const otherTeam = currentMatchup[otherTeamKey];
+
+            // Check if the other team was also looking for the same target.
+            if (otherTeam.targetId === targetId) {
+                // If yes, both teams need a new target.
+                assignNewTarget('teamA');
+                assignNewTarget('teamB');
+            } else {
+                // Otherwise, only the team that made the find gets a new target.
+                assignNewTarget(findingTeamKey);
+            }
+            // --- END: CORRECTED TARGET ASSIGNMENT LOGIC ---
+            
             updateTeamUI();
         }
         
