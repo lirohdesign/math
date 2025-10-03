@@ -9,105 +9,106 @@
     <style>
         /* Custom styles for a retro 16-bit feel */
         body {
-            font-family: 'Press Start 2P', cursive; /* Apply arcade font */
-            background-color: #0f172a; /* Darker, almost black background */
-            color: #cbd5e1; /* Light text for contrast */
+            font-family: 'Press Start 2P', cursive;
+            background-color: #0f172a;
+            color: #cbd5e1;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             padding: 1rem;
-            /* This helps keep pixel art sharp if you use it */
-            image-rendering: optimizeSpeed; /* Older versions */
-            image-rendering: -moz-crisp-edges; /* Firefox */
-            image-rendering: -o-crisp-edges; /* Opera */
-            image-rendering: -webkit-optimize-contrast; /* Webkit (non-standard)*/
-            image-rendering: pixelated; /* Standard */
-            -ms-interpolation-mode: nearest-neighbor; /* IE (non-standard) */
+            image-rendering: optimizeSpeed;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: -o-crisp-edges;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: pixelated;
+            -ms-interpolation-mode: nearest-neighbor;
         }
 
         .game-container {
             width: 100%;
-            max-width: 640px; /* Classic SNES resolution width */
-            border: 8px solid #475569; /* Thicker, distinct border */
-            border-radius: 0; /* Sharp corners for retro feel */
+            max-width: 640px;
+            border: 8px solid #475569;
+            border-radius: 0;
             overflow: hidden;
-            background-color: #1e293b; /* Dark blue-grey background */
-            box-shadow: 0 0 25px rgba(0, 0, 0, 0.7); /* Stronger shadow */
-            display: flex; /* Use flexbox for layout */
-            flex-direction: column; /* Stack image, text, and choices vertically */
+            background-color: #1e293b;
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.7);
+            display: flex;
+            flex-direction: column;
         }
 
         .game-image {
-            width: 100%; /* Make image fill the container width */
-            height: auto; /* Maintain aspect ratio */
-            display: block; /* Remove extra space below image */
-            border-bottom: 8px solid #475569; /* Separator below image */
-            background-color: #000; /* Black background for images/placeholders */
-            /* Placeholder specific styles - remove when using actual pixel art */
-            font-size: 1.5rem; /* Make placeholder text larger */
+            width: 100%;
+            height: auto;
+            display: block;
+            border-bottom: 8px solid #475569;
+            background-color: #000;
+            padding: 8px; /* give some padding so 16x16 sprites look framed */
+            box-sizing: border-box;
             text-align: center;
-            line-height: 300px; /* Center placeholder text vertically */
-            color: #ffffff; /* White text for placeholder */
+        }
+        .game-image svg {
+            width: 128px;
+            height: 128px;
+            image-rendering: pixelated;
         }
 
         .game-display {
-            flex-grow: 1; /* Allow text area to take up remaining space */
+            flex-grow: 1;
             padding: 1.5rem;
-            border-bottom: 8px solid #475569; /* Thicker border bottom */
-            white-space: pre-wrap; /* Preserve line breaks */
+            border-bottom: 8px solid #475569;
+            white-space: pre-wrap;
             overflow-y: auto;
-            max-height: 400px; /* Adjusted max height */
-            line-height: 1.8; /* Increased line height for readability */
-            color: #e2e8f0; /* Slightly lighter text for main content */
-            background-color: #334155; /* Medium dark background for text area */
+            max-height: 400px;
+            line-height: 1.8;
+            color: #e2e8f0;
+            background-color: #334155;
         }
 
         .choices-container {
             padding: 1.5rem;
             display: flex;
             flex-direction: column;
-            gap: 0.8rem; /* Slightly smaller gap for tighter feel */
+            gap: 0.8rem;
         }
 
         .choice-button {
-            background-color: #10b981; /* Green button color, common in retro UI */
-            color: #0f172a; /* Dark text for contrast */
-            padding: 1rem 1.5rem; /* Added horizontal padding */
+            background-color: #10b981;
+            color: #0f172a;
+            padding: 1rem 1.5rem;
             border: none;
-            border-radius: 4px; /* Still use slight rounding for button feel */
+            border-radius: 4px;
             cursor: pointer;
             font-family: 'Press Start 2P', cursive;
-            font-size: 0.8rem; /* Slightly smaller font */
+            font-size: 0.8rem;
             text-align: left;
-            transition: background-color 0.1s ease; /* Faster transition */
-            box-shadow: 2px 2px 0px #1e293b; /* Simple pixel-like shadow */
+            transition: background-color 0.1s ease;
+            box-shadow: 2px 2px 0px #1e293b;
         }
 
         .choice-button:hover {
-            background-color: #059669; /* Darker green on hover */
-            box-shadow: 1px 1px 0px #1e293b; /* Shadow shrinks on hover */
+            background-color: #059669;
+            box-shadow: 1px 1px 0px #1e293b;
         }
 
          .choice-button:active {
-             background-color: #047857; /* Even darker when pressed */
-             box-shadow: 0px 0px 0px #1e293b; /* Shadow disappears when pressed */
-             transform: translate(2px, 2px); /* Button moves down slightly */
+             background-color: #047857;
+             box-shadow: 0px 0px 0px #1e293b;
+             transform: translate(2px, 2px);
          }
 
-
         .choice-button:disabled {
-            background-color: #64748b; /* Greyed out disabled button */
-            color: #cbd5e1; /* Lighter text for disabled */
+            background-color: #64748b;
+            color: #cbd5e1;
             cursor: not-allowed;
-            box-shadow: 2px 2px 0px #475569; /* Disabled shadow */
+            box-shadow: 2px 2px 0px #475569;
         }
     </style>
 </head>
 <body>
 
 <div class="game-container">
-    <img id="game-image" class="game-image" src="" alt="Scene Image">
+    <div id="game-image" class="game-image" aria-hidden="true"></div>
     <div id="game-display" class="game-display">
         Loading...
     </div>
@@ -116,6 +117,102 @@
 </div>
 
 <script>
+    // --- Embedded SVG assets (inline, self-contained) ---
+    const assets = {
+        player: `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" shape-rendering="crispEdges">
+  <rect width="16" height="16" fill="none"/>
+  <rect x="5" y="1" width="6" height="1" fill="#6b4226"/>
+  <rect x="4" y="2" width="8" height="1" fill="#6b4226"/>
+  <rect x="4" y="3" width="2" height="1" fill="#6b4226"/>
+  <rect x="10" y="3" width="2" height="1" fill="#6b4226"/>
+  <rect x="6" y="3" width="4" height="2" fill="#f2c9b6"/>
+  <rect x="6" y="5" width="1" height="1" fill="#000"/>
+  <rect x="9" y="5" width="1" height="1" fill="#000"/>
+  <rect x="5" y="6" width="6" height="3" fill="#2563eb"/>
+  <rect x="5" y="9" width="3" height="3" fill="#1f2937"/>
+  <rect x="8" y="9" width="3" height="3" fill="#1f2937"/>
+  <rect x="5" y="12" width="2" height="1" fill="#2d3748"/>
+  <rect x="9" y="12" width="2" height="1" fill="#2d3748"/>
+</svg>`,
+
+        villager: `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" shape-rendering="crispEdges">
+  <rect width="16" height="16" fill="none"/>
+  <rect x="4" y="1" width="8" height="2" fill="#7c3aed"/>
+  <rect x="5" y="3" width="6" height="1" fill="#7c3aed"/>
+  <rect x="6" y="4" width="4" height="2" fill="#f3d7c4"/>
+  <rect x="6" y="5" width="1" height="1" fill="#000"/>
+  <rect x="9" y="5" width="1" height="1" fill="#000"/>
+  <rect x="4" y="6" width="8" height="5" fill="#4b5563"/>
+  <rect x="6" y="9" width="4" height="2" fill="#374151"/>
+</svg>`,
+
+        blacksmith: `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" shape-rendering="crispEdges">
+  <rect width="16" height="16" fill="none"/>
+  <rect x="4" y="1" width="8" height="2" fill="#444"/>
+  <rect x="5" y="3" width="6" height="1" fill="#444"/>
+  <rect x="6" y="4" width="4" height="2" fill="#f0c8ad"/>
+  <rect x="4" y="6" width="8" height="5" fill="#a16207"/>
+  <rect x="5" y="11" width="6" height="1" fill="#7c2d12"/>
+  <rect x="2" y="9" width="1" height="3" fill="#6b7280"/>
+  <rect x="1" y="9" width="1" height="1" fill="#374151"/>
+</svg>`,
+
+        garden: `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" shape-rendering="crispEdges">
+  <rect width="16" height="16" fill="none"/>
+  <rect x="2" y="6" width="12" height="6" fill="#6b4f2b"/>
+  <rect x="3" y="7" width="2" height="2" fill="#6ab04c"/>
+  <rect x="6" y="7" width="2" height="2" fill="#2ecc71"/>
+  <rect x="9" y="7" width="2" height="2" fill="#27ae60"/>
+  <rect x="3" y="10" width="2" height="1" fill="#145214"/>
+  <rect x="6" y="10" width="2" height="1" fill="#145214"/>
+  <rect x="9" y="10" width="2" height="1" fill="#145214"/>
+  <rect x="1" y="5" width="14" height="1" fill="#c7b299"/>
+</svg>`,
+
+        beach: `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" shape-rendering="crispEdges">
+  <rect width="16" height="16" fill="none"/>
+  <rect x="0" y="0" width="16" height="6" fill="#93c5fd"/>
+  <rect x="0" y="6" width="16" height="4" fill="#0ea5e9"/>
+  <rect x="0" y="10" width="16" height="6" fill="#f3d19c"/>
+  <rect x="12" y="1" width="2" height="2" fill="#f59e0b"/>
+</svg>`,
+
+        chest: `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" shape-rendering="crispEdges">
+  <rect width="16" height="16" fill="none"/>
+  <rect x="3" y="7" width="10" height="5" fill="#8b5e34"/>
+  <rect x="3" y="5" width="10" height="2" fill="#c27a2a"/>
+  <rect x="7" y="9" width="2" height="2" fill="#ffd166"/>
+  <rect x="7.5" y="9.5" width="1" height="1" fill="#826d3b"/>
+</svg>`,
+
+        tree: `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" shape-rendering="crispEdges">
+  <rect width="16" height="16" fill="none"/>
+  <rect x="7" y="10" width="2" height="3" fill="#7c4a2e"/>
+  <rect x="4" y="5" width="8" height="4" fill="#16a34a"/>
+  <rect x="5" y="3" width="6" height="2" fill="#15803d"/>
+</svg>`,
+
+        castle: `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" shape-rendering="crispEdges">
+  <rect width="16" height="16" fill="none"/>
+  <rect x="2" y="6" width="12" height="6" fill="#bdbdbd"/>
+  <rect x="2" y="4" width="2" height="2" fill="#9e9e9e"/>
+  <rect x="12" y="4" width="2" height="2" fill="#9e9e9e"/>
+  <rect x="4" y="5" width="1" height="1" fill="#616161"/>
+  <rect x="6" y="5" width="1" height="1" fill="#616161"/>
+  <rect x="8" y="5" width="1" height="1" fill="#616161"/>
+  <rect x="10" y="5" width="1" height="1" fill="#616161"/>
+  <rect x="7" y="8" width="2" height="4" fill="#6b4e2e"/>
+</svg>`
+    };
+
     // Game state variables
     let gameState = {
         currentPage: 'start',
@@ -124,11 +221,10 @@
         artsSkill: 0,
         happiness: 0,
         lazyDaysSpent: 0,
-        maxLazyDaysBeforeRepetition: 10 // How many lazy choices before it feels very repetitive
+        maxLazyDaysBeforeRepetition: 10
     };
 
     // --- Game Content ---
-    // Each page object can now have an 'image' property with the URL of the scene image
     const gameContent = {
         start: {
             text: `The sunlight of Aethel falls gently upon your face, a warmth that promises not just a day, but a century of possibility. At 25 years, your Prime has just begun, a vast expanse of life stretching before you. The village of Oakhaven is your home, but the whispers of distant shores and lively gatherings are strong in your ear.
@@ -142,8 +238,7 @@ What will you do?`,
                 { text: "Journey to Sylvane for Sun and Festivities (The 'Lazy Path')", nextPage: 'lazy_path_intro' },
                 { text: "Dedicate yourself to a Skill in Oakhaven (The Path of Enduring Craft)", nextPage: 'skill_choice' }
             ],
-            // Replace this placeholder URL with your actual pixel art image URL for the Oakhaven village scene
-            image: 'https://placehold.co/640x300/556b2f/ffffff?text=OAKHAVEN+VILLAGE'
+            image: 'tree'
         },
         skill_choice: {
             text: `You nod, considering Elder Elara's words. The idea of building something lasting resonates with you. Oakhaven offers many paths to mastery, each requiring patience and dedication over years. Which skill calls to you?`,
@@ -152,8 +247,7 @@ What will you do?`,
                 { text: "The Secrets of Root and Bloom (Botany)", nextPage: 'botany_start' },
                 { text: "The Expression of Soul Through Form (Arts)", nextPage: 'arts_start' }
             ],
-            // Replace with your pixel art image URL for an Oakhaven interior scene
-            image: 'https://placehold.co/640x300/4682b4/ffffff?text=OAKHAVEN+INTERIOR'
+            image: 'castle'
         },
         lazy_path_intro: {
              text: `You decide the elder's wisdom can wait. The lure of Sylvane is too strong. You pack a light bag and set off towards the coast, leaving the quiet dedication of Oakhaven behind for now.
@@ -162,67 +256,53 @@ The journey is easy, filled with pleasant scenery. Soon, the salty air hits your
              choices: [
                  { text: "Arrive in Sylvane", nextPage: 'lazy_path_sylvane' }
              ],
-             // Replace with your pixel art image URL for the road to Sylvane scene
-             image: 'https://placehold.co/640x300/daa520/ffffff?text=ROAD+TO+SYLVANE'
+             image: 'beach'
         },
         lazy_path_sylvane: {
             getText: function() {
-                let baseText = `You are in Sylvane. The sun is warm, the music is playing, and the air is filled with laughter. There's always something happening. Your current happiness is ${gameState.happiness}.`;
+                let baseText = `You are in Sylvane. The sun is warm, the music is playing, and the air is filled with laughter. Your current happiness is ${gameState.happiness}.`;
                  if (gameState.lazyDaysSpent > gameState.maxLazyDaysBeforeRepetition) {
-                    baseText += `\n\nAnother day, another party. Another trip to the beach. Another fleeting conversation. It all feels... the same. You've met so many people, seen so many sights, but nothing seems to stick. The joy is temporary, fading with the setting sun, only to be chased again tomorrow. Is this all there is?`;
+                    baseText += `\n\nAnother day, another party...`;
                  }
                  return baseText;
             },
             choices: [
                 { text: "Attend a beach party (+5 Happiness)", action: 'increaseHappiness', value: 5, nextPage: 'lazy_path_sylvane' },
-                { text: "Gamble at the festival (+/- Gold, small chance of big win, high chance of small loss)", action: 'gamble', nextPage: 'lazy_path_sylvane' }, // Action will handle gold change
+                { text: "Gamble at the festival (+/- Gold, small chance of big win, high chance of small loss)", action: 'gamble', nextPage: 'lazy_path_sylvane' },
                 { text: "Flirt with a local (Shallow interaction)", action: 'flirt', nextPage: 'lazy_path_sylvane' },
-                { text: "Buy new clothes (Spend Gold, temporary style boost)", action: 'buyClothes', nextPage: 'lazy_path_sylvane' }, // Action will handle gold change
+                { text: "Buy new clothes (Spend Gold, temporary style boost)", action: 'buyClothes', nextPage: 'lazy_path_sylvane' },
                 { text: "Think about Oakhaven (Consider returning)", nextPage: 'lazy_consider_oakhaven' }
             ],
              onEnter: function() {
-                gameState.lazyDaysSpent++; // Increment lazy days spent each time this page is entered
+                gameState.lazyDaysSpent++;
              },
-             // Replace with your pixel art image URL for the Sylvane beach scene
-             image: 'https://placehold.co/640x300/f08080/ffffff?text=SYLVANE+BEACH'
+             image: 'beach'
         },
          lazy_consider_oakhaven: {
-             text: `You pause amidst the revelry, a flicker of thought about Oakhaven crossing your mind. What were they building back there? While life here is easy, you feel a strange emptiness after so many repetitive days. The laughter rings hollow sometimes.`,
+             text: `You pause amidst the revelry...`,
              choices: [
                  { text: "Return to Oakhaven", nextPage: 'return_to_oakhaven' },
                  { text: "Stay in Sylvane, the party continues!", nextPage: 'lazy_path_sylvane' }
              ],
-             // Replace with your pixel art image URL for a thoughtful moment on the beach
-             image: 'https://placehold.co/640x300/f08080/000000?text=SYLVANE+BEACH%0A(THOUGHTFUL)'
+             image: 'beach'
          },
         return_to_oakhaven: {
-             text: `Leaving the endless summer behind, you make the journey back to Oakhaven. The air feels different here, quieter, filled with the scent of earth and the distant sound of hammers and tools. Elder Elara greets you with a knowing smile.
-
-"Welcome back, child," she says softly. "The path of fleeting joy is wide, but it leads in circles. The path of enduring craft is narrow at first, but it stretches towards the horizon."
-
-You feel a sense of... something. Perhaps a readiness for a different kind of life.`,
+             text: `Leaving the endless summer behind...`,
              choices: [
                  { text: "Begin anew, choose a skill", nextPage: 'skill_choice' }
              ],
-             // Replace with your pixel art image URL for the road back to Oakhaven scene
-             image: 'https://placehold.co/640x300/daa520/000000?text=ROAD+TO+OAKHAVEN'
+             image: 'tree'
         },
         crafting_start: {
-            text: `You choose the path of the craftsman. Borin, the village smith, is a man of few words but strong hands. He sets you to work immediately, starting with the basics of identifying ores and the rhythm of the hammer.
-
-"Patience," he grunts, demonstrating a technique. "Stone and steel yield to will, but only with time and respect."
-
-Your first task: gather common iron ore from the nearby foothills.`,
+            text: `You choose the path of the craftsman...`,
             choices: [
                  { text: "Gather Iron Ore", action: 'gatherOre', nextPage: 'crafting_gather' }
             ],
              onEnter: function() {
-                 // Reset lazy path stats if returning from it
                  gameState.lazyDaysSpent = 0;
                  gameState.happiness = 0;
              },
-             // Replace with your pixel art image URL for the blacksmith forge scene
-             image: 'https://placehold.co/640x300/a9a9a9/000000?text=BLACKSMITH+FORGE'
+             image: 'blacksmith'
         },
         crafting_gather: {
              getText: function() {
@@ -233,30 +313,26 @@ Your first task: gather common iron ore from the nearby foothills.`,
                  { text: "Attempt a simple smelt (Requires Crafting Skill)", action: 'attemptSmelt', nextPage: 'crafting_smelt_result' },
                  { text: "Return to Borin", nextPage: 'crafting_borin' }
              ],
-             // Replace with your pixel art image URL for the foothills/mine scene
-             image: 'https://placehold.co/640x300/8b4513/ffffff?text=FOOTHILLS+MINE'
+             image: 'tree'
         },
          crafting_smelt_result: {
              getText: function() {
-                 // Logic handled in attemptSmelt action
                  return gameState.lastActionMessage || "You attempt to smelt the ore.";
              },
              choices: [
-                 { text: "Continue", nextPage: 'crafting_gather'} // Go back to gathering/smelting loop
+                 { text: "Continue", nextPage: 'crafting_gather'}
              ],
-             // Replace with your pixel art image URL for the forge scene (smelting)
-             image: 'https://placehold.co/640x300/a9a9a9/000000?text=BLACKSMITH+FORGE'
+             image: 'blacksmith'
          },
          crafting_borin: {
              getText: function() {
-                 return `Borin looks at your progress. "Hmm," he says, a rare sign of acknowledgment. "You're not entirely useless. Keep at it. Mastery takes time." Your Crafting Skill is ${gameState.craftingSkill}.`;
+                 return `Borin looks at your progress... Your Crafting Skill is ${gameState.craftingSkill}.`;
              },
              choices: [
                  { text: "Go back to gathering/smelting", nextPage: 'crafting_gather' },
                  { text: "Ask about advanced techniques (Requires higher Crafting Skill)", action: 'askAdvancedCrafting', nextPage: 'crafting_advanced_talk' }
              ],
-             // Replace with your pixel art image URL for the forge scene (talking to Borin)
-             image: 'https://placehold.co/640x300/a9a9a9/000000?text=BLACKSMITH+FORGE'
+             image: 'blacksmith'
          },
          crafting_advanced_talk: {
              getText: function() {
@@ -265,59 +341,48 @@ Your first task: gather common iron ore from the nearby foothills.`,
              choices: [
                  { text: "Understood", nextPage: 'crafting_borin' }
              ],
-             // Replace with your pixel art image URL for the forge scene (learning)
-             image: 'https://placehold.co/640x300/a9a9a9/000000?text=BLACKSMITH+FORGE%0A(LEARNING)'
+             image: 'blacksmith'
          },
         botany_start: {
-            text: `You choose the path of the botanist. Faelar, the village botanist, has a gentle demeanor and a deep connection to the living world. She shows you to a small plot in the community garden.
-
-"Plants speak in whispers," she explains, her fingers tracing the veins of a leaf. "To understand them requires patience and a listening heart."
-
-Your first task: learn to identify and care for common healing herbs.`,
+            text: `You choose the path of the botanist...`,
             choices: [
                  { text: "Tend the Garden", action: 'tendGarden', nextPage: 'botany_garden' }
             ],
              onEnter: function() {
-                 // Reset lazy path stats if returning from it
                  gameState.lazyDaysSpent = 0;
                  gameState.happiness = 0;
              },
-             // Replace with your pixel art image URL for the community garden scene
-             image: 'https://placehold.co/640x300/8fbc8f/000000?text=COMMUNITY+GARDEN'
+             image: 'garden'
         },
          botany_garden: {
              getText: function() {
-                 return `You spend time in the garden, tending to the plants. The scent of soil and leaves fills the air. Your Botany Skill is currently: ${gameState.botanySkill}.`;
+                 return `You spend time in the garden... Your Botany Skill is currently: ${gameState.botanySkill}.`;
              },
              choices: [
                  { text: "Water and Weed (+1 Botany Skill, small chance of finding rare seed)", action: 'increaseBotany', nextPage: 'botany_garden' },
                  { text: "Attempt to identify a plant (Requires Botany Skill)", action: 'identifyPlant', nextPage: 'botany_identify_result' },
                  { text: "Talk to Faelar", nextPage: 'botany_faelar' }
              ],
-             // Replace with your pixel art image URL for the garden plot scene
-             image: 'https://placehold.co/640x300/90ee90/000000?text=GARDEN+PLOT'
+             image: 'garden'
          },
          botany_identify_result: {
              getText: function() {
-                 // Logic handled in identifyPlant action
                  return gameState.lastActionMessage || "You attempt to identify a plant.";
              },
              choices: [
-                 { text: "Continue", nextPage: 'botany_garden'} // Go back to garden/identifying loop
+                 { text: "Continue", nextPage: 'botany_garden'}
              ],
-             // Replace with your pixel art image URL for the garden plot scene (studying)
-             image: 'https://placehold.co/640x300/90ee90/000000?text=GARDEN+PLOT%0A(STUDYING)'
+             image: 'garden'
          },
          botany_faelar: {
              getText: function() {
-                 return `Faelar smiles gently. "The garden responds to your care. Each season brings new lessons. Keep nurturing them." Your Botany Skill is ${gameState.botanySkill}.`;
+                 return `Faelar smiles gently... Your Botany Skill is ${gameState.botanySkill}.`;
              },
              choices: [
                  { text: "Go back to tending the garden", nextPage: 'botany_garden' },
                  { text: "Ask about rare flora (Requires higher Botany Skill)", action: 'askAdvancedBotany', nextPage: 'botany_advanced_talk' }
              ],
-             // Replace with your pixel art image URL for the community garden scene (talking to Faelar)
-             image: 'https://placehold.co/640x300/8fbc8f/000000?text=COMMUNITY+GARDEN'
+             image: 'garden'
          },
          botany_advanced_talk: {
              getText: function() {
@@ -326,59 +391,48 @@ Your first task: learn to identify and care for common healing herbs.`,
              choices: [
                  { text: "Understood", nextPage: 'botany_faelar' }
              ],
-             // Replace with your pixel art image URL for the community garden scene (learning)
-             image: 'https://placehold.co/640x300/8fbc8f/000000?text=COMMUNITY+GARDEN%0A(LEARNING)'
+             image: 'garden'
          },
         arts_start: {
-            text: `You choose the path of the artist. Lyra, the village loremaster and musician, has a spark in her eyes that reflects the beauty she seeks to create. She offers you guidance in expressing yourself.
-
-"Art is a conversation with the world," she says, tuning a lute. "It takes a lifetime to truly learn to listen, and to respond with your own voice."
-
-Your first task: learn the basic scales and rhythms of music.`,
+            text: `You choose the path of the artist...`,
             choices: [
                  { text: "Practice Music", action: 'practiceMusic', nextPage: 'arts_practice' }
             ],
              onEnter: function() {
-                 // Reset lazy path stats if returning from it
                  gameState.lazyDaysSpent = 0;
                  gameState.happiness = 0;
              },
-             // Replace with your pixel art image URL for the art studio scene
-             image: 'https://placehold.co/640x300/b0c4de/000000?text=ART+STUDIO'
+             image: 'castle'
         },
          arts_practice: {
              getText: function() {
-                 return `You spend time practicing your chosen art. The sounds you make are simple now, but hold the promise of future harmony. Your Arts Skill is currently: ${gameState.artsSkill}.`;
+                 return `You spend time practicing your chosen art... Your Arts Skill is currently: ${gameState.artsSkill}.`;
              },
              choices: [
                  { text: "Practice more (+1 Arts Skill, small chance of inspiration)", action: 'increaseArts', nextPage: 'arts_practice' },
                  { text: "Attempt a simple piece (Requires Arts Skill)", action: 'attemptPiece', nextPage: 'arts_piece_result' },
                  { text: "Talk to Lyra", nextPage: 'arts_lyra' }
              ],
-             // Replace with your pixel art image URL for the practicing art scene
-             image: 'https://placehold.co/640x300/add8e6/000000?text=PRACTICING+ART'
+             image: 'castle'
          },
          arts_piece_result: {
              getText: function() {
-                 // Logic handled in attemptPiece action
                  return gameState.lastActionMessage || "You attempt a simple piece.";
              },
              choices: [
-                 { text: "Continue", nextPage: 'arts_practice'} // Go back to practice/attempt loop
+                 { text: "Continue", nextPage: 'arts_practice'}
              ],
-             // Replace with your pixel art image URL for the practicing art scene (creating)
-             image: 'https://placehold.co/640x300/add8e6/000000?text=PRACTICING+ART%0A(CREATING)'
+             image: 'castle'
          },
          arts_lyra: {
              getText: function() {
-                 return `Lyra listens to your practice. "Each note, each stroke, each word is a step," she encourages. "The masterpiece is built over years, not days." Your Arts Skill is ${gameState.artsSkill}.`;
+                 return `Lyra listens to your practice... Your Arts Skill is ${gameState.artsSkill}.`;
              },
              choices: [
                  { text: "Go back to practicing", nextPage: 'arts_practice' },
                  { text: "Ask about ancient forms (Requires higher Arts Skill)", action: 'askAdvancedArts', nextPage: 'arts_advanced_talk' }
              ],
-             // Replace with your pixel art image URL for the art studio scene (talking to Lyra)
-             image: 'https://placehold.co/640x300/b0c4de/000000?text=ART+STUDIO'
+             image: 'castle'
          },
          arts_advanced_talk: {
              getText: function() {
@@ -387,10 +441,8 @@ Your first task: learn the basic scales and rhythms of music.`,
              choices: [
                  { text: "Understood", nextPage: 'arts_lyra' }
              ],
-             // Replace with your pixel art image URL for the art studio scene (learning)
-             image: 'https://placehold.co/640x300/b0c4de/000000?text=ART+STUDIO%0A(LEARNING)'
+             image: 'castle'
          }
-        // Add more pages/states for deeper skill progression, quests, etc.
     };
 
     // --- Game Logic ---
@@ -401,18 +453,23 @@ Your first task: learn the basic scales and rhythms of music.`,
     // Function to update the display based on the current game state
     function updateDisplay() {
         const page = gameContent[gameState.currentPage];
-        let textToShow = typeof page.getText === 'function' ? page.getText() : page.text;
-        gameDisplay.textContent = textToShow; // Use textContent to avoid HTML injection
 
-        // Update image
-        if (page.image) {
-            gameImage.src = page.image;
-            gameImage.style.display = 'block'; // Show the image element
-        } else {
-            gameImage.src = ''; // Clear the image
-            gameImage.style.display = 'none'; // Hide the image element if no image is specified
+        // Call onEnter first so page.getText observes updated state
+        if (typeof page.onEnter === 'function') {
+            page.onEnter();
         }
 
+        let textToShow = typeof page.getText === 'function' ? page.getText() : page.text;
+        gameDisplay.textContent = textToShow;
+
+        // Update image (use embedded assets)
+        if (page.image && assets[page.image]) {
+            gameImage.innerHTML = assets[page.image];
+            gameImage.style.display = 'block';
+        } else {
+            gameImage.innerHTML = '';
+            gameImage.style.display = 'none';
+        }
 
         // Clear previous choices
         choicesContainer.innerHTML = '';
@@ -428,83 +485,74 @@ Your first task: learn the basic scales and rhythms of music.`,
                 handleChoice(choice);
             });
 
-            // Optional: Disable button based on game state/skill level
-             if (choice.action === 'askAdvancedCrafting' && gameState.craftingSkill < 10) { // Example skill gate
+             if (choice.action === 'askAdvancedCrafting' && gameState.craftingSkill < 10) {
                  button.disabled = true;
                  button.textContent += " (Requires 10 Crafting Skill)";
              }
-             if (choice.action === 'askAdvancedBotany' && gameState.botanySkill < 10) { // Example skill gate
+             if (choice.action === 'askAdvancedBotany' && gameState.botanySkill < 10) {
                  button.disabled = true;
                  button.textContent += " (Requires 10 Botany Skill)";
              }
-             if (choice.action === 'askAdvancedArts' && gameState.artsSkill < 10) { // Example skill gate
+             if (choice.action === 'askAdvancedArts' && gameState.artsSkill < 10) {
                  button.disabled = true;
                  button.textContent += " (Requires 10 Arts Skill)";
              }
-             if (choice.action === 'attemptSmelt' && gameState.craftingSkill < 3) { // Example skill gate
+             if (choice.action === 'attemptSmelt' && gameState.craftingSkill < 3) {
                  button.disabled = true;
                  button.textContent += " (Requires 3 Crafting Skill)";
              }
-             if (choice.action === 'identifyPlant' && gameState.botanySkill < 3) { // Example skill gate
+             if (choice.action === 'identifyPlant' && gameState.botanySkill < 3) {
                  button.disabled = true;
                  button.textContent += " (Requires 3 Botany Skill)";
              }
-             if (choice.action === 'attemptPiece' && gameState.artsSkill < 3) { // Example skill gate
+             if (choice.action === 'attemptPiece' && gameState.artsSkill < 3) {
                  button.disabled = true;
                  button.textContent += " (Requires 3 Arts Skill)";
              }
 
-
             choicesContainer.appendChild(button);
         });
-
-         // Call onEnter function for the new page if it exists
-         if (typeof page.onEnter === 'function') {
-             page.onEnter();
-         }
     }
 
     // Function to handle player choices
     function handleChoice(choice) {
         // Perform action if defined
         if (choice.action) {
-            performAction(choice.action, value); // Pass value here
+            performAction(choice.action, choice.value);
         }
 
         // Move to the next page
         if (choice.nextPage) {
             gameState.currentPage = choice.nextPage;
             updateDisplay();
+        } else {
+            // No nextPage (some actions may only set messages) — refresh current page
+            updateDisplay();
         }
     }
 
     // Function to perform actions based on choice
-    function performAction(action, value) { // Accept value here
-        gameState.lastActionMessage = ""; // Reset message
+    function performAction(action, value) {
+        gameState.lastActionMessage = "";
 
         switch (action) {
             case 'increaseHappiness':
-                gameState.happiness += value;
-                // Add some flavor text based on lazyDaysSpent
+                gameState.happiness += (value || 0);
                 if (gameState.lazyDaysSpent <= gameState.maxLazyDaysBeforeRepetition / 2) {
-                     gameState.lastActionMessage = "You enjoy the party. The music is loud, the company is cheerful. (+5 Happiness)";
+                     gameState.lastActionMessage = "You enjoy the party. The music is loud, the company is cheerful.";
                 } else if (gameState.lazyDaysSpent <= gameState.maxLazyDaysBeforeRepetition) {
-                     gameState.lastActionMessage = "Another party. It's fun, but feels a little familiar now. (+5 Happiness)";
+                     gameState.lastActionMessage = "Another party. It's fun, but feels a little familiar now.";
                 } else {
-                     gameState.lastActionMessage = "You attend the party. It's... a party. Just like yesterday. And the day before. (+5 Happiness)";
+                     gameState.lastActionMessage = "You attend the party. It's... a party. Just like yesterday.";
                  }
                 break;
             case 'gamble':
-                const winChance = 0.2; // 20% chance to win big
+                const winChance = 0.2;
                 const bigWin = 50;
                 const smallLoss = 5;
                 if (Math.random() < winChance) {
-                    // Simulate winning gold (need a gold stat)
-                    // gameState.gold += bigWin; // Assuming a gold stat exists
                     gameState.lastActionMessage = `You got lucky and won big! (+${bigWin} Gold - if gold existed)`;
                 } else {
-                    // Simulate losing gold
-                    // gameState.gold = Math.max(0, gameState.gold - smallLoss); // Assuming a gold stat exists
                      gameState.lastActionMessage = `You lost a little. Better luck next time. (-${smallLoss} Gold - if gold existed)`;
                 }
                  if (gameState.lazyDaysSpent > gameState.maxLazyDaysBeforeRepetition) {
@@ -523,9 +571,7 @@ Your first task: learn the basic scales and rhythms of music.`,
                  }
                 break;
             case 'buyClothes':
-                 // Simulate spending gold and temporary boost
-                 // gameState.gold = Math.max(0, gameState.gold - 20); // Assuming a gold stat exists
-                 gameState.lastActionMessage = "You buy some flashy new clothes. You feel good... for a little while. (-20 Gold - if gold existed)";
+                 gameState.lastActionMessage = "You buy some flashy new clothes. You feel good... for a little while.";
                  if (gameState.lazyDaysSpent > gameState.maxLazyDaysBeforeRepetition) {
                      gameState.lastActionMessage += " They'll be out of style next week anyway.";
                  }
@@ -533,14 +579,12 @@ Your first task: learn the basic scales and rhythms of music.`,
             case 'increaseCrafting':
                 gameState.craftingSkill++;
                  gameState.lastActionMessage = "You practice your craft. You feel a little more confident in your hands.";
-                // Add chance for rare ore later
                 break;
              case 'attemptSmelt':
                  if (gameState.craftingSkill >= 3) {
-                     const successChance = gameState.craftingSkill * 0.1; // Example: 10% chance per skill point
+                     const successChance = gameState.craftingSkill * 0.1;
                      if (Math.random() < successChance) {
                          gameState.lastActionMessage = "Success! You smelted the ore into usable metal.";
-                         // Add resource gain later
                      } else {
                          gameState.lastActionMessage = "You tried to smelt the ore, but it didn't quite work out.";
                      }
@@ -550,8 +594,7 @@ Your first task: learn the basic scales and rhythms of music.`,
                  break;
              case 'askAdvancedCrafting':
                  if (gameState.craftingSkill >= 10) {
-                     gameState.lastActionMessage = "Borin nods slowly. 'Advanced techniques require a foundation built over years. Pay attention, this is complex.' He begins to explain...";
-                     // Unlock new crafting options/recipes later
+                     gameState.lastActionMessage = "Borin nods slowly. 'Advanced techniques require a foundation built over years.'";
                  } else {
                      gameState.lastActionMessage = "Borin grunts. 'You're not ready yet. Focus on the basics.'";
                  }
@@ -559,14 +602,12 @@ Your first task: learn the basic scales and rhythms of music.`,
             case 'increaseBotany':
                 gameState.botanySkill++;
                  gameState.lastActionMessage = "You tend the plants. They seem a little healthier.";
-                // Add chance for rare seed later
                 break;
              case 'identifyPlant':
                  if (gameState.botanySkill >= 3) {
-                      const successChance = gameState.botanySkill * 0.1; // Example: 10% chance per skill point
+                      const successChance = gameState.botanySkill * 0.1;
                       if (Math.random() < successChance) {
-                          gameState.lastActionMessage = "You successfully identified the plant! You learned something new about its properties.";
-                          // Add knowledge gain later
+                          gameState.lastActionMessage = "You successfully identified the plant!";
                       } else {
                           gameState.lastActionMessage = "You examine the plant, but its secrets remain hidden for now.";
                       }
@@ -576,23 +617,20 @@ Your first task: learn the basic scales and rhythms of music.`,
                  break;
              case 'askAdvancedBotany':
                  if (gameState.botanySkill >= 10) {
-                     gameState.lastActionMessage = "Faelar's eyes light up. 'Ah, you're ready to learn of the deeper connections. The language of the ancient flora...' She shares her knowledge.";
-                     // Unlock new botany options/plants later
+                     gameState.lastActionMessage = "Faelar's eyes light up. 'Ah, you're ready to learn of the deeper connections.'";
                  } else {
-                     gameState.lastActionMessage = "Faelar smiles gently. 'Patience, young one. The plants will reveal their secrets in time. Keep tending them.'";
+                     gameState.lastActionMessage = "Faelar smiles gently. 'Patience, young one. The plants will reveal their secrets in time.'";
                  }
                  break;
             case 'increaseArts':
                 gameState.artsSkill++;
                  gameState.lastActionMessage = "You practice your art. You feel a flicker of inspiration.";
-                // Add chance for inspiration later
                 break;
              case 'attemptPiece':
                  if (gameState.artsSkill >= 3) {
-                      const successChance = gameState.artsSkill * 0.1; // Example: 10% chance per skill point
+                      const successChance = gameState.artsSkill * 0.1;
                       if (Math.random() < successChance) {
-                          gameState.lastActionMessage = "You completed a simple piece! It's not a masterpiece, but it has heart.";
-                          // Add creation/impact later
+                          gameState.lastActionMessage = "You completed a simple piece!";
                       } else {
                           gameState.lastActionMessage = "You attempted to create a piece, but it didn't quite come together.";
                       }
@@ -602,13 +640,11 @@ Your first task: learn the basic scales and rhythms of music.`,
                  break;
              case 'askAdvancedArts':
                  if (gameState.artsSkill >= 10) {
-                     gameState.lastActionMessage = "Lyra's eyes gleam. 'You seek the ancient forms? The arts hold power beyond simple expression. Listen closely...' She begins to teach you.";
-                     // Unlock new arts options/forms later
+                     gameState.lastActionMessage = "Lyra's eyes gleam. 'You seek the ancient forms? Listen closely...'";
                  } else {
-                     gameState.lastActionMessage = "Lyra smiles. 'Keep practicing the fundamentals. The deeper forms will reveal themselves when you are ready.'";
+                     gameState.lastActionMessage = "Lyra smiles. 'Keep practicing the fundamentals.'";
                  }
                  break;
-            // Add more actions as needed
         }
     }
 
