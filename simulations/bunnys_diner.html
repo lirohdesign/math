@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bunny's Diner: Scheduling Simulation</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom font import for aesthetics */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Bebas+Neue&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f7f7;
+            color: #333;
+        }
+        h1, h2 {
+            font-family: 'Bebas Neue', cursive;
+            letter-spacing: 2px;
+        }
+        .header-bg {
+            background-color: #9C1F1F; /* Diner Red */
+            color: #FFF8E1; /* Creamy White */
+        }
+        .card {
+            background-color: white;
+            border-radius: 0.75rem; /* rounded-xl */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #F7E8A7; /* Light Yellow */
+            font-weight: 600;
+            color: #333;
+        }
+        tr:hover {
+            background-color: #fff9e5;
+        }
+        .list-header {
+            font-weight: 600;
+            color: #9C1F1F;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-8">
+
+    <!-- Header Section -->
+    <header class="header-bg p-6 rounded-xl mb-8 shadow-2xl">
+        <h1 class="text-4xl sm:text-6xl text-center">Bunny's Diner: Scheduling Simulation</h1>
+        <p class="text-center mt-2 text-xl font-light">The Big Staffing Challenge</p>
+    </header>
+
+    <div class="max-w-6xl mx-auto">
+        
+        <!-- Simulation Instructions -->
+        <div class="card p-6 mb-8">
+            <h2 class="text-3xl font-bold mb-4 text-gray-800">Simulation Instructions</h2>
+            <div class="border-l-4 border-red-500 pl-4 py-2 bg-red-50">
+                <p class="mb-4">You are tasked with creating a full two-week schedule (14 consecutive days) for Bunny’s Diner based on the detailed information provided below. You must ensure the diner is adequately staffed to meet the Minimum Staffing Requirements for every operating hour.</p>
+                <p class="text-lg font-semibold mt-3">Task Requirements:</p>
+                <ul class="list-disc ml-6 space-y-1">
+                    <li>Create a 14-day staff schedule (Monday through Sunday, twice).</li>
+                    <li>All operating hours (5:00 AM - 10:00 PM) must be covered.</li>
+                    <li>All shifts must meet the minimum staff numbers.</li>
+                    <li>Employee availability (Full-Time/Part-Time hours) must be strictly respected.</li>
+                    <li>No overtime is allowed (FT = 40 hours max; PT = 25 hours max).</li>
+                    <li>Submission: Submit an organized schedule (spreadsheet/table format highly recommended) and show your work/logic (how you allocated staff during peak times).</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Diner Data Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+            
+            <!-- Operational Details & Menus -->
+            <div class="lg:col-span-2 card p-6">
+                <h2 class="text-3xl font-bold mb-4 text-gray-800">Diner Operations & Staffing Requirements</h2>
+                
+                <h3 class="list-header">Hours of Operation:</h3>
+                <table class="text-sm">
+                    <tr><td>Breakfast</td><td>5:00 AM - 11:00 AM</td></tr>
+                    <tr><td>Lunch</td><td>11:00 AM - 2:00 PM</td></tr>
+                    <tr><td>Dinner</td><td>2:00 PM - 10:00 PM</td></tr>
+                </table>
+
+                <h3 class="list-header mt-4">Peak Times (Requires Maximum Focus):</h3>
+                <ul class="list-disc ml-5 text-sm space-y-1">
+                    <li>Breakfast: 7:00 AM - 7:53 AM</li>
+                    <li>Lunch: 11:30 AM - 12:02 PM</li>
+                    <li>Dinner: 5:30 PM - 6:13 PM</li>
+                    <li>Friday/Saturday Nights: 9:14 PM - 9:36 PM (sometimes to close)</li>
+                    <li>Sunday Brunch: 10:00 AM - 12:13 PM</li>
+                </ul>
+
+                <h3 class="list-header mt-4">Seating Capacity: 68 People</h3>
+                <p class="text-sm italic">12 Booths (4/ea) + 5 Tables (4/ea)</p>
+
+                <h3 class="list-header mt-4">Minimum Staffing Requirements:</h3>
+                <p class="text-sm mb-2 italic font-normal">Roles are flexible: Anyone can act as a Server or on Dish Crew.</p>
+                
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+                    <div class="p-3 border rounded-md">
+                        <p class="font-semibold">Breakfast</p>
+                        <p>Cooks: 3</p>
+                        <p>Servers: 4</p>
+                        <p>Dish Crew: 2</p>
+                    </div>
+                    <div class="p-3 border rounded-md">
+                        <p class="font-semibold">Lunch</p>
+                        <p>Cooks: 2</p>
+                        <p>Servers: 3</p>
+                        <p>Dish Crew: 1</p>
+                    </div>
+                    <div class="p-3 border rounded-md">
+                        <p class="font-semibold">Dinner</p>
+                        <p>Cooks: 3</p>
+                        <p>Servers: 4</p>
+                        <p>Dish Crew: 2</p>
+                    </div>
+                    <div class="p-3 border rounded-md bg-yellow-50">
+                        <p class="font-semibold">Fri/Sat Late Night</p>
+                        <p>Cooks: 3</p>
+                        <p>Servers: 4</p>
+                        <p>Dish Crew: 1</p>
+                    </div>
+                    <div class="p-3 border rounded-md bg-red-50">
+                        <p class="font-semibold">Sunday Brunch</p>
+                        <p>Cooks: 4</p>
+                        <p>Servers: 5</p>
+                        <p>Dish Crew: 2</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Menus -->
+            <div class="card p-6">
+                <h2 class="text-3xl font-bold mb-4 text-gray-800">Menu Highlights</h2>
+
+                <h3 class="list-header">Breakfast Menu:</h3>
+                <ul class="list-disc ml-5 text-sm space-y-1">
+                    <li>The Dude: Two Pancakes, Two Eggs, [$2 Add Two Meats]</li>
+                    <li>Shut Up Donny: Oatmeal with blueberries and honey</li>
+                    <li>Walter Sobchak: Lox on a Bagel</li>
+                </ul>
+
+                <h3 class="list-header mt-4">Drinks:</h3>
+                <ul class="list-disc ml-5 text-sm space-y-1">
+                    <li>Coffee, Orange Juice, Sarsaparilla</li>
+                    <li>Jesus Quintana (Special): Smoothie with protein powder and fruit</li>
+                    <li>Maude (Special): Herbal tea with honey and lemon</li>
+                </ul>
+                
+                <h3 class="list-header mt-4">Lunch Menu:</h3>
+                <p class="text-sm italic">You create this menu in your report!</p>
+
+                <h3 class="list-header mt-4">Dinner Menu:</h3>
+                <p class="text-sm italic">You create this menu in your report!</p>
+
+            </div>
+        </div>
+
+        <!-- Employee Details Section (The Big Lebowski Characters) -->
+        <div class="card p-6 mb-8">
+            <h2 class="text-3xl font-bold mb-4 text-gray-800">Employee Roster & Availability</h2>
+            
+            <h3 class="list-header">Full-Time Employees (40 Hours Max):</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-2 text-sm">
+                <div class="p-3 border rounded-md bg-green-50">Jeffery: Server. Mon-Fri, 9 AM - 5 PM</div>
+                <div class="p-3 border rounded-md bg-green-50">Walter: Cook. Tue-Sat, 11 AM - 7 PM</div>
+                <div class="p-3 border rounded-md bg-green-50">Donny: Cook. Sun-Thu, 3 PM - 10 PM</div>
+                <div class="p-3 border rounded-md bg-green-50">Maude: Cook. Mon-Fri, 7 AM - 3 PM</div>
+                <div class="p-3 border rounded-md bg-green-50">Jesus: Dish Crew. Tue-Sat, 2 PM - 10 PM</div>
+            </div>
+
+            <h3 class="list-header mt-6">Part-Time Employees (25 Hours Max):</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-2 text-sm">
+                <div class="p-3 border rounded-md">Jackie (Cook): Mon-Wed, 5 PM - 9 PM (12 hrs)</div>
+                <div class="p-3 border rounded-md">Smokey (Cook): Tue-Thu, 10 AM - 2 PM (12 hrs)</div>
+                <div class="p-3 border rounded-md">Brandt (Cook): Fri-Sun, 11 AM - 3 PM (12 hrs)</div>
+                <div class="p-3 border rounded-md">Bunny (Server/Dish): Mon-Wed, 3 PM - 7 PM (12 hrs)</div>
+                <div class="p-3 border rounded-md">DaFino (Server/Dish): Tue, Wed, Sun, 11 AM - 3 PM (12 hrs)</div>
+                <div class="p-3 border rounded-md">Uli (Cook): Fri-Sun, 5 PM - 9 PM (12 hrs)</div>
+                <div class="p-3 border rounded-md">Marty (Server/Dish): Mon, Wed, Fri, 7 AM - 11 AM (12 hrs)</div>
+                <div class="p-3 border rounded-md">Knox (Server/Dish): Tue, Wed, Sun, 3 PM - 7 PM (12 hrs)</div>
+                <div class="p-3 border rounded-md">Larry (Server/Dish): Fri-Sun, 11 AM - 3 PM (12 hrs)</div>
+                <div class="p-3 border rounded-md">Limousine (Server/Dish): Mon, Wed, Fri, 7 AM - 11 AM (12 hrs)</div>
+                <div class="p-3 border rounded-md">Malibu (Server/Dish): Tue, Wed, Sun, 3 PM - 7 PM (12 hrs)</div>
+                <div class="p-3 border rounded-md">Blanche (Server/Dish): Fri-Sun, 11 AM - 3 PM (12 hrs)</div>
+                <div class="p-3 border rounded-md">Lumbergh (Server/Dish): Mon, Wed, Fri, 7 AM - 11 AM (12 hrs)</div>
+                <div class="p-3 border rounded-md">Sadachbia (Server/Dish): Tue, Wed, Sun, 3 PM - 7 PM (12 hrs)</div>
+                <div class="p-3 border rounded-md">Icarus (Cook): Tue, Wed, Sun, 3 PM - 7 PM (12 hrs)</div>
+            </div>
+            
+        </div>
+        
+        <!-- Rubric Section -->
+        <div class="card p-6">
+            <h2 class="text-3xl font-bold mb-4 text-gray-800">Grading Rubric (Total: 10 Points)</h2>
+
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr>
+                            <th class="w-1/6 text-center">Score</th>
+                            <th class="w-5/6">Characteristics</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Holistic Scheduling & Analysis (Max 9 Points) -->
+                        <tr>
+                            <td class="font-semibold text-2xl text-center bg-green-50">9</td>
+                            <td>The schedule is exceptionally creative, realistic, and fully meets all employee and operational requirements. The accompanying analysis is thorough, professional, and demonstrates mastery of flexible problem-solving and resource optimization. The final presentation is impeccable and immediately clear to a manager.</td>
+                        </tr>
+                        <tr>
+                            <td class="font-semibold text-2xl text-center bg-yellow-50">7</td>
+                            <td>The schedule is functional and generally realistic. The analysis attempts to justify key decisions, addressing staffing needs well but potentially lacking depth or originality in addressing the most complex periods. Presentation is clear and well-organized.</td>
+                        </tr>
+                        <tr>
+                            <td class="font-semibold text-2xl text-center bg-red-50">5</td>
+                            <td>The schedule contains significant feasibility flaws or misses multiple key minimum staffing requirements. The analysis is minimal, confusing, or fails to provide realistic solutions. The presentation is disorganized and difficult to interpret.</td>
+                        </tr>
+                        <!-- Timeliness (Max 1 Point) -->
+                        <tr>
+                            <td class="font-semibold text-2xl text-center border-t-2 border-gray-400 pt-4">Timeliness (1)</td>
+                            <td class="border-t-2 border-gray-400 pt-4">Submitted by the official deadline (1 point). Submitted late (0 points).</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mt-6 p-4 border-t border-gray-200">
+                <h3 class="list-header text-lg">Grading Scale:</h3>
+                <p>A: 9-10 points</p>
+                <p>B: 7-8 points</p>
+                <p>C: 5-6 points (Lowest possible grade)</p>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
