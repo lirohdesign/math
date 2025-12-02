@@ -19,6 +19,13 @@
             transform: translateY(-5px);
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
+        /* Style for the actual thumbnail images */
+        .thumbnail-image {
+            width: 100%; 
+            height: 12rem; /* h-48 in Tailwind */
+            object-fit: contain; /* Use 'contain' to ensure the whole image is visible without cropping */
+            background-color: #e2e8f0; /* Light background for contrast */
+        }
     </style>
 </head>
 <body class="p-4 sm:p-8">
@@ -40,10 +47,10 @@
 
             <!-- Diagram 1: Block Tackle -->
             <div class="card bg-white rounded-xl shadow-md overflow-hidden">
-                <img src="https://placehold.co/300x200/475569/f0f9ff?text=Diagram+1%0A(Block+Tackle)" alt="Preview of Diagram 1" class="w-full h-48 object-cover">
+                <img src="thumbnails/Diagram_block_tackle.png" alt="Thumbnail preview of Block Tackle diagram" class="thumbnail-image">
                 <div class="p-6">
                     <h2 class="text-xl font-semibold text-slate-800 mb-3">
-                        1. The Physics of a Block Tackle
+                        1. Block Tackle
                     </h2>
                     <a href="files/Diagram_block_tackle.pdf" download class="block w-full text-center py-3 px-4 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                         Download PDF
@@ -53,10 +60,10 @@
 
             <!-- Diagram 2: Bowling -->
             <div class="card bg-white rounded-xl shadow-md overflow-hidden">
-                <img src="https://placehold.co/300x200/475569/f0f9ff?text=Diagram+2%0A(Bowling+Kinematics)" alt="Preview of Diagram 2" class="w-full h-48 object-cover">
+                <img src="thumbnails/Diagram_Bowling.png" alt="Thumbnail preview of Bowling diagram" class="thumbnail-image">
                 <div class="p-6">
                     <h2 class="text-xl font-semibold text-slate-800 mb-3">
-                        2. Kinematics of a Bowling Ball
+                        2. Bowling
                     </h2>
                     <a href="files/Diagram_Bowling.pdf" download class="block w-full text-center py-3 px-4 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                         Download PDF
@@ -66,10 +73,10 @@
 
             <!-- Diagram 3: Gear Ratio -->
             <div class="card bg-white rounded-xl shadow-md overflow-hidden">
-                <img src="https://placehold.co/300x200/475569/f0f9ff?text=Diagram+3%0A(Gear+Ratio)" alt="Preview of Diagram 3" class="w-full h-48 object-cover">
+                <img src="thumbnails/Diagram_gear_ratio.png" alt="Thumbnail preview of Gear Ratio diagram" class="thumbnail-image">
                 <div class="p-6">
                     <h2 class="text-xl font-semibold text-slate-800 mb-3">
-                        3. Analyzing Gear Ratios and Torque
+                        3. Gear Ratio
                     </h2>
                     <a href="files/Diagram_gear_ratio.pdf" download class="block w-full text-center py-3 px-4 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                         Download PDF
@@ -79,10 +86,10 @@
 
             <!-- Diagram 4: Groceries -->
             <div class="card bg-white rounded-xl shadow-md overflow-hidden">
-                <img src="https://placehold.co/300x200/475569/f0f9ff?text=Diagram+4%0A(Grocery+Opt.)" alt="Preview of Diagram 4" class="w-full h-48 object-cover">
+                <img src="thumbnails/Diagram_groceries.png" alt="Thumbnail preview of Groceries diagram" class="thumbnail-image">
                 <div class="p-6">
                     <h2 class="text-xl font-semibold text-slate-800 mb-3">
-                        4. Grocery Store Optimization Problem
+                        4. Groceries
                     </h2>
                     <a href="files/Diagram_groceries.pdf" download class="block w-full text-center py-3 px-4 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                         Download PDF
@@ -92,10 +99,10 @@
 
             <!-- Diagram 5: Hedge Rows -->
             <div class="card bg-white rounded-xl shadow-md overflow-hidden">
-                <img src="https://placehold.co/300x200/475569/f0f9ff?text=Diagram+5%0A(Hedge+Rows)" alt="Preview of Diagram 5" class="w-full h-48 object-cover">
+                <img src="thumbnails/Diagram_HedgeRows.png" alt="Thumbnail preview of Hedge Rows diagram" class="thumbnail-image">
                 <div class="p-6">
                     <h2 class="text-xl font-semibold text-slate-800 mb-3">
-                        5. The Geometry of Hedge Rows
+                        5. Hedge Rows
                     </h2>
                     <a href="files/Diagram_HedgeRows.pdf" download class="block w-full text-center py-3 px-4 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                         Download PDF
@@ -105,10 +112,10 @@
 
             <!-- Diagram 6: Linear Sequencing -->
             <div class="card bg-white rounded-xl shadow-md overflow-hidden">
-                <img src="https://placehold.co/300x200/475569/f0f9ff?text=Diagram+6%0A(Sequencing+Logic)" alt="Preview of Diagram 6" class="w-full h-48 object-cover">
+                <img src="thumbnails/Diagram_linear_sequencing.png" alt="Thumbnail preview of Linear Sequencing diagram" class="thumbnail-image">
                 <div class="p-6">
                     <h2 class="text-xl font-semibold text-slate-800 mb-3">
-                        6. Visualizing Linear Sequencing Logic
+                        6. Linear Sequencing
                     </h2>
                     <a href="files/Diagram_linear_sequencing.pdf" download class="block w-full text-center py-3 px-4 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                         Download PDF
@@ -118,10 +125,10 @@
 
             <!-- Diagram 7: Loci -->
             <div class="card bg-white rounded-xl shadow-md overflow-hidden">
-                <img src="https://placehold.co/300x200/475569/f0f9ff?text=Diagram+7%0A(Geometric+Loci)" alt="Preview of Diagram 7" class="w-full h-48 object-cover">
+                <img src="thumbnails/Diagram_loci.png" alt="Thumbnail preview of Loci diagram" class="thumbnail-image">
                 <div class="p-6">
                     <h2 class="text-xl font-semibold text-slate-800 mb-3">
-                        7. Exploring Geometric Loci
+                        7. Loci
                     </h2>
                     <a href="files/Diagram_loci.pdf" download class="block w-full text-center py-3 px-4 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                         Download PDF
@@ -131,10 +138,10 @@
 
             <!-- Diagram 8: Magicians -->
             <div class="card bg-white rounded-xl shadow-md overflow-hidden">
-                <img src="https://placehold.co/300x200/475569/f0f9ff?text=Diagram+8%0A(Probability+Trick)" alt="Preview of Diagram 8" class="w-full h-48 object-cover">
+                <img src="thumbnails/Diagram_Magicians.png" alt="Thumbnail preview of Magicians diagram" class="thumbnail-image">
                 <div class="p-6">
                     <h2 class="text-xl font-semibold text-slate-800 mb-3">
-                        8. The Magician's Probability Trick
+                        8. Magicians
                     </h2>
                     <a href="files/Diagram_Magicians.pdf" download class="block w-full text-center py-3 px-4 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                         Download PDF
@@ -144,10 +151,10 @@
 
             <!-- Diagram 9: Saverne Tunnel -->
             <div class="card bg-white rounded-xl shadow-md overflow-hidden">
-                <img src="https://placehold.co/300x200/475569/f0f9ff?text=Diagram+9%0A(Tunnel+Arch)" alt="Preview of Diagram 9" class="w-full h-48 object-cover">
+                <img src="thumbnails/Diagram_SaverneTunnel.png" alt="Thumbnail preview of Saverne Tunnel diagram" class="thumbnail-image">
                 <div class="p-6">
                     <h2 class="text-xl font-semibold text-slate-800 mb-3">
-                        9. Engineering the Saverne Tunnel Arch
+                        9. Saverne Tunnel
                     </h2>
                     <a href="files/Diagram_SaverneTunnel.pdf" download class="block w-full text-center py-3 px-4 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                         Download PDF
@@ -157,10 +164,10 @@
 
             <!-- Diagram 10: Toilet -->
             <div class="card bg-white rounded-xl shadow-md overflow-hidden">
-                <img src="https://placehold.co/300x200/475569/f0f9ff?text=Diagram+10%0A(Fluid+Dynamics)" alt="Preview of Diagram 10" class="w-full h-48 object-cover">
+                <img src="thumbnails/Diagram_Toilet.png" alt="Thumbnail preview of Toilet diagram" class="thumbnail-image">
                 <div class="p-6">
                     <h2 class="text-xl font-semibold text-slate-800 mb-3">
-                        10. Modeling Toilet Water Flow Dynamics
+                        10. Toilet
                     </h2>
                     <a href="files/Diagram_Toilet.pdf" download class="block w-full text-center py-3 px-4 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                         Download PDF
